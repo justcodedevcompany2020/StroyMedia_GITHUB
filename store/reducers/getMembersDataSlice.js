@@ -39,6 +39,7 @@ const getMembersSlice = createSlice({
     loading: false,
     error: false,
     data: [],
+    favoriteList: [],
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -48,6 +49,7 @@ const getMembersSlice = createSlice({
       })
       .addCase(getMembersReques.fulfilled, (state, action) => {
         state.data = action.payload.data?.data?.company;
+        state.favoriteList = action.payload.data?.data?.isLike;
         state.error = false;
       })
       .addCase(getMembersReques.rejected, (state) => {

@@ -3,22 +3,21 @@ import { StyleSheet, View, Image, Text, TouchableOpacity } from "react-native";
 import { ImageFavorite, ImageFavoriteGreen } from "../helpers/images";
 import { COLOR_1 } from "../helpers/Variables";
 import { addFavoriteRequest } from "../../store/reducers/addFavoriteDataSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { membersSingleRequest } from "../../store/reducers/membersSingleSlice";
 import { checkLiklyRequest } from "../../store/reducers/checkLikliSlice";
 
-function ParticipantItem(props) {
-  const {
-    imageUri,
-    companyName,
-    city,
-    doingProfile,
-    navigation,
-    id,
-    favorites,
-    likedList,
-  } = props;
+function ParticipantItem({
+  imageUri,
+  companyName,
+  city,
+  doingProfile,
+  navigation,
+  id,
+  favorites,
+  likedList,
+}) {
   const [favorite, setFavorite] = useState(false);
   const [token, setToken] = useState();
   const dispatch = useDispatch();
@@ -37,42 +36,46 @@ function ParticipantItem(props) {
     } else {
       setFavorite(false);
     }
-  });
+  }, []);
 
   return (
     <>
-      {favorites === "Избранное" && favorite && (
-        <TouchableOpacity
-          style={styles.wrapper}
-          activeOpacity={0.5}
-          onPress={() => {
-            dispatch(membersSingleRequest({ token: token, id: id }));
-            navigation.navigate("SingleParticipant", {
-              currentPage: "Страница участника",
-              id,
-            });
-          }}
-        >
-          <View style={styles.leftPart}>
-            <Image source={{ uri: imageUri }} style={styles.image} />
-            <View style={styles.info}>
-              <Text style={styles.name}>{companyName}</Text>
-              <Text style={styles.city}>{city}</Text>
-              <Text style={styles.prof}>{doingProfile}</Text>
-            </View>
-          </View>
+      {favorites === "Избранное" ? (
+        favorite && (
           <TouchableOpacity
+            style={styles.wrapper}
+            activeOpacity={0.5}
             onPress={() => {
-              setFavorite(!favorite);
-              dispatch(addFavoriteRequest({ token: token, id: id }));
+              dispatch(membersSingleRequest({ token: token, id: id }));
+              navigation.navigate("SingleParticipant", {
+                currentPage: "Страница участника",
+                id,
+              });
             }}
-            styles={styles.favImgBlock}
           >
-            {favorite ? <ImageFavoriteGreen /> : <ImageFavorite />}
+            <View style={styles.leftPart}>
+              <Image source={{ uri: imageUri }} style={styles.image} />
+              <View style={styles.info}>
+                <Text style={styles.name}>{companyName}</Text>
+                <Text style={styles.city}>{city}</Text>
+                <Text style={styles.prof}>{doingProfile}</Text>
+              </View>
+            </View>
+            <TouchableOpacity
+              onPress={() => {
+                setFavorite(!favorite);
+                dispatch(addFavoriteRequest({ token: token, id: id }));
+              }}
+              styles={styles.favImgBlock}
+            >
+              {favorite ? <ImageFavoriteGreen /> : <ImageFavorite />}
+            </TouchableOpacity>
           </TouchableOpacity>
-        </TouchableOpacity>
+        )
+      ) : (
+        <Text>нет данных</Text>
       )}
-      {console.log(favorite)}
+
       {favorites === "Все" && (
         <TouchableOpacity
           style={styles.wrapper}

@@ -25,7 +25,7 @@ import { Entypo } from "@expo/vector-icons";
 import { getMembersReques } from "../../store/reducers/getMembersDataSlice";
 const SearchIcon = require("../../assets/search.png");
 
-function Participants(props) {
+function Participants({ route, navigation }) {
   const tabs = ["Все", "Избранное"];
   const [activeTab, setActiveTab] = useState("Все");
   const [searchValue, setSearchValue] = useState("");
@@ -36,9 +36,9 @@ function Participants(props) {
   const [token, setToken] = useState();
   const [role, setRole] = useState("");
   const [cityName, setCityName] = useState("");
-  const [likedList, setLikedList] = useState([]);
-  const members = useSelector((state) => state.getMembersSlice.data);
-  const { route, navigation } = props;
+  const [likedList, setfavoriteList] = useState([]);
+  const members = useSelector((state) => state.getMembersSlice);
+  const { data, favoriteList } = members;
   const { currentPage } = route.params;
   const dispatch = useDispatch();
 
@@ -57,12 +57,12 @@ function Participants(props) {
   }, [citys]);
 
   useEffect(() => {
-    dispatch(getMembersReques({ token, offset }))
-      .unwrap()
-      .then((res) => {
-        setLikedList(res.data?.data?.isLike);
-      });
-    console.log(likedList,'likedlist');
+    setfavoriteList(favoriteList);
+    // dispatch(getMembersReques({ token, offset }))
+    //   .unwrap()
+    //   .then((res) => {
+    //   });
+    console.log(favoriteList, "favoriteList");
   }, [token, page]);
 
   const resetText = () => {
@@ -190,7 +190,7 @@ function Participants(props) {
         {/* )} */}
       </View>
       <FlatList
-        data={members}
+        data={data}
         ListEmptyComponent={() => {
           return <Text style={styles.empty}>ничего не найдено</Text>;
         }}
@@ -204,7 +204,7 @@ function Participants(props) {
               }}
             >
               <ParticipantItem
-                likedList={likedList}
+                likedList={favoriteList}
                 favorites={activeTab}
                 imageUri={`https://teus.online/${item?.avatar}`}
                 companyName={item?.name || item?.contact_person}
@@ -224,7 +224,7 @@ function Participants(props) {
           justifyContent: "center",
         }}
       >
-        {activeTab !== "Избранное" && members?.length === 5 ? (
+        {activeTab !== "Избранное" && data?.length === 5 ? (
           <>
             <View>
               <TouchableOpacity
@@ -241,7 +241,7 @@ function Participants(props) {
             </View>
             <View>
               <TouchableOpacity
-                disabled={members.length === 5 ? false : true}
+                disabled={data.length === 5 ? false : true}
                 onPress={nextPage}
               >
                 <Entypo name="chevron-right" size={28} color={"gray"} />

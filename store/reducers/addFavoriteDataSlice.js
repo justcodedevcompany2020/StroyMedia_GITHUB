@@ -24,7 +24,7 @@ const addFavoriterSlice = createSlice({
   initialState: {
     loading: false,
     error: false,
-    data: {},
+    data: [],
   },
 
   reducers: {},
@@ -34,7 +34,6 @@ const addFavoriterSlice = createSlice({
         state.loading = true;
       })
       .addCase(addFavoriteRequest.fulfilled, (state, action) => {
-        console.log(action.payload);
         state.data = action.payload;
         state.error = false;
       })

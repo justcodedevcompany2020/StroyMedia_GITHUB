@@ -9,6 +9,7 @@ export const checkLiklyRequest = createAsyncThunk(
         secret_token: token,
         last_id: id,
       });
+      console.log(result);
       return result;
     } catch (error) {
       return;
@@ -26,13 +27,17 @@ const checkLiklySlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(checkLiklyRequest.pending, (state) => {
+        console.log('mtavvvv');
         state.loading = true;
       })
       .addCase(checkLiklyRequest.fulfilled, (state, action) => {
+        console.log(action.payload, 'dasdasdasdasdasdasdad');
         state.data = action.payload;
         state.error = false;
       })
       .addCase(checkLiklyRequest.rejected, (state) => {
+
+        console.log('sxalllll');
         state.error = true;
         state.loading = false;
       });

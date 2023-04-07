@@ -18,9 +18,9 @@ import { ActivityIndicator } from "react-native-paper";
 import { useSelector } from "react-redux";
 const BORDER_RADIUS = 10;
 
-const HomeMainButtons = (props) => {
+const HomeMainButtons = ({ navigation }) => {
   const [token, setToken] = useState();
-  const { navigation } = props;
+
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => state.getAllSuggestionsSlice);
   useEffect(() => {
@@ -30,6 +30,7 @@ const HomeMainButtons = (props) => {
       }
     });
   }, []);
+  
   return (
     <View style={styles.wrapper}>
       <TouchableOpacity
