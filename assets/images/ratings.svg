@@ -1,0 +1,9 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 67 10" width="67" height="10">
+	<title>ratings-svg</title>
+	<defs>
+		<image  width="67" height="10" id="img1" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEMAAAAKAQMAAADVU3GUAAAAAXNSR0IB2cksfwAAAANQTFRF////p8QbyAAAAAxJREFUeJxjYKA9AAAAZAABhmQ8NQAAAABJRU5ErkJggg=="/>
+	</defs>
+	<style>
+	</style>
+	<use id="Слой 1" href="#img1" x="0" y="0"/>
+</svg>
