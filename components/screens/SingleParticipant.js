@@ -21,6 +21,7 @@ import { getProjectReviewsRequest } from "../../store/reducers/getAllProjectRevi
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment";
 import { chatOrderRequest } from "../../store/reducers/chatDialogOrderSlice";
+import { projectReviewRequest } from "../../store/reducers/projectReview";
 
 function SingleParticipant(props) {
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -60,12 +61,35 @@ function SingleParticipant(props) {
   };
 
   const reviewSubmit = () => {
-    showMessage({
-      message: "Ваш отзыв успешно сохранён",
-      type: "success",
-    });
-    setShowReviewModal(false);
-    setReviewText("");
+    console.log(rate);
+    reviewText && rate > 0
+      ? dispatch(
+          projectReviewRequest({
+            token,
+            id: route?.params?.id,
+            rate: rate === 3 ? "netral" : rate > 3 ? "plus" : "minus",
+            review: reviewText,
+          })
+        )
+          .unwrap()
+          .then((res) => {
+            showMessage({
+              message: "Ваш отзыв успешно сохранён",
+              type: "success",
+            });
+            setShowReviewModal(false);
+            setReviewText("");
+            setRate(0);
+          })
+      : rate < 1
+      ? showMessage({
+          message: "Поставьте оценку",
+          type: "danger",
+        })
+      : showMessage({
+          message: "Заполните данные",
+          type: "danger",
+        });
   };
 
   const moreReviews = (toOrFrom) => {
@@ -163,7 +187,7 @@ function SingleParticipant(props) {
                         navigation.navigate("Chat", {
                           title: item?.contact_person,
                           id: item?.company?.last_id,
-                          currentPage: 'Диалоги',
+                          currentPage: "Диалоги",
                         });
                       });
                   },
@@ -217,12 +241,12 @@ function SingleParticipant(props) {
         </View>
       </View>
       <LeaveReviewModal
-        value={reviewText}
+        // value={reviewText}
         onChangeText={(val) => setReviewText(val)}
         isVisible={showReviewModal}
         onCancel={() => setShowReviewModal(false)}
         onSubmit={reviewSubmit}
-        id={route?.params?.id}
+        // id={route?.params?.id}
         setRate={setRate}
         rate={rate}
       />

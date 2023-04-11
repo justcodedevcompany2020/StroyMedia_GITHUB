@@ -184,7 +184,7 @@ function SendOffer(props) {
         />
         <View style={styles.containerStyle}>
           <SelectDropdown
-            onSelect={() => {}}
+            onSelect={(e) => setCurrency(e)}
             defaultButtonText="Валюта"
             dropdownIconPosition="right"
             renderDropdownIcon={() => {
@@ -229,6 +229,7 @@ function SendOffer(props) {
             )
               .unwrap()
               .then((res) => {
+                console.log(res);
                 if (!res) {
                   navigation.goBack();
                 } else {

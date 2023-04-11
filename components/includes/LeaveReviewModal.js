@@ -10,9 +10,16 @@ import { projectReviewRequest } from "../../store/reducers/projectReview";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AntDesign } from "@expo/vector-icons";
 
-function LeaveReviewModal(props) {
-  const { onSubmit, onCancel, isVisible, value, onChangeText } = props;
-  const { id, setRate, rate } = props;
+function LeaveReviewModal({
+  onSubmit,
+  onCancel,
+  isVisible,
+  value,
+  onChangeText,
+  id,
+  setRate,
+  rate,
+}) {
   const [token, setToken] = useState();
   const dispatch = useDispatch();
   useEffect(() => {
@@ -81,14 +88,16 @@ function LeaveReviewModal(props) {
         />
         <MyButton
           onPress={() => {
-            dispatch(
-              projectReviewRequest({
-                token,
-                id,
-                rate: rate === 3 ? "netral" : rate > 3 ? "plus" : "minus",
-                review: value,
-              })
-            );
+            // dispatch(
+            //   projectReviewRequest({
+            //     token,
+            //     id,
+            //     rate: rate === 3 ? "netral" : rate > 3 ? "plus" : "minus",
+            //     review: value,
+            //   })
+            // );
+            // .then((res) => console.log(res))
+            // .catch((error) => console.log(error));
             return onSubmit();
           }}
           style={styles.button}

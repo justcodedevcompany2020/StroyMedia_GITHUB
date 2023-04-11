@@ -4,8 +4,9 @@ import { api } from "../../Api";
 export const workRequest = createAsyncThunk("work/request", async (data) => {
   try {
     const result = await api.post("/work-request-send", data);
-    return result;
+    return result.data;
   } catch (error) {
+    console.log(data);
     return error;
   }
 });
@@ -16,6 +17,7 @@ const workRequestSlice = createSlice({
     error: false,
     data: [],
   },
+
   reducers: {},
   extraReducers: (builder) => {
     builder
@@ -23,6 +25,7 @@ const workRequestSlice = createSlice({
       .addCase(workRequest.pending, (state) => {
         state.loading = true;
       })
+
       .addCase(workRequest.fulfilled, (state, action) => {
         state.data = action.payload;
         state.error = false;

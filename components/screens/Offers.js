@@ -346,6 +346,7 @@ function Offers({ route, navigation }) {
               filterFromCitys(option.last_id);
             }}
           />
+
           <FilterItem
             offers
             isCitys={false}
@@ -357,6 +358,7 @@ function Offers({ route, navigation }) {
             }}
             top={274}
           />
+
           <FilterItem
             isCitys
             offers
@@ -369,6 +371,7 @@ function Offers({ route, navigation }) {
             top={274}
           />
         </View>
+
         {containerType || cityFromName || cityToName || searchName ? (
           <TouchableOpacity onPress={resetFiltered} style={styles.resetButton}>
             <Text style={styles.resetText}>Сброс x</Text>
@@ -477,6 +480,7 @@ function Offers({ route, navigation }) {
                   alignItems: "center",
                   justifyContent: "center",
                   flexDirection: "row",
+                  marginBottom: 20,
                 }}
               >
                 <View>
