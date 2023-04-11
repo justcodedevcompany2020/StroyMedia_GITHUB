@@ -3,7 +3,7 @@ import { api } from "../../Api";
 
 export const getMembersReques = createAsyncThunk(
   "getMember",
-  async ({ token, offset, city, role, companyName }) => {
+  async ({ token, offset = null, city, role, companyName }) => {
     let roleName;
     role === "Другое"
       ? (roleName = "isother")

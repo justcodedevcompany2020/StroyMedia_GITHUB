@@ -36,7 +36,7 @@ import { Entypo } from "@expo/vector-icons";
 
 const SearchIcon = require("../../assets/search.png");
 
-function Offers(props) {
+function Offers({ route, navigation }) {
   const [tabs, setTabs] = useState(["Все предложения", "Избранное"]);
   const [activeTab, setActiveTab] = useState("Все предложения");
   const { data, loading } = useSelector(
@@ -56,7 +56,7 @@ function Offers(props) {
   const [load, setLoad] = useState(false);
   const [id, setId] = useState();
   const [token, setToken] = useState();
-  const { route, navigation } = props;
+
   const { currentPage } = route.params;
   const [containerType, setTypeContainer] = useState("");
   const [searchName, setSearchName] = useState("");
@@ -69,8 +69,12 @@ function Offers(props) {
   let allCitys = useSelector(
     (state) => state.getCitysSlice?.data?.data?.data?.citys
   );
-  const dispatch = useDispatch();
+  const favoriteList = useSelector(
+    (state) => state.getAllSuggestionsSlice.favoriteList
+  );
 
+  const dispatch = useDispatch();
+  let liked = false;
   useEffect(() => {
     setId(
       activeSecondaryTab === "Поиск КТК"
@@ -133,9 +137,16 @@ function Offers(props) {
   };
 
   const renderItem = ({ item, index }) => {
+    console.log(favoriteList);
+    if (favoriteList[index] == "is_Favorite") {
+      liked = true;
+    } else if (favoriteList[index] == "not_Favorite") {
+      liked = false;
+    }
+
     return (
       <OfferItem
-        likedList={likedList}
+        likedList={liked}
         navigation={navigation}
         date={item?.date_create?.$date?.$numberLong}
         id={item.last_id}
@@ -331,7 +342,7 @@ function Offers(props) {
             options={citys}
             top={274}
             onSelect={(option) => {
-              setFromCityName(option);
+              setFromCityName(option.title);
               filterFromCitys(option.last_id);
             }}
           />
@@ -341,8 +352,8 @@ function Offers(props) {
             title={containerType ? containerType : "Тип контейнера"}
             options={typeContainer}
             onSelect={(option) => {
-              setTypeContainer(option);
-              filterTypeContainer(option);
+              setTypeContainer(option.title);
+              filterTypeContainer(option.title);
             }}
             top={274}
           />
@@ -350,7 +361,7 @@ function Offers(props) {
             isCitys
             offers
             onSelect={(option) => {
-              setToCityName(option);
+              setToCityName(option.title);
               filterToCitys(option.last_id);
             }}
             title={cityToName ? cityToName : "Куда"}
@@ -387,9 +398,8 @@ function Offers(props) {
             ? 3
             : null,
       })
-    )
-      .unwrap()
-      .then((res) => setLikedList(res?.data.data.isLike));
+    ).unwrap();
+    // .then((res) => setLikedList(res?.data.data.isLike));
   };
 
   const previusPage = () => {
@@ -412,9 +422,8 @@ function Offers(props) {
             ? 3
             : null,
       })
-    )
-      .unwrap()
-      .then((res) => setLikedList(res?.data.data.isLike));
+    ).unwrap();
+    // .then((res) => setLikedList(res?.data.data.isLike));
   };
 
   useEffect(() => {
@@ -422,7 +431,7 @@ function Offers(props) {
       .unwrap()
       .then((res) => {
         // console.log(res?.data.data.isLike,'res?.data.data.isLike');
-        setLikedList(res?.data.data.isLike);
+        // setLikedList(res?.data.data.isLike);
       });
   }, [token]);
 

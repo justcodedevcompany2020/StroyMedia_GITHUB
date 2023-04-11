@@ -18,10 +18,9 @@ function ParticipantItem({
   favorites,
   likedList,
 }) {
-  const [favorite, setFavorite] = useState(false);
   const [token, setToken] = useState();
+  const [liked, setLiked] = useState(likedList);
   const dispatch = useDispatch();
-
   useEffect(() => {
     AsyncStorage.getItem("token").then((result) => {
       if (result) {
@@ -30,51 +29,39 @@ function ParticipantItem({
     });
   }, []);
 
-  useEffect(() => {
-    if (likedList === "is_Favorite") {
-      setFavorite(true);
-    } else {
-      setFavorite(false);
-    }
-  }, []);
-
   return (
     <>
-      {favorites === "Избранное" ? (
-        favorite && (
-          <TouchableOpacity
-            style={styles.wrapper}
-            activeOpacity={0.5}
-            onPress={() => {
-              dispatch(membersSingleRequest({ token: token, id: id }));
-              navigation.navigate("SingleParticipant", {
-                currentPage: "Страница участника",
-                id,
-              });
-            }}
-          >
-            <View style={styles.leftPart}>
-              <Image source={{ uri: imageUri }} style={styles.image} />
-              <View style={styles.info}>
-                <Text style={styles.name}>{companyName}</Text>
-                <Text style={styles.city}>{city}</Text>
-                <Text style={styles.prof}>{doingProfile}</Text>
-              </View>
+      {favorites === "Избранное" && liked ? (
+        <TouchableOpacity
+          style={styles.wrapper}
+          activeOpacity={0.5}
+          onPress={() => {
+            dispatch(membersSingleRequest({ token: token, id: id }));
+            navigation.navigate("SingleParticipant", {
+              currentPage: "Страница участника",
+              id,
+            });
+          }}
+        >
+          <View style={styles.leftPart}>
+            <Image source={{ uri: imageUri }} style={styles.image} />
+            <View style={styles.info}>
+              <Text style={styles.name}>{companyName}</Text>
+              <Text style={styles.city}>{city}</Text>
+              <Text style={styles.prof}>{doingProfile}</Text>
             </View>
-            <TouchableOpacity
-              onPress={() => {
-                setFavorite(!favorite);
-                dispatch(addFavoriteRequest({ token: token, id: id }));
-              }}
-              styles={styles.favImgBlock}
-            >
-              {favorite ? <ImageFavoriteGreen /> : <ImageFavorite />}
-            </TouchableOpacity>
+          </View>
+          <TouchableOpacity
+            onPress={() => {
+              dispatch(addFavoriteRequest({ token: token, id: id }));
+              setLiked(!liked);
+            }}
+            styles={styles.favImgBlock}
+          >
+            {liked ? <ImageFavoriteGreen /> : <ImageFavorite />}
           </TouchableOpacity>
-        )
-      ) : (
-        <Text>нет данных</Text>
-      )}
+        </TouchableOpacity>
+      ) : null}
 
       {favorites === "Все" && (
         <TouchableOpacity
@@ -98,12 +85,12 @@ function ParticipantItem({
           </View>
           <TouchableOpacity
             onPress={() => {
-              setFavorite(!favorite);
               dispatch(addFavoriteRequest({ token: token, id: id }));
+              setLiked(!liked);
             }}
             styles={styles.favImgBlock}
           >
-            {favorite ? <ImageFavoriteGreen /> : <ImageFavorite />}
+            {liked ? <ImageFavoriteGreen /> : <ImageFavorite />}
           </TouchableOpacity>
         </TouchableOpacity>
       )}

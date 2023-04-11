@@ -35,6 +35,7 @@ export const allSuggestionRequest = createAsyncThunk(
         to_city,
         from_city,
       });
+
       return result;
     } catch (err) {
       if (axios.isAxiosError(err)) {
@@ -55,6 +56,7 @@ const allSuggestionsSlice = createSlice({
     loading: false,
     error: false,
     data: [],
+    favoriteList: [],
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -63,9 +65,10 @@ const allSuggestionsSlice = createSlice({
       .addCase(allSuggestionRequest.pending, (state) => {
         state.loading = true;
       })
-      
+
       .addCase(allSuggestionRequest.fulfilled, (state, action) => {
         state.data = action.payload.data?.data.rows;
+        state.favoriteList = action.payload?.data?.data?.isLike;
         state.error = false;
         state.loading = false;
       })

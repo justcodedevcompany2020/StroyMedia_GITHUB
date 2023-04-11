@@ -21,6 +21,7 @@ function Polls({ route, navigation }) {
         dispatch(getAllPollsRequest({ token: result }));
       }
     });
+    console.log(data);
   }, []);
 
   return (
@@ -38,7 +39,7 @@ function Polls({ route, navigation }) {
           const vote1 = d?.vote1?.length || 0;
           const vote2 = d?.vote2?.length || 0;
           const vote3 = d?.vote3?.length || 0;
-          const vote4 = d?.vote4?.lengthZ || 0;
+          const vote4 = d?.vote4?.length || 0;
           const totalVote = vote1 + vote2 + vote3 + vote4;
           const options = [
             {

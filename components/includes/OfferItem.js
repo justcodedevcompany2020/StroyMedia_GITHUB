@@ -26,12 +26,20 @@ import { getLiklyCatRequest } from "../../store/reducers/liklyCatSlice";
 import { checkLiklyOfferRequest } from "../../store/reducers/checkOfferLiklySlice";
 import moment from "moment";
 
-export function OfferItem(props) {
-  const { item, id, timeStamnp, date, navigation, tab, typeId, likedList } =
-    props;
+export function OfferItem({
+  item,
+  id,
+  timeStamnp,
+  date,
+  navigation,
+  tab,
+  typeId,
+  likedList,
+}) {
   const [token, setToken] = useState("");
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(likedList);
   const dispatch = useDispatch();
+
   useEffect(() => {
     AsyncStorage.getItem("token").then((result) => {
       if (result) {
@@ -39,14 +47,6 @@ export function OfferItem(props) {
       }
     });
   }, [token]);
-
-  useEffect(() => {
-    if (likedList === "is_Favorite") {
-      setLiked(true);
-    } else {
-      setLiked(false);
-    }
-  }, [likedList]);
 
   return (
     <>

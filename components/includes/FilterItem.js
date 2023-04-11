@@ -8,9 +8,9 @@ import { AntDesign } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
 import DelayInput from "react-native-debounce-input";
 
-function FilterItem(props) {
+function FilterItem({ title, onSelect, options, top, offers, isCitys }) {
   const [expanded, setExpanded] = useState("");
-  const { title, onSelect, options, top } = props;
+
   const [searchValue, setSearchValue] = useState("");
   const [citys, setCitys] = useState([]);
   let allCitys = useSelector(
@@ -18,11 +18,11 @@ function FilterItem(props) {
   );
   const renderItem = ({ item }) => {
     if (item?.title?.ru) {
-      item = item.title.ru;
+      item = { title: item.title.ru, last_id: item.last_id };
     } else if (item?.title) {
-      item = item?.title;
+      item = { title: item.title, last_id: item.last_id };
     } else if (item) {
-      item = item;
+      item = { title: item };
     }
 
     return (
@@ -35,7 +35,7 @@ function FilterItem(props) {
         }}
         style={styles.optionBlock}
       >
-        <Text style={styles.option}>{item}</Text>
+        <Text style={styles.option}>{item.title}</Text>
       </TouchableOpacity>
     );
   };
@@ -79,8 +79,8 @@ function FilterItem(props) {
         animationOutTiming={100}
         deviceHeight={350}
       >
-        <View style={[styles.showPart, props?.offers && { top: 20 }]}>
-          {props?.isCitys && (
+        <View style={[styles.showPart, offers && { top: 20 }]}>
+          {isCitys && (
             <View style={styles.searchRow}>
               <DelayInput
                 placeholder="Search"

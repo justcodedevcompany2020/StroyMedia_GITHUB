@@ -45,3 +45,4 @@ const addFavoriterSlice = createSlice({
 });
 
 export default addFavoriterSlice.reducer;
+export const { changeFavorites } = addFavoriterSlice.actions;

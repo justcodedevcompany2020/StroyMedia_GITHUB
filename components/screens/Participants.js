@@ -36,11 +36,13 @@ function Participants({ route, navigation }) {
   const [token, setToken] = useState();
   const [role, setRole] = useState("");
   const [cityName, setCityName] = useState("");
-  const [likedList, setfavoriteList] = useState([]);
-  const members = useSelector((state) => state.getMembersSlice);
-  const { data, favoriteList } = members;
+  // const [liked, setLiked] = useState(false);
+  const state = useSelector((state) => state);
+  const { data, favoriteList } = state.getMembersSlice;
+
   const { currentPage } = route.params;
   const dispatch = useDispatch();
+  let liked = false;
 
   useEffect(() => {
     AsyncStorage.getItem("token").then((result) => {
@@ -56,14 +58,15 @@ function Participants({ route, navigation }) {
       });
   }, [citys]);
 
-  useEffect(() => {
-    setfavoriteList(favoriteList);
-    // dispatch(getMembersReques({ token, offset }))
-    //   .unwrap()
-    //   .then((res) => {
-    //   });
-    console.log(favoriteList, "favoriteList");
-  }, [token, page]);
+  // useEffect(() => {
+  //   dispatch(getMembersReques({ token }))
+  //     .unwrap()
+  //     .then((res) => {
+  //       console.log(res?.data?.data?.isLike, "favoriteList");
+  //       favoriteList = res?.data?.data?.isLike;
+  //     });
+  //   // setLikedList(favoriteList);
+  // }, [success]);
 
   const resetText = () => {
     setSearchValue("");
@@ -143,6 +146,7 @@ function Participants({ route, navigation }) {
             activeOpacity={0.2}
             onPress={() => {
               filtered(cityId, role, searchValue);
+              setSearchValue("");
             }}
           >
             <Image source={SearchIcon} style={{ width: 25, height: 25 }} />
@@ -163,8 +167,9 @@ function Participants({ route, navigation }) {
                   "Другое",
                 ]}
                 onSelect={(option) => {
-                  setRole(option);
-                  filtered(cityId, option, searchValue);
+                  setRole(option.title);
+                  filtered(cityId, option.title, searchValue);
+                  setSearchValue("");
                 }}
                 top={204}
               />
@@ -173,9 +178,11 @@ function Participants({ route, navigation }) {
                 title={cityName ? cityName : "Город"}
                 options={citys}
                 onSelect={(option) => {
+                  console.log(option, "option");
                   setCityId(option?.last_id);
-                  filtered(option, role, searchValue);
-                  setCityName(option);
+                  filtered(option.last_id, role, searchValue);
+                  setCityName(option.title);
+                  setSearchValue("");
                 }}
                 top={10}
               />
@@ -187,7 +194,6 @@ function Participants({ route, navigation }) {
             <Text style={styles.resetText}>Сброс x</Text>
           </TouchableOpacity>
         ) : null}
-        {/* )} */}
       </View>
       <FlatList
         data={data}
@@ -195,6 +201,11 @@ function Participants({ route, navigation }) {
           return <Text style={styles.empty}>ничего не найдено</Text>;
         }}
         renderItem={({ item, index }) => {
+          if (favoriteList[index] == "is_Favorite") {
+            liked = true;
+          } else if (favoriteList[index] == "not_Favorite") {
+            liked = false;
+          }
           return (
             <View
               style={{
@@ -204,7 +215,7 @@ function Participants({ route, navigation }) {
               }}
             >
               <ParticipantItem
-                likedList={favoriteList}
+                likedList={liked}
                 favorites={activeTab}
                 imageUri={`https://teus.online/${item?.avatar}`}
                 companyName={item?.name || item?.contact_person}
@@ -222,6 +233,7 @@ function Participants({ route, navigation }) {
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "center",
+          marginBottom: 20,
         }}
       >
         {activeTab !== "Избранное" && data?.length === 5 ? (
