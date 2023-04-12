@@ -9,6 +9,7 @@ import {
 import { COLOR_1, COLOR_6, COLOR_9 } from "../helpers/Variables";
 import { ImageSeePassword, ImageUnSeePassword } from "../helpers/images";
 import { AntDesign } from "@expo/vector-icons";
+import MaskInput from "react-native-mask-input";
 
 function MyInput({
   label,
@@ -27,7 +28,8 @@ function MyInput({
   isGray,
   placeholder,
   secureTextEntry,
-  ...p
+  value,
+  onChangeText,
 }) {
   // constructor(props) {
   //   super(props);
@@ -35,45 +37,75 @@ function MyInput({
   //     isActive: false,
   //   };
   // }
-  const [isActive, setIsActive] = useState(false);
 
+  const [isActive, setIsActive] = useState(false);
+  console.log(secureTextEntry, "secureTextEntry");
   return (
     <View style={styles.wrapper}>
       <Text style={[styles.label, labelStyle]}>{label}</Text>
-      {/* {numberTel && (
-          <Text style={styles.faceNumberTel}>
-            {!phoneNumber?.length && isActive && "+7("}
-            {phoneNumber?.length > 2 && "+7("}
-            {phoneNumber?.length === 2 && isActive && "+7"}
-            {!phoneNumber.replace(regex)}
-          </Text>
-        )} */}
-      {/* {phoneNumber?.length > 5 && <Text style={styles.fake}>{")"}</Text>} */}
-      <TextInput
-        {...p}
-        maxLength={numberTel ? 10 : 100000}
-        keyboardType={keyboardType}
-        placeholderTextColor={"black"}
-        secureTextEntry={secureTextEntry}
-        placeholder={
-          !isActive && !phoneNumber && numberTel
-            ? phoneNumber
-            : !numberTel
-            ? placeholder
-            : ""
-        }
-        style={[
-          styles.input,
-          { borderColor: isActive && !textarea ? COLOR_9 : COLOR_6 },
-          showEye && { paddingRight: 50 },
-          style,
-          textarea && [styles.input, { height: 125, verticalAlign: "top" }],
-          isGray && [styles.input, { backgroundColor: "#EEEEEE" }],
-          numberTel && [styles.input, { letterSpacing: 2 }],
-        ]}
-        onFocus={() => setIsActive(true)}
-        onBlur={() => setIsActive(false)}
-      />
+      {numberTel ? (
+        <MaskInput
+          value={value}
+          onChangeText={onChangeText}
+          secureTextEntry={true}
+          placeholder={placeholder}
+          keyboardType={keyboardType}
+          onFocus={() => setIsActive(true)}
+          onBlur={() => setIsActive(false)}
+          style={[
+            styles.input,
+            { borderColor: isActive ? COLOR_9 : COLOR_6 },
+            { letterSpacing: 2 },
+          ]}
+          mask={[
+            "+",
+            "7",
+            " ",
+            "(",
+            /\d/,
+            /\d/,
+            /\d/,
+            ")",
+            " ",
+            /\d/,
+            /\d/,
+            /\d/,
+            "-",
+            /\d/,
+            /\d/,
+            "-",
+            /\d/,
+            /\d/,
+          ]}
+        />
+      ) : (
+        <TextInput
+          value={value}
+          onChangeText={onChangeText}
+          maxLength={numberTel ? 10 : 100000}
+          keyboardType={keyboardType}
+          placeholderTextColor={"black"}
+          secureTextEntry={secureTextEntry}
+          placeholder={
+            !isActive && !phoneNumber && numberTel
+              ? phoneNumber
+              : !numberTel
+              ? placeholder
+              : ""
+          }
+          style={[
+            styles.input,
+            { borderColor: isActive && !textarea ? COLOR_9 : COLOR_6 },
+            showEye && { paddingRight: 50 },
+            style,
+            textarea && [styles.input, { height: 125, verticalAlign: "top" }],
+            isGray && [styles.input, { backgroundColor: "#EEEEEE" }],
+            // numberTel && [styles.input, { letterSpacing: 2 }],
+          ]}
+          onFocus={() => setIsActive(true)}
+          onBlur={() => setIsActive(false)}
+        />
+      )}
       {filtered && (
         <TouchableOpacity onPress={resetText} style={styles.cancelIcon}>
           <AntDesign name="closecircle" size={20} color="black" />
@@ -111,7 +143,7 @@ const styles = StyleSheet.create({
     paddingTop: 14,
     paddingBottom: 12,
     fontFamily: "GothamProLight",
-    lineHeight: 13,
+    // lineHeight: 13,
   },
   label: {
     fontSize: 10,

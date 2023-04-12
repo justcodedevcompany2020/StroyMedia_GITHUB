@@ -6,19 +6,13 @@ import {
   Image,
   View,
   FlatList,
-  TextInput,
 } from "react-native";
 import Wrapper from "../helpers/Wrapper";
 import { useDispatch, useSelector } from "react-redux";
 import * as ImagePicker from "expo-image-picker";
 import AccordionItem from "../includes/AccordionItem";
 import MyInput from "../includes/MyInput";
-import {
-  COLOR_1,
-  COLOR_2,
-  COLOR_6,
-  WRAPPER_PADDINGS,
-} from "../helpers/Variables";
+import { COLOR_1, COLOR_6, WRAPPER_PADDINGS } from "../helpers/Variables";
 import BlockWithSwitchButton from "../includes/BlockWithSwitchButton";
 import QRCode from "react-native-qrcode-generator";
 import QrModal from "../includes/QrModal";
@@ -407,7 +401,9 @@ const MyProfile = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-    setShowToOthersPhone(user?.hide_phone === "0" || 0 ? false : true);
+    setShowToOthersPhone(
+      user?.hide_phone === "0" || user?.hide_phone === 0 ? false : true
+    );
     setShowToOthersEmail(user?.hide_email === "0" || 0 ? false : true);
     setDontWorkInThisCompany(user?.not_work_here === "0" || 0 ? false : true);
     setActiveRole({
@@ -419,10 +415,6 @@ const MyProfile = ({ route, navigation }) => {
       ownerpc: user?.isownerpc && "ownerpc",
     });
   }, [setShowToOthersPhone, user]);
-
-  const hidePhone = () => {
-    setShowToOthersPhone(!showToOthersPhone);
-  };
 
   const hideEmail = () => {
     setShowToOthersEmail(!showToOthersEmail);
@@ -446,14 +438,6 @@ const MyProfile = ({ route, navigation }) => {
   useEffect(() => {
     filtered(searchValue);
   }, [searchValue]);
-
-  // let phoneRegex = /^(?:\+1)?[^\d]*(\d{3})[^\d]*(\d{3})[^\d]*(\d{4})/g;
-  // const phoneRegex = /[^0-9]/g;
-
-  const handleChangePhoneNumber = (e) => {
-    const regex = /^\+7\s\d{3}\s\d{3}-\d{2}-\d{2}$/g;
-    setPhoneNumber(e.replace(regex));
-  };
 
   return (
     <Wrapper
@@ -510,16 +494,18 @@ const MyProfile = ({ route, navigation }) => {
             numberTel={true}
             phoneNumber={phoneNumber}
             placeholder={user?.phone}
-            onChangeText={handleChangePhoneNumber}
+            onChangeText={(e) => setPhoneNumber(e)}
             keyboardType={"phone-pad"}
+            secureTextEntry={showToOthersPhone}
+            value={phoneNumber}
           />
           <BlockWithSwitchButton
             title={"скрыть телефон"}
             titleStyle={styles.smallSwitchTitle}
             style={styles.switchBlock}
             isOn={showToOthersPhone}
-            onToggle={(val) => {
-              hidePhone();
+            onToggle={() => {
+              setShowToOthersPhone(!showToOthersPhone);
             }}
           />
           <MyInput
@@ -528,6 +514,7 @@ const MyProfile = ({ route, navigation }) => {
             value={email}
             onChangeText={(email) => setEmail(email)}
             keyboardType={"email-address"}
+            secureTextEntry={showToOthersEmail}
           />
           <BlockWithSwitchButton
             title={"скрыть электронную почту"}

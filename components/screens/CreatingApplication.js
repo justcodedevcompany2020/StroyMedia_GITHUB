@@ -8,7 +8,7 @@ import {
   Image,
   Platform,
   ActivityIndicator,
-  TextInput,
+  ScrollView,
 } from "react-native";
 import Wrapper from "../helpers/Wrapper";
 import { useDispatch, useSelector } from "react-redux";
@@ -334,6 +334,7 @@ function CreatingApplication(props) {
           <FlatList
             data={citys}
             keyExtractor={(item) => item.last_id}
+            nestedScrollEnabled
             renderItem={({ item }) => {
               return (
                 <TouchableOpacity
@@ -375,6 +376,7 @@ function CreatingApplication(props) {
           </View>
           <FlatList
             data={citys}
+            nestedScrollEnabled
             keyExtractor={(item) => item.last_id}
             renderItem={({ item }) => {
               return (
@@ -416,7 +418,7 @@ function CreatingApplication(props) {
               textAlign: "left",
             }}
             buttonStyle={{ height: 40, width: "100%", borderRadius: 8 }}
-            search
+            // search
             data={container}
             onSelect={(selectedItem, index) => {
               setTypeContiner(index);
@@ -511,7 +513,7 @@ function CreatingApplication(props) {
               textAlign: "left",
             }}
             buttonStyle={{ height: 40, width: "100%", borderRadius: 8 }}
-            search
+            // search
             data={container}
             onSelect={(selectedItem, index) => {
               setTypeContiner(index);
@@ -789,6 +791,7 @@ function CreatingApplication(props) {
           <FlatList
             data={citys}
             keyExtractor={(item) => item.last_id}
+            nestedScrollEnabled
             renderItem={({ item }) => {
               return (
                 <TouchableOpacity
@@ -831,6 +834,7 @@ function CreatingApplication(props) {
           <FlatList
             data={citys}
             keyExtractor={(item) => item.last_id}
+            nestedScrollEnabled
             renderItem={({ item }) => {
               return (
                 <TouchableOpacity
@@ -871,7 +875,6 @@ function CreatingApplication(props) {
               textAlign: "left",
             }}
             buttonStyle={{ height: 40, width: "100%", borderRadius: 8 }}
-            search
             data={container}
             onSelect={(selectedItem, index) => {
               setTypeContiner(index);
@@ -971,6 +974,7 @@ function CreatingApplication(props) {
           <FlatList
             data={citys}
             keyExtractor={(item) => item.last_id}
+            nestedScrollEnabled
             renderItem={({ item }) => {
               return (
                 <TouchableOpacity
@@ -1013,6 +1017,7 @@ function CreatingApplication(props) {
           <FlatList
             data={citys}
             keyExtractor={(item) => item.last_id}
+            nestedScrollEnabled
             renderItem={({ item }) => {
               return (
                 <TouchableOpacity
@@ -1053,7 +1058,6 @@ function CreatingApplication(props) {
               textAlign: "left",
             }}
             buttonStyle={{ height: 40, width: "100%", borderRadius: 8 }}
-            search
             data={container}
             onSelect={(selectedItem, index) => {
               setTypeContiner(index);
@@ -1152,6 +1156,7 @@ function CreatingApplication(props) {
           </View>
           <FlatList
             data={citys}
+            nestedScrollEnabled
             keyExtractor={(item) => item.last_id}
             renderItem={({ item }) => {
               return (
@@ -1192,8 +1197,12 @@ function CreatingApplication(props) {
               style={styles.searchInput}
             />
           </View>
+
           <FlatList
             data={citys}
+            scrollEnabled
+            // style={{ zIndex: 10 }}
+            nestedScrollEnabled
             keyExtractor={(item) => item.last_id}
             renderItem={({ item }) => {
               return (
@@ -1235,7 +1244,6 @@ function CreatingApplication(props) {
               textAlign: "left",
             }}
             buttonStyle={{ height: 40, width: "100%", borderRadius: 8 }}
-            search
             data={container}
             onSelect={(selectedItem, index) => {
               setTypeContiner(index);

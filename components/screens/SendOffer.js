@@ -49,6 +49,7 @@ function SendOffer(props) {
   const date = moment(+item?.date_create?.$date.$numberLong).format("DD MMMM");
   const { loading, error } = useSelector((state) => state.workRequestSlice);
   const dispatch = useDispatch();
+
   useEffect(() => {
     AsyncStorage.getItem("token").then((result) => {
       if (result) {
@@ -56,6 +57,7 @@ function SendOffer(props) {
       }
     });
   }, [token]);
+
   return (
     <Wrapper
       withContainer
@@ -93,6 +95,7 @@ function SendOffer(props) {
             </Text>
           </View>
         </View>
+
         <View style={styles.company}>
           <Image
             style={styles.companyPhoto}
@@ -198,7 +201,6 @@ function SendOffer(props) {
               textAlign: "left",
             }}
             buttonStyle={{ height: 40, width: "100%", borderRadius: 8 }}
-            // search
             data={valuta}
             rowStyle={{
               flex: 1,
@@ -217,11 +219,18 @@ function SendOffer(props) {
           onPress={() => {
             dispatch(
               workRequest({
-                secret_token: token,
+                secret_token: 'ijm5EeWpG4Z0',
                 last_id: item.last_id,
                 type: id,
                 price,
-                currency,
+                currency:
+                  currency == "₽"
+                    ? 1
+                    : currency == "€"
+                    ? 2
+                    : currency == "$"
+                    ? 3
+                    : "",
                 comment,
                 days: periodOfUsing,
                 op: "enable",
