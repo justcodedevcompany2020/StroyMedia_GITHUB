@@ -21,7 +21,6 @@ function Polls({ route, navigation }) {
         dispatch(getAllPollsRequest({ token: result }));
       }
     });
-    console.log(data);
   }, []);
 
   return (
@@ -40,7 +39,33 @@ function Polls({ route, navigation }) {
           const vote2 = d?.vote2?.length || 0;
           const vote3 = d?.vote3?.length || 0;
           const vote4 = d?.vote4?.length || 0;
-          const totalVote = vote1 + vote2 + vote3 + vote4;
+          const vote5 = d?.vote5?.length || 0;
+          const vote6 = d?.vote6?.length || 0;
+          const vote7 = d?.vote7?.length || 0;
+          const vote8 = d?.vote8?.length || 0;
+          const vote9 = d?.vote9?.length || 0;
+          const vote10 = d?.vote10?.length || 0;
+          const vote11 = d?.vote11?.length || 0;
+          const vote12 = d?.vote12?.length || 0;
+          const vote13 = d?.vote13?.length || 0;
+          const vote14 = d?.vote14?.length || 0;
+          const vote15 = d?.vote15?.length || 0;
+          const totalVote =
+            vote1 +
+            vote2 +
+            vote3 +
+            vote4 +
+            vote5 +
+            vote6 +
+            vote7 +
+            vote8 +
+            vote9 +
+            vote10 +
+            vote11 +
+            vote12 +
+            vote13 +
+            vote14 +
+            vote15;
           const options = [
             {
               id: 1,
@@ -66,6 +91,67 @@ function Polls({ route, navigation }) {
               value: "4",
               vote: Math.round((vote4 / totalVote) * 100),
             },
+            {
+              id: 5,
+              key: d?.title5,
+              value: "6",
+              vote: Math.round((vote5 / totalVote) * 100),
+            },
+
+            {
+              id: 6,
+              key: d?.title6,
+              value: "6",
+              vote: Math.round((vote6 / totalVote) * 100),
+            },
+            {
+              id: 7,
+              key: d?.title7,
+              value: "7",
+              vote: Math.round((vote7 / totalVote) * 100),
+            },
+            {
+              id: 8,
+              key: d?.title8,
+              value: "8",
+              vote: Math.round((vote8 / totalVote) * 100),
+            },
+            {
+              id: 9,
+              key: d?.title9,
+              value: "9",
+              vote: Math.round((vote9 / totalVote) * 100),
+            },
+            {
+              id: 10,
+              key: d?.title10,
+              value: "10",
+              vote: Math.round((vote10 / totalVote) * 100),
+            },
+            {
+              id: 11,
+              key: d?.title11,
+              value: "11",
+              vote: Math.round((vote11 / totalVote) * 100),
+            },
+            {
+              id: 12,
+              key: d?.title12,
+              value: "12",
+              vote: Math.round((vote12 / totalVote) * 100),
+            },
+            {
+              id: 13,
+              key: d?.title13,
+              value: "13",
+              vote: Math.round((vote13 / totalVote) * 100),
+            },
+            {
+              id: 14,
+              key: d?.title14,
+              value: "14",
+              vote: Math.round((vote14 / totalVote) * 100),
+            },
           ];
 
           return (
@@ -77,10 +163,10 @@ function Polls({ route, navigation }) {
             >
               <View style={styles.itemWrapper}>
                 <PollsItem
-                  vote1={vote1}
-                  vote2={vote2}
-                  vote3={vote3}
-                  vote4={vote4}
+                  // vote1={vote1}
+                  // vote2={vote2}
+                  // vote3={vote3}
+                  // vote4={vote4}
                   total={totalVote}
                   id={d.last_id}
                   optionsList={options}

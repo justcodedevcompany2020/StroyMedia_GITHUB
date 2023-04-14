@@ -4,14 +4,12 @@ import { api } from "../../Api";
 export const addFavoriteRequest = createAsyncThunk(
   "addFavorite",
   async ({ token, id }) => {
-    // console.log(id);
     try {
       const result = await api.post("/add-favorite-data", {
         secret_token: token,
         company_id: id,
       });
 
-      console.log(result.data);
       return result.data;
     } catch (error) {
       return error;

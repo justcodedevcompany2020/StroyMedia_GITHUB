@@ -6,7 +6,6 @@ export const workRequest = createAsyncThunk("work/request", async (data) => {
     const result = await api.post("/work-request-send", data);
     return result.data;
   } catch (error) {
-    console.log(data);
     return error;
   }
 });

@@ -8,11 +8,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { showMessage } from "react-native-flash-message";
 import { getAnswerRequest } from "../../store/reducers/sendAnswerPollsSlice";
 
-function PollsItem(props) {
+function PollsItem({ optionsList, id, total }) {
   const [checkedList, setCheckedList] = useState("");
   const [token, setToken] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const { optionsList, id, total } = props;
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -24,12 +24,10 @@ function PollsItem(props) {
   }, []);
 
   const checked = (item) => {
-    console.log(item.id);
     setCheckedList(item?.id);
   };
 
   const submit = () => {
-    console.log(checkedList, "lissssssssstttttttttttttttt");
     checkedList
       ? dispatch(
           getAnswerRequest({ token: token, id: id, answer: checkedList })
@@ -50,33 +48,39 @@ function PollsItem(props) {
 
   return submitted ? (
     <View>
-      {optionsList.map((option) => {
-        return (
-          <View key={Math.random()}>
-            <View style={styles.firstLine}>
-              <Text style={styles.percentage}>{option.vote}%</Text>
-              <Text style={styles.title}>{option.key}</Text>
+      {optionsList.map((option, index) => {
+        if (option?.key) {
+          return (
+            <View key={Math.random()}>
+              <View style={styles.firstLine}>
+                <Text style={styles.percentage}>{option.vote}%</Text>
+                <Text style={styles.title}>{option.key}</Text>
+              </View>
+              <View style={[styles.line, { width: `${option.vote}%` }]} />
             </View>
-            <View style={[styles.line, { width: `${option.vote}%` }]} />
-          </View>
-        );
+          );
+        }
       })}
       <Text style={styles.smallText}>{total} голоса</Text>
     </View>
   ) : (
     <View>
-      {optionsList.map((option) => (
-        <TouchableOpacity key={option.id} onPress={() => checked(option)}>
-          <Text>
-            <MyCheckbox
-              option={option}
-              id={option.id}
-              checkedList={checkedList}
-              key={option.id}
-            />
-          </Text>
-        </TouchableOpacity>
-      ))}
+      {optionsList.map((option, index) => {
+        if (option?.key) {
+          return (
+            <TouchableOpacity key={option.id} onPress={() => checked(option)}>
+              <Text>
+                <MyCheckbox
+                  option={option}
+                  id={option.id}
+                  checkedList={checkedList}
+                  key={option.id}
+                />
+              </Text>
+            </TouchableOpacity>
+          );
+        }
+      })}
       <MyButton onPress={submit} style={styles.button}>
         Отправить
       </MyButton>

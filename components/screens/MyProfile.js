@@ -726,7 +726,7 @@ const MyProfile = ({ route, navigation }) => {
             isGray
             label={"Сайт компании"}
             placeholder={"Введите Сайт компании"}
-            value={site}
+            value={site !== undefined ? site : ""}
             // style={styles.nonEditableInput}
             onChangeText={(site) => setSicte(site)}
           />

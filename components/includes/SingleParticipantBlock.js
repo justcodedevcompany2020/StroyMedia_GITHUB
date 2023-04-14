@@ -1,27 +1,24 @@
-import React, { Component } from "react";
+import React from "react";
 import { StyleSheet, View, Image } from "react-native";
 import MyButton from "./MyButton";
 
-class SingleParticipantBlock extends Component {
-  render() {
-    const { uri, children, button, style } = this.props;
-    return (
-      <View style={[styles.wrapper, style]}>
-        <View style={styles.row}>
-          <View style={styles.imageBlock}>
-            <Image source={{ uri }} style={styles.image} />
-          </View>
-          <View style={styles.mainBlock}>{children}</View>
+export default SingleParticipantBlock = ({ uri, children, button, style }) => {
+  return (
+    <View style={[styles.wrapper, style]}>
+      <View style={styles.row}>
+        <View style={styles.imageBlock}>
+          <Image source={{ uri }} style={styles.image} />
         </View>
-        {button && (
-          <MyButton onPress={button.onPress} style={styles.button}>
-            {button.label}
-          </MyButton>
-        )}
+        <View style={styles.mainBlock}>{children}</View>
       </View>
-    );
-  }
-}
+      {button && (
+        <MyButton onPress={button.onPress} style={styles.button}>
+          {button.label}
+        </MyButton>
+      )}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -46,4 +43,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SingleParticipantBlock;
+SingleParticipantBlock;

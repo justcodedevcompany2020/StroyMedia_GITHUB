@@ -23,13 +23,12 @@ import moment from "moment";
 import { chatOrderRequest } from "../../store/reducers/chatDialogOrderSlice";
 import { projectReviewRequest } from "../../store/reducers/projectReview";
 
-function SingleParticipant(props) {
+function SingleParticipant({ route, navigation }) {
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showMoreReviewsModal, setShowMoreReviewsModal] = useState(false);
   const [toOrFrom, setToOrFrom] = useState("");
   const totalRate = [];
   const [reviewText, setReviewText] = useState("");
-  const { route, navigation } = props;
   const { currentPage } = route.params;
   const [rate, setRate] = useState(0);
   const dispatch = useDispatch();
@@ -61,7 +60,6 @@ function SingleParticipant(props) {
   };
 
   const reviewSubmit = () => {
-    console.log(rate);
     reviewText && rate > 0
       ? dispatch(
           projectReviewRequest({

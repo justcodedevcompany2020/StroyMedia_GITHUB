@@ -43,7 +43,22 @@ function MoreReviewsModal(props) {
         <Text style={styles.title}>
           Отзывы {toOrFrom === "from" && "на "}участника
         </Text>
-        <FlatList data={data} renderItem={renderItem} />
+        <FlatList
+          data={data}
+          renderItem={renderItem}
+          ListEmptyComponent={() => (
+            <Text
+              style={{
+                marginTop: 50,
+                textAlign: "center",
+                fontSize: 15,
+                color: COLOR_1,
+              }}
+            >
+              У данного участника нет отзывов
+            </Text>
+          )}
+        />
       </View>
     </Modal>
   );

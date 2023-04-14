@@ -3,9 +3,7 @@ import { COLOR_1, COLOR_6 } from "../helpers/Variables";
 import { StyleSheet, Text, View } from "react-native";
 import { ImageOk } from "../helpers/images";
 
-function MyCheckbox(props) {
-  const { option, id, checkedList } = props;
-
+function MyCheckbox({ option, id, checkedList }) {
   return (
     <View style={styles.checkRow}>
       <View style={styles.checkbox}>

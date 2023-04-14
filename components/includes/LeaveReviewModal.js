@@ -126,7 +126,6 @@ const styles = StyleSheet.create({
     color: COLOR_1,
     fontFamily: "GothamProMedium",
     fontSize: 16,
-    lineHeight: 14,
     fontWeight: "900",
   },
   button: {

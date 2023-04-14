@@ -219,7 +219,7 @@ function SendOffer(props) {
           onPress={() => {
             dispatch(
               workRequest({
-                secret_token: 'ijm5EeWpG4Z0',
+                secret_token: "ijm5EeWpG4Z0",
                 last_id: item.last_id,
                 type: id,
                 price,
@@ -238,10 +238,11 @@ function SendOffer(props) {
             )
               .unwrap()
               .then((res) => {
-                console.log(res);
                 if (!res) {
                   navigation.goBack();
                 } else {
+                  console.log(!res);
+
                   showMessage({
                     type: "danger",
                     message: "Неверные данные",

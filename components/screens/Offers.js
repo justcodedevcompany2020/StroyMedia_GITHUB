@@ -137,7 +137,6 @@ function Offers({ route, navigation }) {
   };
 
   const renderItem = ({ item, index }) => {
-    console.log(favoriteList);
     if (favoriteList[index] == "is_Favorite") {
       liked = true;
     } else if (favoriteList[index] == "not_Favorite") {

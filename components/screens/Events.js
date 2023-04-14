@@ -32,11 +32,10 @@ import EventsItem from "../includes/eventsItem";
 import RenderHtml from "react-native-render-html";
 import { checkChatExistRequest } from "../../store/reducers/checkChatExistSlice";
 
-function Events(props) {
+function Events({ route, navigation }) {
   const [tabs, setTabs] = useState(["1 день", "2 день"]);
   const { width } = useWindowDimensions();
   const [activeTab, setActiveTab] = useState("1 день");
-  const { route, navigation } = props;
   const { currentPage } = route.params;
   const [token, setToken] = useState();
   const session = useSelector((state) => state.getEventsSlice.data.schedule);

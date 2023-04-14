@@ -20,8 +20,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 function Header(props) {
   const { currentPage, home, navigation, onSavePress } = props;
   const data = useSelector((state) =>
-    state.getAllNotificationsSlice?.data.date_16_08_2022
-      ? state.getAllNotificationsSlice?.data.date_16_08_2022[0]
+    state.getAllNotificationsSlice?.data?.date_16_08_2022
+      ? state.getAllNotificationsSlice?.data?.date_16_08_2022[0]
       : null
   );
   const [visible, setVisible] = useState(false);

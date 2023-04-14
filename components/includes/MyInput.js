@@ -39,7 +39,6 @@ function MyInput({
   // }
 
   const [isActive, setIsActive] = useState(false);
-  console.log(secureTextEntry, "secureTextEntry");
   return (
     <View style={styles.wrapper}>
       <Text style={[styles.label, labelStyle]}>{label}</Text>

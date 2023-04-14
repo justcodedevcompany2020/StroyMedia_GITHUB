@@ -178,7 +178,6 @@ function Participants({ route, navigation }) {
                 title={cityName ? cityName : "Город"}
                 options={citys}
                 onSelect={(option) => {
-                  console.log(option, "option");
                   setCityId(option?.last_id);
                   filtered(option.last_id, role, searchValue);
                   setCityName(option.title);
