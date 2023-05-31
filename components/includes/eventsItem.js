@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
-import { COLOR_1, COLOR_9 } from "../helpers/Variables";
-import { ImageLike, ImageLikeBlue } from "../helpers/images";
+import React, {useEffect, useState} from "react";
+import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {COLOR_1, COLOR_9} from "../helpers/Variables";
+import {ImageLike, ImageLikeBlue} from "../helpers/images";
 import MyButton from "../includes/MyButton";
-import { useDispatch } from "react-redux";
-import { likeEventsRequest } from "../../store/reducers/likeEventsPostSlice";
-import { checkEventsLikeRequest } from "../../store/reducers/checkEventsLikeSlice";
-import { checkChatExistRequest } from "../../store/reducers/checkChatExistSlice";
+import {useDispatch} from "react-redux";
+import {likeEventsRequest} from "../../store/reducers/likeEventsPostSlice";
+import {checkEventsLikeRequest} from "../../store/reducers/checkEventsLikeSlice";
+import {checkChatExistRequest} from "../../store/reducers/checkChatExistSlice";
 
 function EventsItem(props) {
-  const { title, text, personName, position, photoUri, token, id, navigation } =
+  const {title, text, personName, position, photoUri, token, id, navigation} =
     props;
   const dispatch = useDispatch();
   const [liked, setLiked] = useState(false);
 
   useEffect(() => {
-    dispatch(checkEventsLikeRequest({ token, id: id }))
+    dispatch(checkEventsLikeRequest({token, id: id}))
       .unwrap()
       .then((result) => {
         setLiked(result?.data?.success);
@@ -31,7 +31,7 @@ function EventsItem(props) {
           <Text style={styles.personName}>{personName}</Text>
           <Text style={styles.personPosition}>{position}</Text>
           <Image
-            source={{ uri: "https://teus.online/" + photoUri }}
+            source={{uri: "https://teus.online/" + photoUri}}
             style={styles.personPhoto}
           />
         </View>
@@ -41,11 +41,11 @@ function EventsItem(props) {
           textStyle={styles.buttonText}
           style={styles.sectionButton}
           onPress={() => {
-            dispatch(checkChatExistRequest({ token: token, id: id }))
+            dispatch(checkChatExistRequest({token: token, id: id}))
               .unwrap()
               .then(() => {
-                navigation.navigate("Chat", {
-                  currentPage: "Чаты",
+                navigation.navigate("DialogChat", {
+                  currentPage: "Диалоги",
                   title: title,
                   id: id,
                 });
@@ -57,11 +57,11 @@ function EventsItem(props) {
         <TouchableOpacity
           onPress={() => {
             setLiked(!liked);
-            dispatch(likeEventsRequest({ token, id }));
+            dispatch(likeEventsRequest({token, id}));
           }}
           style={styles.like}
         >
-          {liked ? <ImageLikeBlue /> : <ImageLike />}
+          {liked ? <ImageLikeBlue/> : <ImageLike/>}
         </TouchableOpacity>
       </View>
     </View>

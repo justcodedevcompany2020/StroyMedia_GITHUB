@@ -1,14 +1,32 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { api } from "../../Api";
+import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 
 export const sendMessageRequest = createAsyncThunk(
   "send/message",
-  async (data) => {
+  async (data, rejectedWithValue) => {
     try {
-      const result = await api.post("/chat-send-message", data);
-      return result;
+      const response = await fetch('https://teus.online/api/chat-send-message', {
+        body: data.data,
+        method: "POST"
+      }).then(response => response.json()).then(result => {
+
+        return result
+      })
+
+      // const data = await response.json()
+
+      // const result = await api.post("/chat-send-message", data.data).then((r) => {
+      //   alert("sendMessageRequest1")
+      // }).catch((error) => {
+      //   console.log(error, 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
+      //   // alert("sendMessageRequest2")
+      //
+      // });
+
+
+      // return data;
     } catch (error) {
-      return error;
+
+      return rejectedWithValue(error.result.data);
     }
   }
 );
@@ -18,7 +36,7 @@ const sendMessageSlice = createSlice({
   initialState: {
     loading: false,
     error: false,
-    data: [],
+    send_message: [],
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -27,8 +45,9 @@ const sendMessageSlice = createSlice({
       .addCase(sendMessageRequest.pending, (state) => {
         state.loading = true;
       })
+
       .addCase(sendMessageRequest.fulfilled, (state, action) => {
-        state.data = action.payload;
+        state.send_message = action.payload;
         state.error = false;
       })
 

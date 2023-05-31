@@ -1,45 +1,36 @@
-import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  Text,
-  Image,
-  ActivityIndicator,
-  FlatList,
-} from "react-native";
+import React, {useEffect, useState} from "react";
+import {ActivityIndicator, FlatList, Image, StyleSheet, Text, TouchableOpacity, View,} from "react-native";
 import Wrapper from "../helpers/Wrapper";
-import { useSelector } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import NavBar from "../includes/NavBar";
-import Search from "../includes/Search";
-import { ImageFadePart, ImageSend } from "../helpers/images";
+import {Search} from "../includes/Search";
+import {ImageFadePart, ImageSend} from "../helpers/images";
 import FilterItem from "../includes/FilterItem";
-import { useDispatch } from "react-redux";
-import { SwipeListView } from "react-native-swipe-list-view";
+import {SwipeListView} from "react-native-swipe-list-view";
 import {
+  COLOR_1,
   COLOR_10,
   COLOR_2,
+  COLOR_3,
   COLOR_5,
   COLOR_6,
   COLOR_8,
   COLOR_9,
-  COLOR_1,
   WRAPPER_PADDINGS,
-  COLOR_3,
 } from "../helpers/Variables";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { OfferItem } from "../includes/OfferItem";
-import { getCitys } from "../../store/reducers/getCitysSlice";
+import {OfferItem} from "../includes/OfferItem";
+import {getCitys} from "../../store/reducers/getCitysSlice";
 import Modal from "react-native-modal";
-import { allSuggestionRequest } from "../../store/reducers/getAllSuggestionsSlice";
-import { Entypo } from "@expo/vector-icons";
+import {allSuggestionRequest} from "../../store/reducers/getAllSuggestionsSlice";
+import {Entypo} from "@expo/vector-icons";
 
 const SearchIcon = require("../../assets/search.png");
 
-function Offers({ route, navigation }) {
+function Offers({route, navigation}) {
   const [tabs, setTabs] = useState(["Все предложения", "Избранное"]);
   const [activeTab, setActiveTab] = useState("Все предложения");
-  const { data, loading } = useSelector(
+  const {data, loading} = useSelector(
     (state) => state.getAllSuggestionsSlice
   );
   const [citys, setCitys] = useState([]);
@@ -57,7 +48,7 @@ function Offers({ route, navigation }) {
   const [id, setId] = useState();
   const [token, setToken] = useState();
 
-  const { currentPage } = route.params;
+  const {currentPage} = route.params;
   const [containerType, setTypeContainer] = useState("");
   const [searchName, setSearchName] = useState("");
   const [cityFromName, setFromCityName] = useState("");
@@ -80,12 +71,12 @@ function Offers({ route, navigation }) {
       activeSecondaryTab === "Поиск КТК"
         ? "2"
         : activeSecondaryTab === "Продажа КТК"
-        ? "5"
-        : activeSecondaryTab === "Выдача КТК"
-        ? "3"
-        : activeSecondaryTab === "Контейнерный сервис"
-        ? "6"
-        : "7"
+          ? "5"
+          : activeSecondaryTab === "Выдача КТК"
+            ? "3"
+            : activeSecondaryTab === "Контейнерный сервис"
+              ? "6"
+              : "7"
     );
   }, [activeSecondaryTab]);
 
@@ -126,17 +117,17 @@ function Offers({ route, navigation }) {
           containerType === "40 ST" || containerType === "20 (30)"
             ? 4
             : containerType === "20 (24)"
-            ? 2
-            : containerType === "40 HQ"
-            ? 3
-            : null,
+              ? 2
+              : containerType === "40 HQ"
+                ? 3
+                : null,
       })
     )
       .unwrap()
       .then(() => setLoad(false));
   };
 
-  const renderItem = ({ item, index }) => {
+  const renderItem = ({item, index}) => {
     if (favoriteList[index] == "is_Favorite") {
       liked = true;
     } else if (favoriteList[index] == "not_Favorite") {
@@ -172,10 +163,10 @@ function Offers({ route, navigation }) {
           containerType === "40 ST" || containerType === "20 (30)"
             ? 4
             : containerType === "20 (24)"
-            ? 2
-            : containerType === "40 HQ"
-            ? 3
-            : null,
+              ? 2
+              : containerType === "40 HQ"
+                ? 3
+                : null,
       })
     )
       .unwrap()
@@ -197,10 +188,10 @@ function Offers({ route, navigation }) {
           containerType === "40 ST" || containerType === "20 (30)"
             ? 4
             : containerType === "20 (24)"
-            ? 2
-            : containerType === "40 HQ"
-            ? 3
-            : null,
+              ? 2
+              : containerType === "40 HQ"
+                ? 3
+                : null,
       })
     )
       .unwrap()
@@ -222,10 +213,10 @@ function Offers({ route, navigation }) {
           data === "40 ST" || data === "20 (30)"
             ? 4
             : data === "20 (24)"
-            ? 2
-            : data === "40 HQ"
-            ? 3
-            : null,
+              ? 2
+              : data === "40 HQ"
+                ? 3
+                : null,
       })
     )
       .unwrap()
@@ -251,11 +242,11 @@ function Offers({ route, navigation }) {
     setFromCityName(null);
     setToCityName(null);
     dispatch(
-      allSuggestionRequest({ token, id: activeSecondaryTab, offset: 5 })
+      allSuggestionRequest({token, id: activeSecondaryTab, offset: 5})
     );
   };
 
-  const renderCitys = ({ item }) => {
+  const renderCitys = ({item}) => {
     return (
       <TouchableOpacity
         onPress={() => {
@@ -274,10 +265,10 @@ function Offers({ route, navigation }) {
                 containerType === "40 ST" || containerType === "20 (30)"
                   ? 4
                   : containerType === "20 (24)"
-                  ? 2
-                  : containerType === "40 HQ"
-                  ? 3
-                  : null,
+                    ? 2
+                    : containerType === "40 HQ"
+                      ? 3
+                      : null,
             })
           )
             .unwrap()
@@ -288,7 +279,7 @@ function Offers({ route, navigation }) {
             });
         }}
       >
-        <Text style={{ marginBottom: 8 }}>{item.title.ru || item.title}</Text>
+        <Text style={{marginBottom: 8}}>{item.title.ru || item.title}</Text>
       </TouchableOpacity>
     );
   };
@@ -314,7 +305,7 @@ function Offers({ route, navigation }) {
             setTypeContainer(null);
             setFromCityName(null);
             setToCityName(null);
-            dispatch(allSuggestionRequest({ token, id: tab, offset: 5 }));
+            dispatch(allSuggestionRequest({token, id: tab, offset: 5}));
             setActiveSecondaryTab(tab);
           }}
           secondary
@@ -330,7 +321,7 @@ function Offers({ route, navigation }) {
             resetText={resetText}
           />
           <TouchableOpacity activeOpacity={0.2} onPress={filtered}>
-            <Image source={SearchIcon} style={{ width: 25, height: 25 }} />
+            <Image source={SearchIcon} style={{width: 25, height: 25}}/>
           </TouchableOpacity>
         </View>
         <View style={styles.filtersRow}>
@@ -395,10 +386,10 @@ function Offers({ route, navigation }) {
           containerType === "40 ST" || containerType === "20 (30)"
             ? 4
             : containerType === "20 (24)"
-            ? 2
-            : containerType === "40 HQ"
-            ? 3
-            : null,
+              ? 2
+              : containerType === "40 HQ"
+                ? 3
+                : null,
       })
     ).unwrap();
     // .then((res) => setLikedList(res?.data.data.isLike));
@@ -419,17 +410,17 @@ function Offers({ route, navigation }) {
           containerType === "40 ST" || containerType === "20 (30)"
             ? 4
             : containerType === "20 (24)"
-            ? 2
-            : containerType === "40 HQ"
-            ? 3
-            : null,
+              ? 2
+              : containerType === "40 HQ"
+                ? 3
+                : null,
       })
     ).unwrap();
     // .then((res) => setLikedList(res?.data.data.isLike));
   };
 
   useEffect(() => {
-    dispatch(allSuggestionRequest({ token, id: "Поиск КТК", offset }))
+    dispatch(allSuggestionRequest({token, id: "Поиск КТК", offset}))
       .unwrap()
       .then((res) => {
         // console.log(res?.data.data.isLike,'res?.data.data.isLike');
@@ -442,7 +433,7 @@ function Offers({ route, navigation }) {
       {loading && (
         <Modal backdropOpacity={0.75} isVisible={true}>
           <View>
-            <ActivityIndicator size="large" />
+            <ActivityIndicator size="large"/>
           </View>
         </Modal>
       )}
@@ -487,7 +478,7 @@ function Offers({ route, navigation }) {
                     disabled={page === 1 ? true : false}
                     onPress={previusPage}
                   >
-                    <Entypo name="chevron-left" size={28} color={"gray"} />
+                    <Entypo name="chevron-left" size={28} color={"gray"}/>
                   </TouchableOpacity>
                 </View>
                 <View>
@@ -500,7 +491,7 @@ function Offers({ route, navigation }) {
                     disabled={data.length === 5 ? false : true}
                     onPress={nextPage}
                   >
-                    <Entypo name="chevron-right" size={28} color={"gray"} />
+                    <Entypo name="chevron-right" size={28} color={"gray"}/>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -509,7 +500,7 @@ function Offers({ route, navigation }) {
           ListEmptyComponent={() => {
             return <Text style={styles.empty}>ничего не найдено</Text>;
           }}
-          renderHiddenItem={({ item }) => (
+          renderHiddenItem={({item}) => (
             <View style={styles.hiddenWrapper}>
               <TouchableOpacity
                 style={styles.hiddenItem}
@@ -522,7 +513,7 @@ function Offers({ route, navigation }) {
                 }
               >
                 <View style={styles.hiddenBlock}>
-                  <ImageSend />
+                  <ImageSend/>
                   <View style={styles.hiddenItemTextBlock}>
                     <Text style={styles.hiddenItemText}>Отправить</Text>
                     <Text style={styles.hiddenItemText}>предложение</Text>
@@ -535,11 +526,11 @@ function Offers({ route, navigation }) {
           disableRightSwipe
           keyExtractor={(item) => item.last_id}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ flexGrow: 1 }}
+          contentContainerStyle={{flexGrow: 1}}
           stickyHeaderIndices={[0]}
         />
         <View style={styles.fadeBlock}>
-          <Image source={ImageFadePart} style={styles.fade} />
+          <Image source={ImageFadePart} style={styles.fade}/>
         </View>
       </Wrapper>
     </>

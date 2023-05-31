@@ -65,3 +65,8 @@ export { default as ImageLikeSmall } from "../../assets/images/likeSmall.svg";
 export { default as ImageLikeSmallBlue } from "../../assets/images/likeSmallBlue.svg";
 export { default as ImageReply } from "../../assets/images/reply.svg";
 export { default as ImageDelete } from "../../assets/images/delete.svg";
+
+
+export { default as QR_code } from "../../assets/images/QR_code.svg";
+
+

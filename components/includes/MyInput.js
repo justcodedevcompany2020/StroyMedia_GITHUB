@@ -1,44 +1,38 @@
-import React, { useEffect, useState } from "react";
-import {
-  TextInput,
-  StyleSheet,
-  View,
-  Text,
-  TouchableOpacity,
-} from "react-native";
-import { COLOR_1, COLOR_6, COLOR_9 } from "../helpers/Variables";
-import { ImageSeePassword, ImageUnSeePassword } from "../helpers/images";
-import { AntDesign } from "@expo/vector-icons";
+import React, {useEffect, useState} from "react";
+import {StyleSheet, Text, TextInput, TouchableOpacity, View,} from "react-native";
+import {COLOR_1, COLOR_6, COLOR_9} from "../helpers/Variables";
+import {ImageSeePassword, ImageUnSeePassword} from "../helpers/images";
+import {AntDesign} from "@expo/vector-icons";
 import MaskInput from "react-native-mask-input";
 
 function MyInput({
-  label,
-  phoneNumber,
-  style,
-  labelStyle,
-  error,
-  onEyePressed,
-  showEye,
-  sendComponent,
-  keyboardType,
-  filtered,
-  resetText,
-  textarea,
-  numberTel,
-  isGray,
-  placeholder,
-  secureTextEntry,
-  value,
-  onChangeText,
-}) {
-  // constructor(props) {
-  //   super(props);
-  //   this.state = {
-  //     isActive: false,
-  //   };
-  // }
-
+                   label,
+                   phoneNumber,
+                   style,
+                   labelStyle,
+                   error,
+                   onEyePressed,
+                   showEye,
+                   sendComponent,
+                   keyboardType,
+                   filtered,
+                   resetText,
+                   textarea,
+                   numberTel,
+                   isGray,
+                   placeholder,
+                   secureTextEntry,
+                   value,
+                   onChangeText,
+                   editable,
+                   multiline,
+                 }) {
   const [isActive, setIsActive] = useState(false);
+  useEffect(() => {
+    if (!editable) {
+      setIsActive(false);
+    }
+  }, [numberTel]);
   return (
     <View style={styles.wrapper}>
       <Text style={[styles.label, labelStyle]}>{label}</Text>
@@ -46,15 +40,16 @@ function MyInput({
         <MaskInput
           value={value}
           onChangeText={onChangeText}
-          secureTextEntry={true}
+          // secureTextEntry={secureTextEntry}
           placeholder={placeholder}
+          placeholderTextColor={"black"}
           keyboardType={keyboardType}
           onFocus={() => setIsActive(true)}
           onBlur={() => setIsActive(false)}
           style={[
             styles.input,
-            { borderColor: isActive ? COLOR_9 : COLOR_6 },
-            { letterSpacing: 2 },
+            {borderColor: isActive ? COLOR_9 : COLOR_6},
+            {letterSpacing: 2},
           ]}
           mask={[
             "+",
@@ -81,33 +76,29 @@ function MyInput({
         <TextInput
           value={value}
           onChangeText={onChangeText}
-          maxLength={numberTel ? 10 : 100000}
+          // maxLength={numberTel ? 10 : 100000}
           keyboardType={keyboardType}
           placeholderTextColor={"black"}
           secureTextEntry={secureTextEntry}
-          placeholder={
-            !isActive && !phoneNumber && numberTel
-              ? phoneNumber
-              : !numberTel
-              ? placeholder
-              : ""
-          }
-          style={[
-            styles.input,
-            { borderColor: isActive && !textarea ? COLOR_9 : COLOR_6 },
-            showEye && { paddingRight: 50 },
-            style,
-            textarea && [styles.input, { height: 125, verticalAlign: "top" }],
-            isGray && [styles.input, { backgroundColor: "#EEEEEE" }],
-            // numberTel && [styles.input, { letterSpacing: 2 }],
-          ]}
+          editable={editable}
+          placeholder={placeholder}
           onFocus={() => setIsActive(true)}
           onBlur={() => setIsActive(false)}
+          multiline={multiline}
+          style={[
+            styles.input,
+            {borderColor: isActive && !textarea ? COLOR_9 : COLOR_6},
+            showEye && {paddingRight: 50},
+            style,
+            textarea && [styles.input, {height: 125, verticalAlign: "top"}],
+            isGray && [styles.input, {backgroundColor: "#EEEEEE"}],
+            // numberTel && [styles.input, { letterSpacing: 2 }],
+          ]}
         />
       )}
       {filtered && (
         <TouchableOpacity onPress={resetText} style={styles.cancelIcon}>
-          <AntDesign name="closecircle" size={20} color="black" />
+          <AntDesign name="closecircle" size={20} color="black"/>
         </TouchableOpacity>
       )}
       {showEye ? (
@@ -116,9 +107,9 @@ function MyInput({
           onPress={() => onEyePressed(secureTextEntry)}
         >
           {!secureTextEntry ? (
-            <ImageSeePassword style={styles.see} />
+            <ImageSeePassword style={styles.see}/>
           ) : (
-            <ImageUnSeePassword style={styles.unsee} />
+            <ImageUnSeePassword style={styles.unsee}/>
           )}
         </TouchableOpacity>
       ) : null}

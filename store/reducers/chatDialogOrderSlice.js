@@ -1,17 +1,18 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { api } from "../../Api";
+import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import {api} from "../../Api";
 
 export const chatOrderRequest = createAsyncThunk(
   "order/chat",
-  async ({ token, id }) => {
+  async (data, {rejectWithValue}) => {
     try {
       const result = await api.post("/auth-chat-dialog-order", {
-        secret_token: token,
-        last_id: id,
+        secret_token: data.token,
+        last_id: data.id,
+        // offset: data.offset
       });
-      return result;
+      return result.data;
     } catch (error) {
-      return error;
+      return rejectWithValue.error.data;
     }
   }
 );
@@ -30,7 +31,8 @@ const orderChatSlice = createSlice({
         state.loading = true;
       })
       .addCase(chatOrderRequest.fulfilled, (state, action) => {
-        state.data = action.payload.data.data;
+        // console.log(action.payload.data.current, "dialog  auth-chat-dialog-order");
+        state.data = action.payload.data
         state.loading = false;
       })
       .addCase(chatOrderRequest.rejected, (state) => {

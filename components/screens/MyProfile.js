@@ -14,7 +14,7 @@ import AccordionItem from "../includes/AccordionItem";
 import MyInput from "../includes/MyInput";
 import { COLOR_1, COLOR_6, WRAPPER_PADDINGS } from "../helpers/Variables";
 import BlockWithSwitchButton from "../includes/BlockWithSwitchButton";
-import QRCode from "react-native-qrcode-generator";
+import QRCode from "react-native-qrcode-svg";
 import QrModal from "../includes/QrModal";
 import { deleteUserRequest } from "../../store/reducers/deleteUserSlice";
 import { offerMessageRequest } from "../../store/reducers/offerMessageSlice";
@@ -33,13 +33,14 @@ import { getCitys } from "../../store/reducers/getCitysSlice";
 import { getCountrys } from "../../store/reducers/getCountrysSlice";
 import SelectDropdown from "react-native-select-dropdown";
 import { showMessage } from "react-native-flash-message";
-import { BarCodeScanner } from "expo-barcode-scanner";
 import { AntDesign } from "@expo/vector-icons";
 import SectionedMultiSelect from "react-native-sectioned-multi-select";
 import { MaterialIcons } from "@expo/vector-icons";
 import DelayInput from "react-native-debounce-input";
 import * as FileSystem from "expo-file-system";
-
+import { authRequest } from "../../store/reducers/authUserSlice";
+import * as Contacts from "expo-contacts";
+import vCard from "vcard-creator";
 const items = [
   {
     id: "owner",
@@ -70,6 +71,7 @@ const items = [
 const MyProfile = ({ route, navigation }) => {
   const { currentPage } = route.params;
   const user = useSelector((state) => state.authUserSlice.data.user);
+
   const [name, setName] = useState("");
   const [image, setImage] = useState(null);
   const [position, setPosoition] = useState("");
@@ -145,8 +147,6 @@ const MyProfile = ({ route, navigation }) => {
     if (!result.canceled) {
       setFileSize(await getFileInfo(result.assets[0].uri));
       setImage(result);
-    } else {
-      console.log(await getFileInfo(result.assets[0].uri));
     }
   };
 
@@ -157,6 +157,8 @@ const MyProfile = ({ route, navigation }) => {
     setCompanyName(user?.name);
     setInn(user?.inn);
     setSicte(user?.site);
+    setPhoneNumber(user?.phone);
+
     const getCytys = () => {
       dispatch(getCitys())
         .unwrap()
@@ -194,17 +196,17 @@ const MyProfile = ({ route, navigation }) => {
   const save = () => {
     const data = new FormData();
     const avatar_person = {
-      uri: image?.uri ? image?.uri : user?.avater,
+      uri: image?.assets[0].uri ? image?.assets[0].uri : user?.avater,
       name: new Date().toISOString(),
       type: `image/jpeg`,
     };
-    image?.uri && data.append("avatar_person", avatar_person);
+    image?.assets[0].uri && data.append("avatar_person", avatar_person);
     data.append("secret_token", token);
     data.append("post", position ? position : user?.post);
     data.append("hide_email", showToOthersEmail ? 1 : 0);
     data.append("hide_phone", showToOthersPhone ? 1 : 0);
-    data.append("phone", phoneNumber ? phoneNumber : user?.phone);
-    data.append("email", email ? email : user?.email);
+    data.append("phone", phoneNumber);
+    data.append("email", email);
     data.append("contact_person", name ? name : user?.contact_person);
     data.append("city_person", city ? city : user?.city_person?.last_id);
     data.append("name", companyName ? companyName : user?.name);
@@ -247,53 +249,53 @@ const MyProfile = ({ route, navigation }) => {
 
   useEffect(() => {
     setHideProfile(user?.hide_person);
-    const getToken = () => {
-      try {
-        AsyncStorage.getItem("token").then((token) => {
-          setToken(token);
-        });
-        AsyncStorage.getItem("hide_person").then((result) => {
-          if (result) {
-            setHideProfile(result);
-          }
-        });
-        AsyncStorage.getItem("personal_notify").then((result) => {
-          if (result) {
-            setDmPush(result);
-          }
-        });
-        AsyncStorage.getItem("personal_message").then((result) => {
-          if (result) {
-            setDmEmail(result);
-          }
-        });
-        AsyncStorage.getItem("global_message").then((result) => {
-          if (result) {
-            setGroupMessagesEmail(result);
-          }
-        });
-        AsyncStorage.getItem("global_notify").then((result) => {
-          if (result) {
-            setGroupMessagesPush(result);
-          }
-        });
-        AsyncStorage.getItem("offer_message").then((result) => {
-          if (result) {
-            setNewMessagesEmail(result);
-          }
-        });
-        AsyncStorage.getItem("offer_notify").then((result) => {
-          if (result) {
-            setNewMessagesPush(result);
-          }
-        });
-      } catch (error) {
-        console.warn(error);
+    // const getToken = () => {
+    //   try {
+    AsyncStorage.getItem("token").then((token) => {
+      setToken(token);
+      dispatch(authRequest({ secret_token: token }));
+    });
+    AsyncStorage.getItem("hide_person").then((result) => {
+      if (result) {
+        setHideProfile(result);
       }
-    };
+    });
+    AsyncStorage.getItem("personal_notify").then((result) => {
+      if (result) {
+        setDmPush(result);
+      }
+    });
+    AsyncStorage.getItem("personal_message").then((result) => {
+      if (result) {
+        setDmEmail(result);
+      }
+    });
+    AsyncStorage.getItem("global_message").then((result) => {
+      if (result) {
+        setGroupMessagesEmail(result);
+      }
+    });
+    AsyncStorage.getItem("global_notify").then((result) => {
+      if (result) {
+        setGroupMessagesPush(result);
+      }
+    });
+    AsyncStorage.getItem("offer_message").then((result) => {
+      if (result) {
+        setNewMessagesEmail(result);
+      }
+    });
+    AsyncStorage.getItem("offer_notify").then((result) => {
+      if (result) {
+        setNewMessagesPush(result);
+      }
+    });
+    //   } catch (error) {
+    //     console.warn(error);
+    //   }
+    // };
 
-    getToken();
-    // dispatch(authRequest({token:token}))
+    // getToken();
   }, []);
 
   const changeHide = async () => {
@@ -416,10 +418,6 @@ const MyProfile = ({ route, navigation }) => {
     });
   }, [setShowToOthersPhone, user]);
 
-  const hideEmail = () => {
-    setShowToOthersEmail(!showToOthersEmail);
-  };
-
   const dontWork = () => {
     setDontWorkInThisCompany(!dontWorkInThisCompany);
   };
@@ -438,6 +436,23 @@ const MyProfile = ({ route, navigation }) => {
   useEffect(() => {
     filtered(searchValue);
   }, [searchValue]);
+
+  const card = new vCard()
+    .addName(name)
+    .addPhoneNumber(phoneNumber)
+    .addEmail(email)
+    // .addPhoto(" https://teus.online/" + user?.avatar_person)
+    .addCompany(companyName)
+    .addLogoURL("https://teus.online/" + user?.avatar_person)
+    .addPhotoURL("https://teus.online/" + user?.avatar_person);
+
+  //     setPosoition(user?.post);
+  //     setEmail(user?.email);
+  //     setInn(user?.inn);
+  //     setSicte(user?.site);
+
+  const vcardString = card.toString();
+  // const vcardBase64 = btoa(vcardString);
 
   return (
     <Wrapper
@@ -465,7 +480,7 @@ const MyProfile = ({ route, navigation }) => {
               <Image
                 source={{
                   uri: image
-                    ? image.uri
+                    ? image.assets[0].uri
                     : user?.avatar_person
                     ? "https://teus.online/" + user?.avatar_person
                     : "https://vyshnevyi-partners.com/wp-content/uploads/2016/12/no-avatar.png",
@@ -491,12 +506,13 @@ const MyProfile = ({ route, navigation }) => {
           />
           <MyInput
             label={"Номер телефона"}
-            numberTel={true}
+            numberTel={!showToOthersPhone}
             phoneNumber={phoneNumber}
-            placeholder={user?.phone}
+            // placeholder={phoneNumber}
             onChangeText={(e) => setPhoneNumber(e)}
-            keyboardType={"phone-pad"}
+            keyboardType={showToOthersPhone ? "default" : "phone-pad"}
             secureTextEntry={showToOthersPhone}
+            editable={!showToOthersPhone}
             value={phoneNumber}
           />
           <BlockWithSwitchButton
@@ -513,15 +529,19 @@ const MyProfile = ({ route, navigation }) => {
             placeholder={"Введите электронную почту"}
             value={email}
             onChangeText={(email) => setEmail(email)}
-            keyboardType={"email-address"}
-            secureTextEntry={showToOthersEmail}
+            keyboardType={showToOthersEmail ? "default" : "email-address"}
+            secureTextEntry={true}
+            editable={!showToOthersEmail}
+            numberTel={false}
           />
           <BlockWithSwitchButton
             title={"скрыть электронную почту"}
             titleStyle={styles.smallSwitchTitle}
             style={styles.switchBlock}
             isOn={showToOthersEmail}
-            onToggle={(val) => hideEmail()}
+            onToggle={(val) => {
+              setShowToOthersEmail(!showToOthersEmail);
+            }}
           />
           <View style={styles.dropDownCitys}>
             <AccordionItem
@@ -674,6 +694,7 @@ const MyProfile = ({ route, navigation }) => {
               hideTags
               items={items}
               uniqueKey="id"
+              selectedText={"Выбрано"}
               onSelectedItemsChange={onSelectedItemsChange}
               selectedItems={selectedItems}
               selectText="Профиль деятельности"
@@ -750,18 +771,8 @@ const MyProfile = ({ route, navigation }) => {
               style={[styles.imageView, styles.qrView]}
             >
               <QRCode
-                value={JSON.stringify({
-                  name: user?.contact_person,
-                  position: user?.post,
-                  phoneNumber: user?.phone,
-                  email: user?.email,
-                  city: user?.city_person?.title.ru,
-                  companyName: user?.name,
-                  image: "https://teus.online/" + user?.avatar_person,
-                })}
-                size={94}
-                bgColor="black"
-                fgColor="white"
+                value={`BEGIN:VCARD\n${vcardString}\nEND:VCARD`}
+                enableLinearGradient
               />
             </TouchableOpacity>
             <TouchableOpacity>
@@ -772,7 +783,7 @@ const MyProfile = ({ route, navigation }) => {
           </View>
           <QrModal
             onCancel={() => setBigQr(false)}
-            value={"https://teus.online//"}
+            value={`BEGIN:VCARD\n${vcardString}\nEND:VCARD`}
             isVisible={bigQr}
           />
         </AccordionItem>
@@ -977,7 +988,7 @@ const styles = StyleSheet.create({
   },
   qrView: {
     padding: 3,
-    backgroundColor: "#000",
+    // backgroundColor: "#000",
     borderRadius: 10,
   },
   image: {

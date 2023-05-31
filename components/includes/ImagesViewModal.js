@@ -1,12 +1,12 @@
 import React from "react";
 import Modal from "react-native-modal";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
-import { COLOR_1, COLOR_5 } from "../helpers/Variables";
-import { AntDesign } from "@expo/vector-icons";
+import {Image, StyleSheet, TouchableOpacity, View} from "react-native";
+import {COLOR_1, COLOR_5} from "../helpers/Variables";
+import {AntDesign} from "@expo/vector-icons";
 
 
-function ImagesViewhModal(props) {
-  const { onCancel, isVisible, fileName, local } = props;
+export const ImagesViewModal = (props) => {
+  const {onCancel, isVisible, fileName, local} = props;
   return (
     <Modal
       style={styles.modal}
@@ -24,11 +24,11 @@ function ImagesViewhModal(props) {
       <View style={styles.wrapper}>
         <View style={styles.modalHeader}>
           <TouchableOpacity onPress={onCancel}>
-          <AntDesign name="close" size={20} color="red" />
+            <AntDesign name="close" size={20} color="red"/>
           </TouchableOpacity>
         </View>
         <Image
-          source={{ uri: local ? fileName : "https://teus.online" + fileName }}
+          source={{uri: local ? fileName : "https://teus.online" + fileName}}
           style={{
             width: "100%",
             height: 200,
@@ -94,4 +94,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default ImagesViewhModal;
+

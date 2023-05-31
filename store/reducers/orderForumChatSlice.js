@@ -1,17 +1,17 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { api } from "../../Api";
+import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import {api} from "../../Api";
 
 export const chatForumOrderRequest = createAsyncThunk(
   "forum/order",
-  async ({ token, id }) => {
+  async (data, {rejectWithValue}) => {
     try {
       const result = await api.post("/auth-chat-forum-order", {
-        secret_token: token,
-        last_id: id,
+        secret_token: data.token,
+        last_id: data.id,
       });
-      return result;
+      return result.data;
     } catch (error) {
-      return error;
+      return rejectWithValue.error.data;
     }
   }
 );
@@ -22,18 +22,21 @@ const orderChatForumSlice = createSlice({
     loading: false,
     error: false,
     data: [],
+    dialog_message: []
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
 
       .addCase(chatForumOrderRequest.pending, (state) => {
-        state.loading = true;
+        // state.loading = true;
       })
-      
+
       .addCase(chatForumOrderRequest.fulfilled, (state, action) => {
-        state.data = action.payload.data.data;
         state.loading = false;
+        state.dialog_message = action.payload.data.messages;
+        // console.log(action.payload.data.messages, 'action.payload.data')
+        // state.dialog_last_message = action.payload
       })
 
       .addCase(chatForumOrderRequest.rejected, (state) => {

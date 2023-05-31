@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { FlatList, StyleSheet, TextInput } from "react-native";
-import { View, TouchableOpacity, Text } from "react-native";
-import { ImageArrowSmall, ImageArrowSmallUp } from "../helpers/images";
+import React, {useEffect, useState} from "react";
+import {FlatList, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {ImageArrowSmall, ImageArrowSmallUp} from "../helpers/images";
 import Modal from "react-native-modal";
-import { COLOR_1, COLOR_5 } from "../helpers/Variables";
-import { AntDesign } from "@expo/vector-icons";
-import { useSelector } from "react-redux";
+import {COLOR_1, COLOR_5} from "../helpers/Variables";
+import {useSelector} from "react-redux";
 import DelayInput from "react-native-debounce-input";
 
-function FilterItem({ title, onSelect, options, top, offers, isCitys }) {
+function FilterItem({title, onSelect, options, top, offers, isCitys}) {
   const [expanded, setExpanded] = useState("");
 
   const [searchValue, setSearchValue] = useState("");
@@ -16,13 +14,13 @@ function FilterItem({ title, onSelect, options, top, offers, isCitys }) {
   let allCitys = useSelector(
     (state) => state.getCitysSlice?.data?.data?.data?.citys
   );
-  const renderItem = ({ item }) => {
+  const renderItem = ({item}) => {
     if (item?.title?.ru) {
-      item = { title: item.title.ru, last_id: item.last_id };
+      item = {title: item.title.ru, last_id: item.last_id};
     } else if (item?.title) {
-      item = { title: item.title, last_id: item.last_id };
+      item = {title: item.title, last_id: item.last_id};
     } else if (item) {
-      item = { title: item };
+      item = {title: item};
     }
 
     return (
@@ -63,7 +61,7 @@ function FilterItem({ title, onSelect, options, top, offers, isCitys }) {
         style={styles.wrapper}
       >
         <Text style={styles.title}>{title}</Text>
-        {expanded ? <ImageArrowSmallUp /> : <ImageArrowSmall />}
+        {expanded ? <ImageArrowSmallUp/> : <ImageArrowSmall/>}
       </TouchableOpacity>
       <Modal
         isVisible={expanded ? true : false}
@@ -79,7 +77,7 @@ function FilterItem({ title, onSelect, options, top, offers, isCitys }) {
         animationOutTiming={100}
         deviceHeight={350}
       >
-        <View style={[styles.showPart, offers && { top: 20 }]}>
+        <View style={[styles.showPart, offers && {top: 20}]}>
           {isCitys && (
             <View style={styles.searchRow}>
               <DelayInput

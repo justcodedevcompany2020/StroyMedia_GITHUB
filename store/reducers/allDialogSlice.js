@@ -5,12 +5,13 @@ import axios from "axios";
 export const allDialogRequest = createAsyncThunk(
   "all/dialog",
   async ({ token }) => {
+    
     try {
       const result = await api.post("/auth-chat-dialog-all", {
         secret_token: token,
       });
 
-      return result;
+      return result.data;
     } catch (err) {
       if (axios.isAxiosError(err)) {
         let error = err;
@@ -35,10 +36,10 @@ const allDialogSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(allDialogRequest.pending, (state) => {
-        state.loading = true;
+        // state.loading = true;
       })
       .addCase(allDialogRequest.fulfilled, (state, action) => {
-        state.data = action.payload.data.data.users;
+        state.data = action.payload.data.users;
         state.error = false;
         state.loading = false;
       })

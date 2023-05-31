@@ -1,42 +1,24 @@
-import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  useWindowDimensions,
-  Platform,
-} from "react-native";
+import React, {useEffect, useState} from "react";
+import {Platform, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View,} from "react-native";
 import Wrapper from "../helpers/Wrapper";
-import { useSelector } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import NavBar from "../includes/NavBar";
-import {
-  COLOR_1,
-  COLOR_6,
-  COLOR_8,
-  COLOR_9,
-  WRAPPER_PADDINGS,
-} from "../helpers/Variables";
-import {
-  ImageBiggerPlaceholder,
-  ImageCalendar,
-  ImageNextArrow,
-} from "../helpers/images";
-
+import {COLOR_1, COLOR_6, COLOR_8, COLOR_9, WRAPPER_PADDINGS,} from "../helpers/Variables";
+import {ImageBiggerPlaceholder, ImageCalendar, ImageNextArrow,} from "../helpers/images";
+import openMap, {createOpenLink} from 'react-native-open-maps';
 import AccordionItem from "../includes/AccordionItem";
-import { useDispatch } from "react-redux";
 import moment from "moment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getEventsRequest } from "../../store/reducers/getEventsAllSlice";
+import {getEventsRequest} from "../../store/reducers/getEventsAllSlice";
 import EventsItem from "../includes/eventsItem";
 import RenderHtml from "react-native-render-html";
-import { checkChatExistRequest } from "../../store/reducers/checkChatExistSlice";
+import {checkChatExistRequest} from "../../store/reducers/checkChatExistSlice";
 
-function Events({ route, navigation }) {
+function Events({route, navigation}) {
   const [tabs, setTabs] = useState(["1 день", "2 день"]);
-  const { width } = useWindowDimensions();
+  const {width} = useWindowDimensions();
   const [activeTab, setActiveTab] = useState("1 день");
-  const { currentPage } = route.params;
+  const {currentPage} = route.params;
   const [token, setToken] = useState();
   const session = useSelector((state) => state.getEventsSlice.data.schedule);
   const data = useSelector((state) => state.getEventsSlice.data.rows);
@@ -44,17 +26,22 @@ function Events({ route, navigation }) {
   const regex = /(<([^>]+)>)/gi;
   const simvolRegexp = /&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-fA-F]{1,6})/;
   const spacesRegex = /&(nbsp|amp|quot|lt|gt);/g;
-
+  const mapLink = createOpenLink({
+    navigate: true,
+    zoom: 12,
+    latitude: 37.865101,
+    longitude: -119.538330
+  })
   useEffect(() => {
     AsyncStorage.getItem("token").then((result) => {
       if (result) {
         setToken(result);
-        dispatch(getEventsRequest({ token: result, events_id: 1 }));
-        dispatch(getEventsRequest({ token: result, events_id: "index" }));
+        dispatch(getEventsRequest({token: result, events_id: 1}));
+        // dispatch(getEventsRequest({token: result, events_id: "index"}));
       }
     });
-    dispatch(getEventsRequest({ token, events_id: 1 }));
-    dispatch(getEventsRequest({ token, events_id: "index" }));
+    dispatch(getEventsRequest({token, events_id: 1}));
+    // dispatch(getEventsRequest({token, events_id: "index"}));
   }, [dispatch]);
 
   const titleComponent = (startTime, endTime, listTitleText) => {
@@ -91,13 +78,17 @@ function Events({ route, navigation }) {
               <Text style={styles.title}>{d.title}</Text>
               <View style={styles.info}>
                 <View style={styles.date}>
-                  <ImageCalendar />
+                  <ImageCalendar/>
                   <Text style={styles.dateText}>
                     {moment(+date).format("YYYY-MM-DD")}
                   </Text>
                 </View>
-                <TouchableOpacity style={styles.location}>
-                  <ImageBiggerPlaceholder />
+                <TouchableOpacity
+                  style={styles.location}
+                  onPress={() => {
+                    openMap(mapLink)
+                  }}>
+                  <ImageBiggerPlaceholder/>
                   <Text style={styles.locationText}>{d.place}</Text>
                 </TouchableOpacity>
               </View>
@@ -119,26 +110,26 @@ function Events({ route, navigation }) {
                   text={
                     Platform.OS === "android"
                       ? s?.full
-                          ?.replace(regex, "")
-                          .replace(simvolRegexp, "")
-                          .replace(spacesRegex, "")
-                          .trim() ||
-                        s?.event?.full
-                          ?.replace(regex, "")
-                          .replace(spacesRegex, "")
-                          .replace(simvolRegexp, " ")
-                          .trim()
+                        ?.replace(regex, "")
+                        .replace(simvolRegexp, "")
+                        .replace(spacesRegex, "")
+                        .trim() ||
+                      s?.event?.full
+                        ?.replace(regex, "")
+                        .replace(spacesRegex, "")
+                        .replace(simvolRegexp, " ")
+                        .trim()
                       : (
-                          <RenderHtml
-                            contentWidth={width}
-                            source={{ html: s.full }}
-                          />
-                        ) || (
-                          <RenderHtml
-                            contentWidth={width}
-                            source={{ html: s.event.full }}
-                          />
-                        )
+                      <RenderHtml
+                        contentWidth={width}
+                        source={{html: s.full}}
+                      />
+                    ) || (
+                      <RenderHtml
+                        contentWidth={width}
+                        source={{html: s.event.full}}
+                      />
+                    )
                   }
                   personName={s.moderator}
                   token={token}
@@ -150,12 +141,12 @@ function Events({ route, navigation }) {
                 <TouchableOpacity
                   onPress={() => {
                     dispatch(
-                      checkChatExistRequest({ token: token, id: s.last_id })
+                      checkChatExistRequest({token: token, id: s.last_id})
                     )
                       .unwrap()
                       .then(() => {
-                        navigation.navigate("Chat", {
-                          currentPage: "Чаты",
+                        navigation.navigate("DialogChat", {
+                          currentPage: "Диалоги",
                           title: s.event.title,
                           id: s.last_id,
                         });
@@ -163,7 +154,7 @@ function Events({ route, navigation }) {
                   }}
                   style={styles.nextArrow}
                 >
-                  <ImageNextArrow />
+                  <ImageNextArrow/>
                 </TouchableOpacity>
               </View>
             </AccordionItem>
@@ -183,26 +174,26 @@ function Events({ route, navigation }) {
                   text={
                     Platform.OS === "android"
                       ? s?.full
-                          ?.replace(regex, "")
-                          .replace(spacesRegex, "")
-                          .replace(simvolRegexp, " ")
-                          .trim() ||
-                        s?.event?.full
-                          ?.replace(regex, "")
-                          .replace(spacesRegex, "")
-                          .replace(simvolRegexp, " ")
-                          .trim()
+                        ?.replace(regex, "")
+                        .replace(spacesRegex, "")
+                        .replace(simvolRegexp, " ")
+                        .trim() ||
+                      s?.event?.full
+                        ?.replace(regex, "")
+                        .replace(spacesRegex, "")
+                        .replace(simvolRegexp, " ")
+                        .trim()
                       : (
-                          <RenderHtml
-                            contentWidth={width}
-                            source={{ html: s.full }}
-                          />
-                        ) || (
-                          <RenderHtml
-                            contentWidth={width}
-                            source={{ html: s.event.full }}
-                          />
-                        )
+                      <RenderHtml
+                        contentWidth={width}
+                        source={{html: s.full}}
+                      />
+                    ) || (
+                      <RenderHtml
+                        contentWidth={width}
+                        source={{html: s.event.full}}
+                      />
+                    )
                   }
                   personName={s.moderator}
                   token={token}
@@ -214,12 +205,12 @@ function Events({ route, navigation }) {
                 <TouchableOpacity
                   onPress={() => {
                     dispatch(
-                      checkChatExistRequest({ token: token, id: s.last_id })
+                      checkChatExistRequest({token: token, id: s.last_id})
                     )
                       .unwrap()
                       .then(() => {
-                        navigation.navigate("Chat", {
-                          currentPage: "Чаты",
+                        navigation.navigate("DialogChat", {
+                          currentPage: "Диалоги",
                           title: s.event.title,
                           id: s.last_id,
                         });
@@ -227,7 +218,7 @@ function Events({ route, navigation }) {
                   }}
                   style={styles.nextArrow}
                 >
-                  <ImageNextArrow />
+                  <ImageNextArrow/>
                 </TouchableOpacity>
               </View>
             </AccordionItem>

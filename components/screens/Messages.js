@@ -1,39 +1,26 @@
-import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
+import React, {useEffect, useState} from "react";
+import {ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View,} from "react-native";
 import Wrapper from "../helpers/Wrapper";
-import { useDispatch, useSelector } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import NavBar from "../includes/NavBar";
-import {
-  COLOR_5,
-  COLOR_1,
-  COLOR_6,
-  WRAPPER_PADDINGS,
-} from "../helpers/Variables";
-import { SwipeListView } from "react-native-swipe-list-view";
-import { ImageDelete, ImageFadePart } from "../helpers/images";
-import Search from "../includes/Search";
+import {COLOR_1, COLOR_5, COLOR_6, WRAPPER_PADDINGS,} from "../helpers/Variables";
+import {SwipeListView} from "react-native-swipe-list-view";
+import {ImageDelete, ImageFadePart} from "../helpers/images";
+import {Search} from "../includes/Search";
 import AddNew from "../includes/AddNew";
 import ScrollableAccordionItem from "../includes/ScrollableAccordionItem";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { allDialogRequest } from "../../store/reducers/allDialogSlice";
-import { chatOrderRequest } from "../../store/reducers/chatDialogOrderSlice";
-import { authRequest } from "../../store/reducers/authUserSlice";
-import { allChatForumRequest } from "../../store/reducers/forumChatAllSlice";
-import { chatForumOrderRequest } from "../../store/reducers/orderForumChatSlice";
+import {allDialogRequest} from "../../store/reducers/allDialogSlice";
+import {authRequest} from "../../store/reducers/authUserSlice";
+import {allChatForumRequest} from "../../store/reducers/forumChatAllSlice";
+import {chatForumOrderRequest} from "../../store/reducers/orderForumChatSlice";
 import SearchModal from "../includes/SearchModal";
 import Modal from "react-native-modal";
-import { deleteChatRequest } from "../../store/reducers/deleteChatSlice";
-import _ from "lodash";
+import {deleteChatRequest} from "../../store/reducers/deleteChatSlice";
+
 const SearchIcon = require("../../assets/search.png");
 
-function Messages(props) {
+function Messages({route, navigation}) {
   const [tabs, setTabs] = useState(["Диалоги", "Чаты"]);
   const [activeTab, setActiveTab] = useState("Диалоги");
   const [searchValue, setSearchValue] = useState("");
@@ -41,7 +28,7 @@ function Messages(props) {
   const [token, setToken] = useState();
   const [visibleModal, setVisibleModal] = useState(false);
   const dispatch = useDispatch();
-  const { data, loading } = useSelector((state) => state.allDialogSlice);
+  const {data, loading} = useSelector((state) => state.allDialogSlice);
   const forumChats = useSelector((state) => state.forumChatAllSlice.data);
   const isloading = useSelector((state) => state.forumChatAllSlice.loading);
   const [filteredData, setFilteredData] = useState([]);
@@ -51,8 +38,7 @@ function Messages(props) {
   );
   const success = useSelector((state) => state.searchChatMembersSlice.success);
   const searchMessages = serachResult;
-  const { route, navigation } = props;
-  const { currentPage } = route.params;
+  const {currentPage} = route.params;
   const [compName, setCompName] = useState("");
   const [userName, setUserName] = useState("");
   const [deletedId, setDeletedId] = useState([]);
@@ -66,12 +52,10 @@ function Messages(props) {
   useEffect(() => {
     AsyncStorage.getItem("token").then((result) => {
       setToken(result);
-      dispatch(authRequest({ token: result }));
-      dispatch(allDialogRequest({ token: result }));
-      dispatch(allChatForumRequest({ token: result }));
+      dispatch(authRequest({secret_token: result}));
+      dispatch(allDialogRequest({token: result}));
+      dispatch(allChatForumRequest({token: result}));
     });
-    dispatch(allDialogRequest({ token }));
-    dispatch(allChatForumRequest({ token }));
   }, []);
 
   const convertedArray = Object.keys(data).map(function (key) {
@@ -82,7 +66,7 @@ function Messages(props) {
     return forumChats[key];
   });
 
-  const renderItem = ({ item, index }) => {
+  const renderItem = ({item, index}) => {
     return (
       <>
         {!deletedId.includes(item.last_id) && (
@@ -98,25 +82,31 @@ function Messages(props) {
             onPress={() => {
               activeTab === "Чаты"
                 ? dispatch(
-                    chatForumOrderRequest({ token: token, id: item.last_id })
-                  )
-                    .unwrap()
-                    .then(() => {
-                      navigation.navigate("Chat", {
-                        currentPage: "Чаты",
-                        title: item?.title || item.description,
-                        id: item.last_id,
-                      });
-                    })
-                : dispatch(chatOrderRequest({ token: token, id: item.last_id }))
-                    .unwrap()
-                    .then(() => {
-                      navigation.navigate("Chat", {
-                        currentPage: "Диалоги",
-                        title: item?.title || item.description,
-                        id: item.last_id,
-                      });
+                  chatForumOrderRequest({token: token, id: item.last_id})
+                )
+                  .unwrap()
+                  .then(() => {
+                    navigation.navigate("Chat", {
+                      currentPage: "Чаты",
+                      title: item?.title || item.description,
+                      id: item.last_id,
                     });
+                  })
+                :
+                // dispatch(chatOrderRequest({token: token, id: item.last_id}))
+                //   .unwrap()
+                //   .then(() => {
+                //     // navigation.navigate("Chat", {
+                //     //   currentPage: "Диалоги",
+                //     //   title: item?.title || item.description,
+                //     //   id: item.last_id,
+                //     // });
+                navigation.navigate("DialogChat", {
+                  currentPage: "Диалоги",
+                  title: item?.title || item.description,
+                  id: item.last_id,
+                });
+              //   });
             }}
           />
         )}
@@ -129,8 +119,8 @@ function Messages(props) {
       activeTab === "Чаты"
         ? convertForumChatToArray
         : searchMessages?.length
-        ? searchMessages
-        : Object.keys(data).map((key) => {
+          ? searchMessages
+          : Object.keys(data).map((key) => {
             return data[key];
           })
     );
@@ -138,25 +128,25 @@ function Messages(props) {
 
   const filteredMessages = (searchText) => {
     activeTab === "Диалоги" &&
-      !serachResult.length &&
-      setFilteredData(
-        convertedArray.filter((m) => {
-          return m?.name?.includes(searchText);
-        })
-      );
+    !serachResult.length &&
+    setFilteredData(
+      convertedArray.filter((m) => {
+        return m?.name?.includes(searchText);
+      })
+    );
     activeTab === "Чаты" &&
-      setFilteredData(
-        convertForumChatToArray.filter((m) => {
-          return m?.title?.includes(searchText);
-        })
-      );
+    setFilteredData(
+      convertForumChatToArray.filter((m) => {
+        return m?.title?.includes(searchText);
+      })
+    );
     activeTab === "Диалоги" &&
-      serachResult.length &&
-      setFilteredData(
-        searchMessages.filter((m) => {
-          return m?.name?.includes(searchText);
-        })
-      );
+    serachResult.length &&
+    setFilteredData(
+      searchMessages.filter((m) => {
+        return m?.name?.includes(searchText);
+      })
+    );
   };
 
   const onClick = () => {
@@ -202,7 +192,7 @@ function Messages(props) {
               filteredMessages(searchValue);
             }}
           >
-            <Image source={SearchIcon} style={{ width: 25, height: 25 }} />
+            <Image source={SearchIcon} style={{width: 25, height: 25}}/>
           </TouchableOpacity>
         </View>
       </View>
@@ -210,7 +200,7 @@ function Messages(props) {
   };
 
   const removeItem = (id) => {
-    dispatch(deleteChatRequest({ token, id }));
+    dispatch(deleteChatRequest({token, id}));
     setFilteredData(
       filteredData.filter((data) => {
         data;
@@ -242,7 +232,7 @@ function Messages(props) {
             return <Text style={styles.empty}>ничего не найдено</Text>;
           }}
           ListHeaderComponent={headerComponent()}
-          renderHiddenItem={({ item, index }) =>
+          renderHiddenItem={({item, index}) =>
             activeTab === "Диалоги" && (
               <View style={styles.hiddenWrapper}>
                 <TouchableOpacity
@@ -253,7 +243,7 @@ function Messages(props) {
                   }
                 >
                   <View style={styles.hiddenBlock}>
-                    <ImageDelete />
+                    <ImageDelete/>
 
                     <View style={styles.hiddenItemTextBlock}>
                       <Text style={styles.hiddenItemText}>Удалить</Text>
@@ -271,17 +261,17 @@ function Messages(props) {
           //onEndReachedThreshold={0}
         />
         <View style={styles.fadeBlock}>
-          <Image source={ImageFadePart} style={styles.fade} />
+          <Image source={ImageFadePart} style={styles.fade}/>
         </View>
         {loading && !data.length && (
           <Modal backdropOpacity={0.75} isVisible={true}>
             <View>
-              <ActivityIndicator size="large" />
+              <ActivityIndicator size="large"/>
             </View>
           </Modal>
         )}
         {activeTab === "Диалоги" && (
-          <AddNew onPress={() => setVisibleModal(true)} />
+          <AddNew onPress={() => setVisibleModal(true)}/>
         )}
         <SearchModal
           isVisible={visibleModal}

@@ -1,9 +1,8 @@
 import React from "react";
-import { Dimensions, SafeAreaView } from "react-native";
-import { StyleSheet, View, ScrollView } from "react-native";
-import { WRAPPER_PADDINGS } from "./Variables";
+import {Dimensions, SafeAreaView, ScrollView, StyleSheet, View} from "react-native";
+import {WRAPPER_PADDINGS} from "./Variables";
 import Header from "../includes/Header";
-import { ImageBackGround } from "./images";
+import {ImageBackGround} from "./images";
 import Container from "./Container";
 
 class Wrapper extends React.Component {

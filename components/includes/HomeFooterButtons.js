@@ -25,7 +25,7 @@ const HomeFooterButtons = ({ navigation }) => {
         SvgImage={ImageUser}
         text={"Мой профиль"}
         onPress={() => {
-          dispatch(authRequest({ token: token }));
+          dispatch(authRequest({ secret_token: token }));
           return navigation.navigate("MyProfile", {
             currentPage: "Мой профиль",
           });

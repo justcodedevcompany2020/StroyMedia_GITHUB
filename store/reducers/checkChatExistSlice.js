@@ -1,14 +1,15 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { api } from "../../Api";
+import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import {api} from "../../Api";
 
 export const checkChatExistRequest = createAsyncThunk(
   "check/chat",
-  async ({ token, id }) => {
+  async ({token, id}) => {
     try {
       const result = await api.post("/check-chat-exist", {
         secret_token: token,
         last_id: id,
       });
+      console.log(result.data, 'result.data')
       return result;
     } catch (error) {
       return error;

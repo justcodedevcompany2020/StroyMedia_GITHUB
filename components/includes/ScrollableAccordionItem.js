@@ -62,7 +62,7 @@ function ScrollableAccordionItem(props) {
   useEffect(() => {
     AsyncStorage.getItem("token").then((result) => {
       dispatch(allDialogRequest({ token: result }));
-      dispatch(authRequest({ token: result }));
+      dispatch(authRequest({ secret_token: result }));
       setToken(result);
     });
   }, []);

@@ -1,12 +1,13 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { api } from "../../Api";
+import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import {api} from "../../Api";
 
 export const sendForumMessageRequest = createAsyncThunk(
   "send/forum/message",
   async (data) => {
     try {
       const result = await api.post("/forum-send-message", data);
-      return result;
+      return result.data;
+
     } catch (error) {
       return error;
     }

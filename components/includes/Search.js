@@ -1,12 +1,9 @@
-import React, { Component } from "react";
-import { StyleSheet, View } from "react-native";
-import { COLOR_6 } from "../helpers/Variables";
+import React from "react";
+import {StyleSheet, View} from "react-native";
+import {COLOR_6} from "../helpers/Variables";
 import MyInput from "./MyInput";
-import { ImageSearch } from "../helpers/images";
 
-function Search(props) {
-  const { style, searchText, onSearchText, resetText, value, keyboardType } =
-    props;
+export const Search = ({style, searchText, onSearchText, resetText, value, keyboardType}) => {
   return (
     <View style={[styles.wrapper, style]}>
       <MyInput
@@ -34,4 +31,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Search;
+

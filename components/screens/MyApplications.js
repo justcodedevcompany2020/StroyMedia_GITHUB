@@ -1,44 +1,31 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { StyleSheet, View, Text, Image, TouchableOpacity } from "react-native";
+import React, {useCallback, useEffect, useState} from "react";
+import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import Wrapper from "../helpers/Wrapper";
-import { useDispatch, useSelector } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import NavBar from "../includes/NavBar";
-import {
-  COLOR_1,
-  COLOR_2,
-  COLOR_3,
-  COLOR_5,
-  COLOR_6,
-  COLOR_8,
-  COLOR_9,
-  WRAPPER_PADDINGS,
-} from "../helpers/Variables";
-import { SwipeListView } from "react-native-swipe-list-view";
-import { allCatRequest } from "../../store/reducers/allCatSlice";
-import {
-  ImageBlankApplications,
-  ImageEdit,
-  ImageFadePart,
-  ImageOffersArrow,
-} from "../helpers/images";
-import Search from "../includes/Search";
+import {COLOR_1, COLOR_2, COLOR_3, COLOR_5, COLOR_6, COLOR_8, COLOR_9, WRAPPER_PADDINGS,} from "../helpers/Variables";
+import {SwipeListView} from "react-native-swipe-list-view";
+import {allCatRequest} from "../../store/reducers/allCatSlice";
+import {ImageBlankApplications, ImageEdit, ImageFadePart, ImageOffersArrow,} from "../helpers/images";
+import {Search} from "../includes/Search";
 import AddNew from "../includes/AddNew";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment";
-import { useFocusEffect } from "@react-navigation/native";
-import { authRequest } from "../../store/reducers/authUserSlice";
-import { Entypo } from "@expo/vector-icons";
+import {useFocusEffect} from "@react-navigation/native";
+import {authRequest} from "../../store/reducers/authUserSlice";
+import {Entypo} from "@expo/vector-icons";
+
 const SearchIcon = require("../../assets/search.png");
 
-function MyApplications({ route, navigation }) {
+function MyApplications({route, navigation}) {
   const [activeTab, setActiveTab] = useState("В работе");
   const [searchValue, setSearchValue] = useState("");
   const [page, setPage] = useState(1);
   const [offset, setOffset] = useState(5);
-  const { currentPage } = route.params;
+  const {currentPage} = route.params;
   const [token, setToken] = useState();
   const dispatch = useDispatch();
-  const { data } = useSelector((state) => state.allCatSlice);
+  const {data} = useSelector((state) => state.allCatSlice);
   const user = useSelector((state) => state.authUserSlice.data.user);
   let aplications = data;
   const [filteredData, setFilteredData] = useState([]);
@@ -49,18 +36,18 @@ function MyApplications({ route, navigation }) {
     AsyncStorage.getItem("token").then((result) => {
       if (result) {
         setToken(result);
-        dispatch(authRequest({ token: result }));
+        dispatch(authRequest({secret_token: result}));
       }
     });
   }, []);
 
   useFocusEffect(
     useCallback(() => {
-      dispatch(allCatRequest({ token, tab: activeTab, offset }));
+      dispatch(allCatRequest({token, tab: activeTab, offset}));
     }, [token, activeTab])
   );
 
-  const renderItem = ({ item, index }) => {
+  const renderItem = ({item, index}) => {
     return (
       <View style={styles.item}>
         <View style={styles.row}>
@@ -72,7 +59,7 @@ function MyApplications({ route, navigation }) {
                     ? "https://teus.online/" + item.img
                     : null,
               }}
-              style={{ height: 50, width: 50, borderRadius: 5 }}
+              style={{height: 50, width: 50, borderRadius: 5}}
             />
           </View>
           <View style={styles.number}>
@@ -99,11 +86,11 @@ function MyApplications({ route, navigation }) {
               <Text style={styles.fromCity}>
                 {item?.from_city?.title?.ru || item?.dislokaciya?.title.ru}
               </Text>
-              <ImageOffersArrow />
+              <ImageOffersArrow/>
               <Text style={styles.toCity}>{item?.to_city?.title?.ru}</Text>
             </View>
-            <View style={{ flexDirection: "column", width: "80%" }}>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <View style={{flexDirection: "column", width: "80%"}}>
+              <View style={{flexDirection: "row", alignItems: "center"}}>
                 <Text style={styles.quantity}>Количество: {item?.count}</Text>
                 <Text style={styles.priceText}>Цена:</Text>
                 <View style={styles.price}>
@@ -147,11 +134,11 @@ function MyApplications({ route, navigation }) {
             setPage(1);
             setOffset(0);
             setActiveTab(tab);
-            dispatch(allCatRequest({ token, tab }));
+            dispatch(allCatRequest({token, tab}));
           }}
         />
         <View style={styles.searchRow}>
-          <View style={{ flex: 1 }}>
+          <View style={{flex: 1}}>
             <Search
               style={styles.search}
               keyboardType={"web-search"}
@@ -165,10 +152,10 @@ function MyApplications({ route, navigation }) {
           </View>
           <TouchableOpacity
             activeOpacity={0.2}
-            style={{ marginLeft: 10 }}
+            style={{marginLeft: 10}}
             onPress={() => filtered(searchValue)}
           >
-            <Image source={SearchIcon} style={{ width: 25, height: 25 }} />
+            <Image source={SearchIcon} style={{width: 25, height: 25}}/>
           </TouchableOpacity>
         </View>
       </View>
@@ -234,7 +221,7 @@ function MyApplications({ route, navigation }) {
                       disabled={page === 1 ? true : false}
                       onPress={previusPage}
                     >
-                      <Entypo name="chevron-left" size={28} color={"gray"} />
+                      <Entypo name="chevron-left" size={28} color={"gray"}/>
                     </TouchableOpacity>
                   </View>
                   <View>
@@ -247,7 +234,7 @@ function MyApplications({ route, navigation }) {
                       disabled={data.length === 5 ? false : true}
                       onPress={nextPage}
                     >
-                      <Entypo name="chevron-right" size={28} color={"gray"} />
+                      <Entypo name="chevron-right" size={28} color={"gray"}/>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -255,7 +242,7 @@ function MyApplications({ route, navigation }) {
             }}
             renderItem={renderItem}
             ListHeaderComponent={headerComponent()}
-            renderHiddenItem={({ item }) => (
+            renderHiddenItem={({item}) => (
               <View style={styles.hiddenWrapper}>
                 <TouchableOpacity
                   style={styles.hiddenItem}
@@ -270,7 +257,7 @@ function MyApplications({ route, navigation }) {
                   }
                 >
                   <View style={styles.hiddenBlock}>
-                    <ImageEdit />
+                    <ImageEdit/>
 
                     <View style={styles.hiddenItemTextBlock}>
                       <Text style={styles.hiddenItemText}>Редактировать</Text>
@@ -283,11 +270,11 @@ function MyApplications({ route, navigation }) {
             disableRightSwipe
             keyExtractor={(item) => item.last_id}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ flexGrow: 1 }}
+            contentContainerStyle={{flexGrow: 1}}
             stickyHeaderIndices={[0]}
           />
           <View style={styles.fadeBlock}>
-            <Image source={ImageFadePart} style={styles.fade} />
+            <Image source={ImageFadePart} style={styles.fade}/>
           </View>
         </View>
       ) : (
@@ -297,7 +284,7 @@ function MyApplications({ route, navigation }) {
             activeTab={activeTab}
             onPress={(tab) => {
               setActiveTab(tab);
-              dispatch(allCatRequest({ token, tab, offset }));
+              dispatch(allCatRequest({token, tab, offset}));
             }}
           />
           <View style={styles.blankTextBlock}>
@@ -306,7 +293,7 @@ function MyApplications({ route, navigation }) {
             <Text style={styles.blankText}>добавить заявку</Text>
           </View>
           <View style={styles.blankImage}>
-            <ImageBlankApplications />
+            <ImageBlankApplications/>
           </View>
         </View>
       )}

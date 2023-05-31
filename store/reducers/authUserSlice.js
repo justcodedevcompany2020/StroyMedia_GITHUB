@@ -1,17 +1,20 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { api } from "../../Api";
+import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import {api} from "../../Api";
 
-export const authRequest = createAsyncThunk("authUser", async ({ token }) => {
-  try {
-    const result = await api.post("/get-auth-data", { secret_token: token });
-    return result;
-  } catch (error) {
-    return error;
+export const authRequest = createAsyncThunk(
+  "authUser",
+  async (secret_token) => {
+    try {
+      const result = await api.post("/get-auth-data", secret_token);
+
+      return result.data;
+    } catch (error) {
+      return error;
+    }
   }
-});
+);
 
-const authSlice = createSlice({
+const authUserSlice = createSlice({
   name: "authUser",
   initialState: {
     loading: false,
@@ -21,17 +24,20 @@ const authSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+
       .addCase(authRequest.pending, (state) => {
         state.loading = true;
       })
+
       .addCase(authRequest.fulfilled, (state, action) => {
-        state.data = action.payload?.data?.data;
+        state.data = action.payload.data;
         state.loading = false;
       })
+
       .addCase(authRequest.rejected, (state) => {
         state.loading = false;
       });
   },
 });
 
-export default authSlice.reducer;
+export default authUserSlice.reducer;

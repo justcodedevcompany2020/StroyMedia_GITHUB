@@ -1,31 +1,20 @@
-import React, { useEffect, useState } from "react";
-import {
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  FlatList,
-  Image,
-  Text,
-} from "react-native";
+import React, {useEffect, useState} from "react";
+import {FlatList, Image, StyleSheet, Text, TouchableOpacity, View,} from "react-native";
 import Wrapper from "../helpers/Wrapper";
-import { useDispatch, useSelector } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import NavBar from "../includes/NavBar";
-import Search from "../includes/Search";
+import {Search} from "../includes/Search";
 import FilterItem from "../includes/FilterItem";
 import ParticipantItem from "../includes/ParticipantItem";
-import {
-  COLOR_1,
-  COLOR_3,
-  COLOR_10,
-  WRAPPER_PADDINGS,
-} from "../helpers/Variables";
+import {COLOR_1, COLOR_10, COLOR_3, WRAPPER_PADDINGS,} from "../helpers/Variables";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getCitys } from "../../store/reducers/getCitysSlice";
-import { Entypo } from "@expo/vector-icons";
-import { getMembersReques } from "../../store/reducers/getMembersDataSlice";
+import {getCitys} from "../../store/reducers/getCitysSlice";
+import {Entypo} from "@expo/vector-icons";
+import {getMembersReques} from "../../store/reducers/getMembersDataSlice";
+
 const SearchIcon = require("../../assets/search.png");
 
-function Participants({ route, navigation }) {
+function Participants({route, navigation}) {
   const tabs = ["Все", "Избранное"];
   const [activeTab, setActiveTab] = useState("Все");
   const [searchValue, setSearchValue] = useState("");
@@ -38,9 +27,9 @@ function Participants({ route, navigation }) {
   const [cityName, setCityName] = useState("");
   // const [liked, setLiked] = useState(false);
   const state = useSelector((state) => state);
-  const { data, favoriteList } = state.getMembersSlice;
+  const {data, favoriteList} = state.getMembersSlice;
 
-  const { currentPage } = route.params;
+  const {currentPage} = route.params;
   const dispatch = useDispatch();
   let liked = false;
 
@@ -110,7 +99,7 @@ function Participants({ route, navigation }) {
     setPage(1);
     setOffset(null);
     dispatch(
-      getMembersReques({ token, offset: null, role, city: id, companyName })
+      getMembersReques({token, offset: null, role, city: id, companyName})
     );
   };
 
@@ -149,7 +138,7 @@ function Participants({ route, navigation }) {
               setSearchValue("");
             }}
           >
-            <Image source={SearchIcon} style={{ width: 25, height: 25 }} />
+            <Image source={SearchIcon} style={{width: 25, height: 25}}/>
           </TouchableOpacity>
         </View>
         <View style={styles.filtersRow}>
@@ -199,7 +188,7 @@ function Participants({ route, navigation }) {
         ListEmptyComponent={() => {
           return <Text style={styles.empty}>ничего не найдено</Text>;
         }}
-        renderItem={({ item, index }) => {
+        renderItem={({item, index}) => {
           if (favoriteList[index] == "is_Favorite") {
             liked = true;
           } else if (favoriteList[index] == "not_Favorite") {
@@ -242,7 +231,7 @@ function Participants({ route, navigation }) {
                 disabled={page === 1 ? true : false}
                 onPress={previusPage}
               >
-                <Entypo name="chevron-left" size={28} color={"gray"} />
+                <Entypo name="chevron-left" size={28} color={"gray"}/>
               </TouchableOpacity>
             </View>
             <View>
@@ -255,7 +244,7 @@ function Participants({ route, navigation }) {
                 disabled={data.length === 5 ? false : true}
                 onPress={nextPage}
               >
-                <Entypo name="chevron-right" size={28} color={"gray"} />
+                <Entypo name="chevron-right" size={28} color={"gray"}/>
               </TouchableOpacity>
             </View>
           </>

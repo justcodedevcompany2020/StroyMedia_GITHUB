@@ -1,6 +1,6 @@
 import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import {NavigationContainer} from "@react-navigation/native";
+import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import Home from "../components/screens/Home";
 import Help from "../components/screens/Help";
 import Events from "../components/screens/Events";
@@ -16,6 +16,7 @@ import CreatingApplication from "../components/screens/CreatingApplication";
 import EditApplication from "../components/screens/EditApplication";
 import Chat from "../components/screens/Chat";
 import TermsOfAgreement from "../components/screens/TermsOfAgreement";
+import {DialogChat} from "../components/screens/DialogChat";
 
 const Stack = createNativeStackNavigator();
 
@@ -28,27 +29,28 @@ class MainNavigation extends React.Component {
             headerShown: false,
           }}
         >
-          <Stack.Screen name="Home" component={Home} />
-          <Stack.Screen name="Help" component={Help} />
-          <Stack.Screen name="Events" component={Events} />
-          <Stack.Screen name="Messages" component={Messages} />
-          <Stack.Screen name="MyApplications" component={MyApplications} />
-          <Stack.Screen name="MyProfile" component={MyProfile} />
-          <Stack.Screen name="Offers" component={Offers} />
-          <Stack.Screen name="Participants" component={Participants} />
-          <Stack.Screen name="Polls" component={Polls} />
+          <Stack.Screen name="Home" component={Home}/>
+          <Stack.Screen name="Help" component={Help}/>
+          <Stack.Screen name="Events" component={Events}/>
+          <Stack.Screen name="Messages" component={Messages}/>
+          <Stack.Screen name="MyApplications" component={MyApplications}/>
+          <Stack.Screen name="MyProfile" component={MyProfile}/>
+          <Stack.Screen name="Offers" component={Offers}/>
+          <Stack.Screen name="Participants" component={Participants}/>
+          <Stack.Screen name="Polls" component={Polls}/>
           <Stack.Screen
             name="SingleParticipant"
             component={SingleParticipant}
           />
-          <Stack.Screen name="SendOffer" component={SendOffer} />
+          <Stack.Screen name="SendOffer" component={SendOffer}/>
           <Stack.Screen
             name="CreatingApplication"
             component={CreatingApplication}
           />
-          <Stack.Screen name="EditApplication" component={EditApplication} />
-          <Stack.Screen name="Chat" component={Chat} />
-          <Stack.Screen name="TermsOfAgreement" component={TermsOfAgreement} />
+          <Stack.Screen name="EditApplication" component={EditApplication}/>
+          <Stack.Screen name="Chat" component={Chat}/>
+          <Stack.Screen name="DialogChat" component={DialogChat}/>
+          <Stack.Screen name="TermsOfAgreement" component={TermsOfAgreement}/>
         </Stack.Navigator>
       </NavigationContainer>
     );
