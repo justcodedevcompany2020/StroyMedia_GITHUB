@@ -5,8 +5,7 @@ import {COLOR_1, COLOR_5} from "../helpers/Variables";
 import {AntDesign} from "@expo/vector-icons";
 
 
-export const ImagesViewModal = (props) => {
-  const {onCancel, isVisible, fileName, local} = props;
+export const ImagesViewModal = ({onCancel, isVisible, file,}) => {
   return (
     <Modal
       style={styles.modal}
@@ -28,7 +27,7 @@ export const ImagesViewModal = (props) => {
           </TouchableOpacity>
         </View>
         <Image
-          source={{uri: local ? fileName : "https://teus.online" + fileName}}
+          source={{uri: file.local ? file.files : "https://teus.online/" + file.files}}
           style={{
             width: "100%",
             height: 200,

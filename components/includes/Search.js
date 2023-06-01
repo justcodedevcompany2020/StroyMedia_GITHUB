@@ -3,16 +3,17 @@ import {StyleSheet, View} from "react-native";
 import {COLOR_6} from "../helpers/Variables";
 import MyInput from "./MyInput";
 
-export const Search = ({style, searchText, onSearchText, resetText, value, keyboardType}) => {
+export const Search = ({style, onSearchText, resetText, value, keyboardType}) => {
   return (
     <View style={[styles.wrapper, style]}>
       <MyInput
-        value={searchText ? searchText : value}
-        onChangeText={(value) => onSearchText(value)}
+        value={value}
+        onChangeText={onSearchText}
         style={styles.input}
-        filtered={searchText ? true : false}
+        // filtered={value ? true : false}
         resetText={resetText}
         keyboardType={keyboardType}
+
       />
     </View>
   );

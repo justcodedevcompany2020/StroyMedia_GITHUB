@@ -2,7 +2,6 @@ import React, {useCallback, useEffect, useRef, useState} from "react";
 import {Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View,} from "react-native";
 import Wrapper from "../helpers/Wrapper";
 import {COLOR_1, COLOR_10, COLOR_5, COLOR_8, COLOR_9, WRAPPER_PADDINGS,} from "../helpers/Variables";
-import {Search} from "../includes/Search";
 import MyInput from "../includes/MyInput";
 import {ImageAttach, ImageSend,} from "../helpers/images";
 import {useDispatch, useSelector} from "react-redux";
@@ -13,6 +12,9 @@ import * as ImagePicker from "expo-image-picker";
 import {useNavigation} from "@react-navigation/native";
 import {chatOrderRequest} from "../../store/reducers/chatDialogOrderSlice";
 import {ImagesViewModal} from "../includes/ImagesViewModal";
+import * as FileSystem from 'expo-file-system'
+import {showMessage} from "react-native-flash-message";
+import {Search} from "../includes/Search";
 
 const SearchIcon = require("../../assets/search.png");
 const HEIGHT = Dimensions.get("window").width;
@@ -21,11 +23,11 @@ const ITEM_HEIGHT = 100;
 export const DialogChat = ({route}) => {
   const navigation = useNavigation();
   const messagesRef = useRef(null);
-  const [searchValue, setSearchValue] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [inputBottom, setInputBottom] = useState(6);
   const [inputHeight, setInputHeight] = useState(40);
   const [isChanged, setIsChanged] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
   const user = useSelector((state) => state.authUserSlice?.data?.user);
   const dispatch = useDispatch();
   const intervalRef = useRef(null);
@@ -35,7 +37,6 @@ export const DialogChat = ({route}) => {
   const [filePath, setFilePath] = useState("");
   const [fileName, setFileName] = useState("");
   const [selectedFile, setSelectedFile] = useState("");
-  const [local, setLocal] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
   const state = useSelector(state1 => state1)
   const {messages} = state.chatDialogOrderSlice.data
@@ -54,17 +55,35 @@ export const DialogChat = ({route}) => {
     return afterDot;
   }
 
+  const getFileInfo = async (fileURI) => {
+    const fileInfo = await FileSystem.getInfoAsync(fileURI)
+    return fileInfo
+  }
+
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0,
+
     });
-    if (!result.canceled) {
-      getImageFormat(result.assets[0].uri);
-      setFileName(result.assets[0].uri.split("/").pop());
-      setFilePath(result.assets[0].uri);
+    const {type, uri} = result.assets[0]
+    const fileInfo = await getFileInfo(result.assets[0].uri)
+
+
+    if (fileInfo.size < 10000) {
+      if (!result.canceled) {
+        getImageFormat(result.assets[0].uri);
+        setFileName(result.assets[0].uri.split("/").pop());
+        setFilePath(result.assets[0].uri);
+      }
+    } else {
+      showMessage({
+        type: 'info',
+        message: 'Image size must be smaller than 15MB!',
+        color: 'green'
+      })
     }
   };
 
@@ -153,7 +172,7 @@ export const DialogChat = ({route}) => {
     }
     intervalRef.current = setInterval(() => {
       actionHandler()
-    }, 8000);
+    }, 6000);
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -207,7 +226,7 @@ export const DialogChat = ({route}) => {
               }}
               placeholder={"Напишите сообщение..."}
               sendComponent={
-                inputValue || filePath ? (
+                inputValue || filePath && inputValue ? (
                   <TouchableOpacity
                     style={[
                       styles.send,
@@ -229,13 +248,6 @@ export const DialogChat = ({route}) => {
   };
 
   const filteredMessages = (searchText) => {
-    // route.params.currentPage === "Диалоги"
-    //   ? setFilteredData(
-    //     dialogMessage.filter((m) => {
-    //       return m?.comment?.includes(searchText);
-    //     })
-    //   )
-    //   :
     setFilteredData(
       filteredData.filter((m) => {
         return m?.comment?.includes(searchText);
@@ -255,9 +267,8 @@ export const DialogChat = ({route}) => {
         <View style={styles.searchRow}>
           <Search
             style={styles.search}
-            searchText={searchValue}
+            value={searchValue}
             onSearchText={(val) => setSearchValue(val)}
-            filtered
             resetText={resetText}
           />
           <TouchableOpacity
@@ -273,7 +284,7 @@ export const DialogChat = ({route}) => {
     );
   };
 
-  console.log(messages, 'item.files')
+
   const renderItem = ({item, index}) => {
     return (
       <View style={styles.item}>
@@ -281,7 +292,6 @@ export const DialogChat = ({route}) => {
           style={styles.photo}
           source={{
             uri: "https://teus.online/" + item?.from?.avatar_person
-
           }}
         />
         <View style={styles.messagesList}>
@@ -311,13 +321,12 @@ export const DialogChat = ({route}) => {
               {item.files ? (
                 <TouchableOpacity
                   onPress={() => {
-                    // setSelectedFile(item?.files);
-                    setLocal(item?.local);
+                    setSelectedFile(item);
                   }}
                 >
 
                   <Image
-                    source={{uri: item.files}}
+                    source={{uri: item.local ? item.files : "https://teus.online/" + item.files}}
                     style={{
                       width: 60,
                       height: 60,
@@ -371,7 +380,7 @@ export const DialogChat = ({route}) => {
           data={filteredData}
           renderItem={renderItem}
           ref={messagesRef}
-          ListHeaderComponent={headerComponent}
+          ListHeaderComponent={headerComponent()}
           stickyHeaderIndices={[0]}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item, $) => item.last_id}
@@ -408,9 +417,8 @@ export const DialogChat = ({route}) => {
 
       <ImagesViewModal
         isVisible={selectedFile ? true : false}
-        fileName={selectedFile}
-        item={filteredData}
-        local={local}
+        file={selectedFile}
+
         onCancel={() => {
           setSelectedFile("");
         }}
@@ -495,8 +503,7 @@ const styles = StyleSheet.create({
       borderRightColor: "transparent",
       borderBottomWidth: 10,
       borderBottomColor: COLOR_10,
-    }
-    ,
+    },
     photo: {
       width: 50,
       height: 50,

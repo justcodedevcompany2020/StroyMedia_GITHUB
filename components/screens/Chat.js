@@ -211,13 +211,6 @@ export default function Chat({route}) {
   };
 
   const filteredMessages = (searchText) => {
-    // route.params.currentPage === "Диалоги"
-    //   ? setFilteredData(
-    //     dialogMessage.filter((m) => {
-    //       return m?.comment?.includes(searchText);
-    //     })
-    //   )
-    //   :
     setFilteredData(
       filteredData.filter((m) => {
         return m?.comment?.includes(searchText);
@@ -237,9 +230,8 @@ export default function Chat({route}) {
         <View style={styles.searchRow}>
           <Search
             style={styles.search}
-            searchText={searchValue}
+            value={searchValue}
             onSearchText={(val) => setSearchValue(val)}
-            filtered
             resetText={resetText}
           />
           <TouchableOpacity

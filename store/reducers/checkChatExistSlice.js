@@ -9,7 +9,6 @@ export const checkChatExistRequest = createAsyncThunk(
         secret_token: token,
         last_id: id,
       });
-      console.log(result.data, 'result.data')
       return result;
     } catch (error) {
       return error;

@@ -35,8 +35,6 @@ const orderChatForumSlice = createSlice({
       .addCase(chatForumOrderRequest.fulfilled, (state, action) => {
         state.loading = false;
         state.dialog_message = action.payload.data.messages;
-        // console.log(action.payload.data.messages, 'action.payload.data')
-        // state.dialog_last_message = action.payload
       })
 
       .addCase(chatForumOrderRequest.rejected, (state) => {
