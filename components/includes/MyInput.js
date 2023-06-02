@@ -26,6 +26,7 @@ function MyInput({
                    onChangeText,
                    editable,
                    multiline,
+                   isChat
                  }) {
   const [isActive, setIsActive] = useState(false);
   useEffect(() => {
@@ -35,7 +36,7 @@ function MyInput({
   }, [numberTel]);
   return (
     <View style={styles.wrapper}>
-      <Text style={[styles.label, labelStyle]}>{label}</Text>
+      {!isChat && <Text style={[styles.label, labelStyle]}>{label}</Text>}
       {numberTel ? (
         <MaskInput
           value={value}

@@ -44,8 +44,8 @@ function EventsItem(props) {
             dispatch(checkChatExistRequest({token: token, id: id}))
               .unwrap()
               .then(() => {
-                navigation.navigate("DialogChat", {
-                  currentPage: "Диалоги",
+                navigation.navigate("Chat", {
+                  currentPage: "Чаты",
                   title: title,
                   id: id,
                 });

@@ -12,6 +12,9 @@ import * as ImagePicker from "expo-image-picker";
 import {sendForumMessageRequest} from "../../store/reducers/sendForumMessageSlice";
 import {chatForumOrderRequest} from "./../../store/reducers/orderForumChatSlice";
 import {useNavigation} from "@react-navigation/native";
+import {ImagesViewModal} from "../includes/ImagesViewModal";
+import * as FileSystem from "expo-file-system";
+import {showMessage} from "react-native-flash-message";
 
 const SearchIcon = require("../../assets/search.png");
 const HEIGHT = Dimensions.get("window").width;
@@ -38,7 +41,6 @@ export default function Chat({route}) {
   const [filePath, setFilePath] = useState("");
   const [fileName, setFileName] = useState("");
   const [selectedFile, setSelectedFile] = useState("");
-  const [local, setLocal] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
 
   useEffect(() => {
@@ -52,6 +54,11 @@ export default function Chat({route}) {
     return afterDot;
   }
 
+  const getFileInfo = async (fileURI) => {
+    const fileInfo = await FileSystem.getInfoAsync(fileURI)
+    return fileInfo
+  }
+
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -59,10 +66,22 @@ export default function Chat({route}) {
       aspect: [1, 1],
       quality: 0,
     });
-    if (!result.canceled) {
-      getImageFormat(result.assets[0].uri);
-      setFileName(result.assets[0].uri.split("/").pop());
-      setFilePath(result.assets[0].uri);
+    const {type, uri} = result.assets[0]
+    const fileInfo = await getFileInfo(result.assets[0].uri)
+
+
+    if (fileInfo.size < 10000) {
+      if (!result.canceled) {
+        getImageFormat(result.assets[0].uri);
+        setFileName(result.assets[0].uri.split("/").pop());
+        setFilePath(result.assets[0].uri);
+      }
+    } else {
+      showMessage({
+        type: 'info',
+        message: 'Размер фото не должен превышать 1 МВ',
+        color: 'green'
+      })
     }
   };
 
@@ -79,7 +98,7 @@ export default function Chat({route}) {
     }
     intervalRef.current = setInterval(() => {
       actionHandler()
-    }, 8000);
+    }, 6000);
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -89,11 +108,12 @@ export default function Chat({route}) {
 
 
   const sendMessage = async () => {
+    console.log(user?.avatar_person)
     setFilteredData((state) => [
       ...state,
       {
         comment: inputValue,
-        from: {
+        user: {
           avatar_person: user?.avatar_person,
           contact_person: user?.contact_person,
           name: user?.name,
@@ -111,7 +131,7 @@ export default function Chat({route}) {
 
     let data = new FormData();
     data.append(
-      "file_dialog",
+      "file_forum",
       filePath && {
         uri: filePath,
         // Platform.OS === "android"
@@ -125,11 +145,12 @@ export default function Chat({route}) {
     data.append("last_id", route.params.id);
     data.append("message", inputValue);
     dispatch(
-      sendForumMessageRequest({
-        secret_token: token,
-        last_id: route.params.id,
-        message: inputValue,
-      })
+      // sendForumMessageRequest({
+      //   secret_token: token,
+      //   last_id: route.params.id,
+      //   message: inputValue,
+      // })
+      sendForumMessageRequest({data})
     );
     setInputValue("");
     setFilePath("")
@@ -171,6 +192,7 @@ export default function Chat({route}) {
           </TouchableOpacity>
           <View style={styles.inputView}>
             <MyInput
+              isChat={true}
               value={inputValue}
               onChangeText={(val) => setInputValue(val)}
               style={{
@@ -189,7 +211,7 @@ export default function Chat({route}) {
               }}
               placeholder={"Напишите сообщение..."}
               sendComponent={
-                inputValue || filePath ? (
+                inputValue || filePath && inputValue ? (
                   <TouchableOpacity
                     style={[
                       styles.send,
@@ -248,19 +270,12 @@ export default function Chat({route}) {
   };
 
   const renderItem = ({item, index}) => {
-    // if (index == 0) {
-    //   if (dialog) {
-    //     setId(item?.to?.last_id)
-    //   } else {
-    //     setId(item?.last_id);
-    //   }
-    // }+
     return (
       <View style={styles.item}>
         <Image
           style={styles.photo}
           source={{
-            uri: "https://teus.online/" + item?.user?.avatar_person
+            uri: "https://teus.online" + item?.user?.avatar_person
           }}
         />
         <View style={styles.messagesList}>
@@ -290,11 +305,10 @@ export default function Chat({route}) {
             </View>
             <Text style={styles.message}>{item.comment} </Text>
             <View style={!item.comment ? {marginTop: -16} : {marginTop: 8}}>
-              {item?.files?.length > 0 ? (
+              {item?.files ? (
                 <TouchableOpacity
                   onPress={() => {
-                    setSelectedFile(item?.files);
-                    setLocal(item?.local);
+                    setSelectedFile(item);
                   }}
                   // style={{
                   //   zIndex: 0,
@@ -306,7 +320,7 @@ export default function Chat({route}) {
                     // source={{
                     //   uri: "https://teus.online/" + item?.user?.avatar_person,
                     // }}
-                    source={{uri: item?.files}}
+                    source={{uri: item.local ? item.files : "https://teus.online" + item.files}}
                     style={{
                       width: 60,
                       height: 60,
@@ -385,19 +399,21 @@ export default function Chat({route}) {
               index,
             };
           }}
+          nestedScrollEnabled
+          maxToRenderPerBatch={10}
+          updateCellsBatchingPeriod={20}
         />
         {footerComponent()}
       </View>
 
-      {/* <ImagesViewhModal
+      <ImagesViewModal
         isVisible={selectedFile ? true : false}
-        fileName={selectedFile}
-        item={dialogMessage}
-        local={local}
+        file={selectedFile}
+
         onCancel={() => {
           setSelectedFile("");
         }}
-      /> */}
+      />
     </Wrapper>
   );
 }
@@ -441,7 +457,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: WRAPPER_PADDINGS,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    // justifyContent: "space-between",
     position: "absolute",
     bottom: 0,
     zIndex: 9999,
@@ -463,7 +479,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     zIndex: 2,
     right: 0,
-    top: 26,
+    top: 6,
   },
   triangle: {
     width: 10,
@@ -538,7 +554,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   message: {
-    fontSize: 9,
+    fontSize: 10,
     fontFamily: "GothamProRegular",
     color: COLOR_9,
     lineHeight: 11,
@@ -546,6 +562,7 @@ const styles = StyleSheet.create({
   attach: {
     height: 50,
     justifyContent: "center",
+    marginTop: -11
   },
   selectImage: {
     paddingHorizontal: 20,

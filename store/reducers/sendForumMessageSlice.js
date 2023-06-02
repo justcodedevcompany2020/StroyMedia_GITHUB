@@ -1,15 +1,19 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
-import {api} from "../../Api";
 
 export const sendForumMessageRequest = createAsyncThunk(
   "send/forum/message",
-  async (data) => {
+  async (data, rejectedWithValue) => {
     try {
-      const result = await api.post("/forum-send-message", data);
-      return result.data;
+      await fetch('https://teus.online/api/forum-send-message', {
+        body: data.data,
+        method: "POST"
+      }).then(response => response.json()).then(result => {
 
+        return result
+      })
     } catch (error) {
-      return error;
+      console.log(error.data, 'error.data')
+      return rejectedWithValue(error.result.data);
     }
   }
 );

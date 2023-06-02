@@ -17,6 +17,7 @@ import {chatForumOrderRequest} from "../../store/reducers/orderForumChatSlice";
 import SearchModal from "../includes/SearchModal";
 import Modal from "react-native-modal";
 import {deleteChatRequest} from "../../store/reducers/deleteChatSlice";
+import {chatOrderRequest} from "../../store/reducers/chatDialogOrderSlice";
 
 const SearchIcon = require("../../assets/search.png");
 
@@ -93,20 +94,15 @@ function Messages({route, navigation}) {
                     });
                   })
                 :
-                // dispatch(chatOrderRequest({token: token, id: item.last_id}))
-                //   .unwrap()
-                //   .then(() => {
-                //     // navigation.navigate("Chat", {
-                //     //   currentPage: "Диалоги",
-                //     //   title: item?.title || item.description,
-                //     //   id: item.last_id,
-                //     // });
-                navigation.navigate("DialogChat", {
-                  currentPage: "Диалоги",
-                  title: item?.title || item.description,
-                  id: item.last_id,
-                });
-              //   });
+                dispatch(chatOrderRequest({token: token, id: item.last_id}))
+                  .unwrap()
+                  .then(() => {
+                    navigation.navigate("DialogChat", {
+                      currentPage: "Диалоги",
+                      title: item?.title || item.description,
+                      id: item.last_id,
+                    });
+                  });
             }}
           />
         )}

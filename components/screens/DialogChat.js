@@ -81,31 +81,13 @@ export const DialogChat = ({route}) => {
     } else {
       showMessage({
         type: 'info',
-        message: 'Image size must be smaller than 15MB!',
+        message: 'Размер фото не должен превышать 1 МВ',
         color: 'green'
       })
     }
   };
 
   const sendMessage = async () => {
-
-    // let item = {...filteredData}
-    // item.comment = inputValue
-    // item.from = {
-    //   avatar_person: user?.avatar_person,
-    //   contact_person: user?.contact_person,
-    //   name: user?.name,
-    // }
-    // item.date = {
-    //   $date: {
-    //     $numberLong: new Date()
-    //   }
-    // }
-    // item.last_id = new Date().toISOString()
-    // item.files = filePath ? filePath : ""
-    // item.local = true
-    //
-    // setFilteredData(item)
     setFilteredData([
         ...filteredData,
         {
@@ -208,6 +190,7 @@ export const DialogChat = ({route}) => {
           </TouchableOpacity>
           <View style={styles.inputView}>
             <MyInput
+              isChat={true}
               value={inputValue}
               onChangeText={(val) => setInputValue(val)}
               style={{
@@ -411,8 +394,10 @@ export const DialogChat = ({route}) => {
           nestedScrollEnabled
           maxToRenderPerBatch={10}
           updateCellsBatchingPeriod={20}
+
         />
         {footerComponent()}
+
       </View>
 
       <ImagesViewModal
@@ -455,6 +440,7 @@ const styles = StyleSheet.create({
       //   Dimensions.get("window").height - Platform.OS === "ios" ? -120 : -100,
       paddingBottom: 80,
 // backgroundColor: "red",
+      position: 'relative'
     },
     item: {
       marginBottom: 20,
@@ -466,7 +452,7 @@ const styles = StyleSheet.create({
       paddingHorizontal: WRAPPER_PADDINGS,
       flexDirection: "row",
       alignItems: "center",
-      justifyContent: "space-between",
+      // justifyContent: "space-between",
       position: "absolute",
       bottom: 0,
       zIndex: 9999,
@@ -489,7 +475,7 @@ const styles = StyleSheet.create({
       position: "absolute",
       zIndex: 2,
       right: 0,
-      top: 26,
+      top: 6,
     },
     triangle: {
       width: 10,
@@ -564,14 +550,16 @@ const styles = StyleSheet.create({
       marginRight: 8,
     },
     message: {
-      fontSize: 9,
+      fontSize: 11,
       fontFamily: "GothamProRegular",
       color: COLOR_9,
-      lineHeight: 11,
+      lineHeight: 12,
     },
     attach: {
       height: 50,
       justifyContent: "center",
+      marginTop: -11,
+      // backgroundColor: 'red'
     },
     selectImage: {
       paddingHorizontal: 20,

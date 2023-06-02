@@ -145,8 +145,8 @@ function Events({route, navigation}) {
                     )
                       .unwrap()
                       .then(() => {
-                        navigation.navigate("DialogChat", {
-                          currentPage: "Диалоги",
+                        navigation.navigate("Chat", {
+                          currentPage: "Чаты",
                           title: s.event.title,
                           id: s.last_id,
                         });
@@ -209,8 +209,8 @@ function Events({route, navigation}) {
                     )
                       .unwrap()
                       .then(() => {
-                        navigation.navigate("DialogChat", {
-                          currentPage: "Диалоги",
+                        navigation.navigate("Chat", {
+                          currentPage: "Чаты",
                           title: s.event.title,
                           id: s.last_id,
                         });
