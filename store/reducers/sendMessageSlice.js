@@ -8,24 +8,11 @@ export const sendMessageRequest = createAsyncThunk(
         body: data.data,
         method: "POST"
       }).then(response => response.json()).then(result => {
-
+        
         return result
       })
-
-      // const data = await response.json()
-
-      // const result = await api.post("/chat-send-message", data.data).then((r) => {
-      //   alert("sendMessageRequest1")
-      // }).catch((error) => {
-      //   console.log(error, 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
-      //   // alert("sendMessageRequest2")
-      //
-      // });
-
-
-      // return data;
     } catch (error) {
-
+      
       return rejectedWithValue(error.result.data);
     }
   }
@@ -41,16 +28,16 @@ const sendMessageSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-
+      
       .addCase(sendMessageRequest.pending, (state) => {
         state.loading = true;
       })
-
+      
       .addCase(sendMessageRequest.fulfilled, (state, action) => {
         state.send_message = action.payload;
         state.error = false;
       })
-
+      
       .addCase(sendMessageRequest.rejected, (state) => {
         state.error = true;
         state.loading = false;

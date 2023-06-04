@@ -30,7 +30,6 @@ export default function Chat({route}) {
   const [isChanged, setIsChanged] = useState(false);
   const user = useSelector((state) => state.authUserSlice?.data?.user);
   const dispatch = useDispatch();
-
   const {currentPage} = route.params;
   const [id, setId] = useState();
   const [token, setToken] = useState();
@@ -42,23 +41,23 @@ export default function Chat({route}) {
   const [fileName, setFileName] = useState("");
   const [selectedFile, setSelectedFile] = useState("");
   const [filteredData, setFilteredData] = useState([]);
-
+  
   useEffect(() => {
     if (dialog_message?.length > 0) {
       setFilteredData(dialog_message)
     }
   }, [dialog_message]);
-
+  
   function getImageFormat(str) {
     const afterDot = str.substr(str.indexOf(".") + 1);
     return afterDot;
   }
-
+  
   const getFileInfo = async (fileURI) => {
     const fileInfo = await FileSystem.getInfoAsync(fileURI)
     return fileInfo
   }
-
+  
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -68,8 +67,8 @@ export default function Chat({route}) {
     });
     const {type, uri} = result.assets[0]
     const fileInfo = await getFileInfo(result.assets[0].uri)
-
-
+    
+    
     if (fileInfo.size < 10000) {
       if (!result.canceled) {
         getImageFormat(result.assets[0].uri);
@@ -84,14 +83,14 @@ export default function Chat({route}) {
       })
     }
   };
-
+  
   const actionHandler = useCallback(
     () => {
       dispatch(chatForumOrderRequest({token: token, id: route.params.id}));
     },
     [dialog_message]
   );
-
+  
   useEffect(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -105,10 +104,10 @@ export default function Chat({route}) {
       }
     };
   }, [navigation, dialog_message])
-
-
+  
+  
   const sendMessage = async () => {
-    console.log(user?.avatar_person)
+    console.log(route.params.id)
     setFilteredData((state) => [
       ...state,
       {
@@ -128,7 +127,7 @@ export default function Chat({route}) {
         local: true,
       },
     ]);
-
+    
     let data = new FormData();
     data.append(
       "file_forum",
@@ -138,7 +137,8 @@ export default function Chat({route}) {
         //   ? filePath
         //   : filePath.replace("file://", ""),
         name: fileName,
-        type: `image/${getImageFormat(filePath)}`,
+        // type: `image/${getImageFormat(filePath)}`,
+        type: `image/jpg`,
       }
     );
     data.append("secret_token", token);
@@ -156,14 +156,14 @@ export default function Chat({route}) {
     setFilePath("")
     setInputHeight(40);
   };
-
+  
   useEffect(() => {
     AsyncStorage.getItem("token").then((result) => {
       setToken(result);
     });
-
+    
   }, [])
-
+  
   const footerComponent = () => {
     return (
       <>
@@ -176,7 +176,7 @@ export default function Chat({route}) {
                 height: 60,
               }}
             />
-
+            
             <Text onPress={() => setFilePath("")} style={styles.cancel}>
               X
             </Text>
@@ -231,7 +231,7 @@ export default function Chat({route}) {
       </>
     );
   };
-
+  
   const filteredMessages = (searchText) => {
     setFilteredData(
       filteredData.filter((m) => {
@@ -239,12 +239,12 @@ export default function Chat({route}) {
       })
     );
   };
-
+  
   const resetText = () => {
     setSearchValue("");
     filteredMessages("");
   };
-
+  
   const headerComponent = () => {
     return (
       <View style={styles.headerComponent}>
@@ -268,7 +268,7 @@ export default function Chat({route}) {
       </View>
     );
   };
-
+  
   const renderItem = ({item, index}) => {
     return (
       <View style={styles.item}>
@@ -337,25 +337,25 @@ export default function Chat({route}) {
       </View>
     );
   };
-
+  
   const countInputBottom = (height) => {
     const lines = Math.floor((Math.round(height) - 26) / 14);
     return lines < 5 ? lines * 8 : 42;
   };
-
+  
   const countSendBottom = (inputBottom) => {
     const lines = Math.floor(inputBottom / 10);
     if (!lines) return 5;
     else if (lines < 5) return lines * 8;
     else return 40;
   };
-
+  
   const getItemLayout = (data, index) => ({
     length: HEIGHT,
     offset: HEIGHT,
     index,
   });
-
+  
   return (
     <Wrapper
       withoutScrollView
@@ -405,11 +405,11 @@ export default function Chat({route}) {
         />
         {footerComponent()}
       </View>
-
+      
       <ImagesViewModal
         isVisible={selectedFile ? true : false}
         file={selectedFile}
-
+        
         onCancel={() => {
           setSelectedFile("");
         }}
