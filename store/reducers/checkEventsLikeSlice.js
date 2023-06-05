@@ -1,9 +1,11 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { api } from "../../Api";
+import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import {api} from "../../Api";
 
 export const checkEventsLikeRequest = createAsyncThunk(
   "check/chat",
-  async ({ token, id }) => {
+  async ({token, id}) => {
+    console.log(token)
+    console.log(id)
     try {
       const result = await api.post("/check-likes-event", {
         secret_token: token,
