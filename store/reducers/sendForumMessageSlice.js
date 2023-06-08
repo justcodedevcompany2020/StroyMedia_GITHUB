@@ -1,32 +1,27 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
-import {api} from "../../Api";
 
-export const sendForumMessageRequest = createAsyncThunk(
-    "send/forum/message",
-    async (data, rejectedWithValue) => {
-      
-      const requestOptions = {
-        method: 'POST',
-        body: data.data,
-        redirect: 'follow'
-      };
-      
-      await fetch("https://teus.online/api/forum-send-message", requestOptions)
-        .then(response => response.json())
-        .then(result => console.log(result))
-        .catch(error => console.log('error', error));
-    }
-  )
-;
+export const sendForumMessageRequest = createAsyncThunk("send/forum/message", async (data, {rejectedWithValue}) => {
+  try {
+    const requestOptions = {
+      method: 'POST', body: data.data,
+    };
+    
+    const response = await fetch("https://teus.online/api/forum-send-message", requestOptions)
+    const result = await response.json();
+    console.log(result)
+    return result;
+  } catch (e) {
+    console.log('error', e)
+    return rejectedWithValue(e)
+  }
+});
 
 const sendForumMessageSlice = createSlice({
-  name: "send/forum/message",
-  initialState: {
-    loading: false,
-    error: false,
-    data: [],
-  },
-  reducers: {},
+  name: "send/forum/message", initialState: {
+    loading: false, error: false, data: [],
+  }, reducers: {},
+  
+  
   extraReducers: (builder) => {
     builder
       

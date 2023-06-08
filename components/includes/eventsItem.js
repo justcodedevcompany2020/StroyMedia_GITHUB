@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Image, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View} from "react-native";
+import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {COLOR_1, COLOR_9} from "../helpers/Variables";
 import {ImageLike, ImageLikeBlue} from "../helpers/images";
 import MyButton from "../includes/MyButton";
@@ -8,8 +8,7 @@ import {likeEventsRequest} from "../../store/reducers/likeEventsPostSlice";
 import {checkEventsLikeRequest} from "../../store/reducers/checkEventsLikeSlice";
 import {checkChatExistRequest} from "../../store/reducers/checkChatExistSlice";
 
-function EventsItem(props) {
-  const {title, text, personName, position, photoUri, token, id, navigation} = props;
+function EventsItem({title, text, personName, position, photoUri, token, id, navigation}) {
   const dispatch = useDispatch();
   const [liked, setLiked] = useState(false);
   const [count, setCount] = useState(0);
@@ -59,13 +58,6 @@ function EventsItem(props) {
         }}
         style={styles.like}
       >
-        <TouchableHighlight style={styles.likeCount}>
-          <Text style={{}}>
-            {count}
-          </Text>
-        </TouchableHighlight>
-        
-        
         {liked ? <ImageLikeBlue/> : <ImageLike/>}
       </TouchableOpacity>
     </View>
@@ -89,20 +81,17 @@ const styles = StyleSheet.create({
     fontFamily: "GothamProRegular", fontSize: 10, color: COLOR_9,
   }, personPhoto: {
     width: 44, height: 44, borderRadius: 30, position: "absolute", left: -60, top: -8,
-  }, buttonRow: {}, sectionButton: {
+  }, sectionButton: {
     alignSelf: "center", paddingHorizontal: 18, paddingVertical: 6,
   }, buttonText: {
     fontSize: 12,
   }, like: {
-    position: "absolute", right: 40, top: 6, flexDirection: 'row', alignItems: 'center'
+    position: "absolute", right: 40, top: 6,
   }, arrowStyle: {
     top: 14,
   }, nextArrow: {
     position: "absolute", right: 0, bottom: 44,
   },
-  likeCount: {
-    marginRight: 10,
-  }
 });
 
 export default EventsItem;

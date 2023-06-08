@@ -34,9 +34,7 @@ function Messages({route, navigation}) {
   const isloading = useSelector((state) => state.forumChatAllSlice.loading);
   const [filteredData, setFilteredData] = useState([]);
   const [changed, setChanged] = useState(true);
-  const serachResult = useSelector(
-    (state) => state.searchChatMembersSlice.data
-  );
+  const serachResult = useSelector((state) => state.searchChatMembersSlice.data);
   const success = useSelector((state) => state.searchChatMembersSlice.success);
   const searchMessages = serachResult;
   const {currentPage} = route.params;
@@ -68,81 +66,52 @@ function Messages({route, navigation}) {
   });
 
   const renderItem = ({item, index}) => {
-    return (
-      <>
-        {!deletedId.includes(item.last_id) && (
-          <ScrollableAccordionItem
-            item={item}
-            expandedList={expandedList}
-            id={item?.last_id}
-            onArrowPress={() => {
-              setExpandedList(!expandedList);
-            }}
-            expanded={expandedList}
-            activeTab={activeTab}
-            onPress={() => {
-              activeTab === "Чаты"
-                ? dispatch(
-                  chatForumOrderRequest({token: token, id: item.last_id})
-                )
-                  .unwrap()
-                  .then(() => {
-                    navigation.navigate("Chat", {
-                      currentPage: "Чаты",
-                      title: item?.title || item.description,
-                      id: item.last_id,
-                    });
-                  })
-                :
-                dispatch(chatOrderRequest({token: token, id: item.last_id}))
-                  .unwrap()
-                  .then(() => {
-                    navigation.navigate("DialogChat", {
-                      currentPage: "Диалоги",
-                      title: item?.title || item.description,
-                      id: item.last_id,
-                    });
-                  });
-            }}
-          />
-        )}
-      </>
-    );
+    return (<>
+      {!deletedId.includes(item.last_id) && (<ScrollableAccordionItem
+        item={item}
+        expandedList={expandedList}
+        id={item?.last_id}
+        onArrowPress={() => {
+          setExpandedList(!expandedList);
+        }}
+        expanded={expandedList}
+        activeTab={activeTab}
+        onPress={() => {
+          console.log(item)
+          activeTab === "Чаты" ? dispatch(chatForumOrderRequest({token: token, id: item.last_id}))
+          .unwrap()
+          .then(() => {
+            navigation.navigate("Chat", {
+              currentPage: "Чаты", title: item?.title || item.description, id: item.last_id,
+            });
+          }) : dispatch(chatOrderRequest({token: token, id: item.last_id}))
+          .unwrap()
+          .then(() => {
+            navigation.navigate("DialogChat", {
+              currentPage: "Диалоги", title: item?.title || item.description, id: item.last_id,
+            });
+          });
+        }}
+      />)}
+    </>);
   };
 
   useEffect(() => {
-    setFilteredData(
-      activeTab === "Чаты"
-        ? convertForumChatToArray
-        : searchMessages?.length
-          ? searchMessages
-          : Object.keys(data).map((key) => {
-            return data[key];
-          })
-    );
+    setFilteredData(activeTab === "Чаты" ? convertForumChatToArray : searchMessages?.length ? searchMessages : Object.keys(data).map((key) => {
+      return data[key];
+    }));
   }, [data.length, activeTab, searchMessages]);
 
   const filteredMessages = (searchText) => {
-    activeTab === "Диалоги" &&
-    !serachResult.length &&
-    setFilteredData(
-      convertedArray.filter((m) => {
-        return m?.name?.includes(searchText);
-      })
-    );
-    activeTab === "Чаты" &&
-    setFilteredData(
-      convertForumChatToArray.filter((m) => {
-        return m?.title?.includes(searchText);
-      })
-    );
-    activeTab === "Диалоги" &&
-    serachResult.length &&
-    setFilteredData(
-      searchMessages.filter((m) => {
-        return m?.name?.includes(searchText);
-      })
-    );
+    activeTab === "Диалоги" && !serachResult.length && setFilteredData(convertedArray.filter((m) => {
+      return m?.name?.includes(searchText);
+    }));
+    activeTab === "Чаты" && setFilteredData(convertForumChatToArray.filter((m) => {
+      return m?.title?.includes(searchText);
+    }));
+    activeTab === "Диалоги" && serachResult.length && setFilteredData(searchMessages.filter((m) => {
+      return m?.name?.includes(searchText);
+    }));
   };
 
   const onClick = () => {
@@ -160,49 +129,43 @@ function Messages({route, navigation}) {
   // }, [searchValue === ""]);
 
   const headerComponent = () => {
-    return (
-      <View style={styles.header}>
-        <NavBar
-          tabs={tabs}
-          activeTab={activeTab}
-          onPress={(tab) => {
-            setChanged(tab === "Диалоги" ? true : false);
-            setActiveTab(tab);
+    return (<View style={styles.header}>
+      <NavBar
+        tabs={tabs}
+        activeTab={activeTab}
+        onPress={(tab) => {
+          setChanged(tab === "Диалоги" ? true : false);
+          setActiveTab(tab);
+        }}
+      />
+      <View style={styles.searchRow}>
+        <Search
+          style={styles.search}
+          searchText={searchValue}
+          onSearchText={(val) => {
+            val == "" ? setSearchValue("") && filteredMessages("") : setSearchValue(val);
           }}
+          resetText={resetText}
         />
-        <View style={styles.searchRow}>
-          <Search
-            style={styles.search}
-            searchText={searchValue}
-            onSearchText={(val) => {
-              val == ""
-                ? setSearchValue("") && filteredMessages("")
-                : setSearchValue(val);
-            }}
-            resetText={resetText}
-          />
-          <TouchableOpacity
-            activeOpacity={0.2}
-            onPress={() => {
-              setChanged(false);
-              filteredMessages(searchValue);
-            }}
-          >
-            <Image source={SearchIcon} style={{width: 25, height: 25}}/>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          activeOpacity={0.2}
+          onPress={() => {
+            setChanged(false);
+            filteredMessages(searchValue);
+          }}
+        >
+          <Image source={SearchIcon} style={{width: 25, height: 25}}/>
+        </TouchableOpacity>
       </View>
-    );
+    </View>);
   };
 
   const removeItem = (id) => {
     dispatch(deleteChatRequest({token, id}));
-    setFilteredData(
-      filteredData.filter((data) => {
-        data;
-        return data.last_id !== id;
-      })
-    );
+    setFilteredData(filteredData.filter((data) => {
+      data;
+      return data.last_id !== id;
+    }));
   };
 
   const resetText = () => {
@@ -210,160 +173,107 @@ function Messages({route, navigation}) {
     filteredMessages("");
   };
 
-  return (
-    <Wrapper
-      withContainer
-      withoutScrollView
-      header={{
-        currentPage,
-        home: true,
-        navigation,
-      }}
-    >
-      <View style={styles.wrapper}>
-        <SwipeListView
-          data={filteredData}
-          renderItem={renderItem}
-          ListEmptyComponent={() => {
-            return <Text style={styles.empty}>ничего не найдено</Text>;
-          }}
-          ListHeaderComponent={headerComponent()}
-          renderHiddenItem={({item, index}) =>
-            activeTab === "Диалоги" && (
-              <View style={styles.hiddenWrapper}>
-                <TouchableOpacity
-                  style={styles.hiddenItem}
-                  onPress={() =>
-                    // setDeletedId((state) => [...state, item.last_id])
-                    removeItem(item.last_id)
-                  }
-                >
-                  <View style={styles.hiddenBlock}>
-                    <ImageDelete/>
+  return (<Wrapper
+    withContainer
+    withoutScrollView
+    header={{
+      currentPage, home: true, navigation,
+    }}
+  >
+    <View style={styles.wrapper}>
+      <SwipeListView
+        data={filteredData}
+        renderItem={renderItem}
+        ListEmptyComponent={() => {
+          return <Text style={styles.empty}>ничего не найдено</Text>;
+        }}
+        ListHeaderComponent={headerComponent()}
+        renderHiddenItem={({item, index}) => activeTab === "Диалоги" && (<View style={styles.hiddenWrapper}>
+          <TouchableOpacity
+            style={styles.hiddenItem}
+            onPress={() => // setDeletedId((state) => [...state, item.last_id])
+              removeItem(item.last_id)}
+          >
+            <View style={styles.hiddenBlock}>
+              <ImageDelete/>
 
-                    <View style={styles.hiddenItemTextBlock}>
-                      <Text style={styles.hiddenItemText}>Удалить</Text>
-                    </View>
-                  </View>
-                </TouchableOpacity>
+              <View style={styles.hiddenItemTextBlock}>
+                <Text style={styles.hiddenItemText}>Удалить</Text>
               </View>
-            )
-          }
-          rightOpenValue={-100}
-          disableRightSwipe
-          keyExtractor={(item) => item.last_id}
-          showsVerticalScrollIndicator={false}
-          stickyHeaderIndices={[0]}
-          //onEndReachedThreshold={0}
-        />
-        <View style={styles.fadeBlock}>
-          <Image source={ImageFadePart} style={styles.fade}/>
-        </View>
-        {loading && !data.length && (
-          <Modal backdropOpacity={0.75} isVisible={true}>
-            <View>
-              <ActivityIndicator size="large"/>
             </View>
-          </Modal>
-        )}
-        {activeTab === "Диалоги" && (
-          <AddNew onPress={() => setVisibleModal(true)}/>
-        )}
-        <SearchModal
-          isVisible={visibleModal}
-          value={compName}
-          onChangeText={(val) => setCompName(val)}
-          onChangeName={(val) => setUserName(val)}
-          name={userName}
-          onCancel={() => {
-            setCompName("");
-            setUserName("");
-            setVisibleModal(false);
-          }}
-          onClick={onClick}
-        />
+          </TouchableOpacity>
+        </View>)}
+        rightOpenValue={-100}
+        disableRightSwipe
+        keyExtractor={(item) => item.last_id}
+        showsVerticalScrollIndicator={false}
+        stickyHeaderIndices={[0]}
+        // onEndReachedThreshold={0}
+      />
+      <View style={styles.fadeBlock}>
+        <Image source={ImageFadePart} style={styles.fade}/>
       </View>
-    </Wrapper>
-  );
+      {loading && !data.length && (<Modal backdropOpacity={0.75} isVisible={true}>
+        <View>
+          <ActivityIndicator size="large"/>
+        </View>
+      </Modal>)}
+      {activeTab === "Диалоги" && (<AddNew onPress={() => setVisibleModal(true)}/>)}
+      <SearchModal
+        isVisible={visibleModal}
+        value={compName}
+        onChangeText={(val) => setCompName(val)}
+        onChangeName={(val) => setUserName(val)}
+        name={userName}
+        onCancel={() => {
+          setCompName("");
+          setUserName("");
+          setVisibleModal(false);
+        }}
+        onClick={onClick}
+      />
+    </View>
+  </Wrapper>);
 }
 
 const styles = StyleSheet.create({
   wrapper: {
     height: "100%",
-  },
-  header: {
+  }, header: {
     backgroundColor: COLOR_5,
-  },
-  searchRow: {
+  }, searchRow: {
     paddingHorizontal: WRAPPER_PADDINGS,
     marginTop: -20,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-  },
-  fadeBlock: {
-    height: "100%",
-    width: WRAPPER_PADDINGS,
-    position: "absolute",
-    zIndex: 2,
-    top: 150,
-    left: 0,
-  },
-  fade: {
-    width: "100%",
-    height: "100%",
-  },
-  hiddenWrapper: {
-    paddingVertical: 16,
-    position: "absolute",
-    right: 0,
-    top: 0,
-    paddingRight: WRAPPER_PADDINGS,
-    height: "100%",
-  },
-  hiddenWrapperBig: {
-    paddingVertical: 16,
-    position: "absolute",
-    right: 0,
-    top: 0,
-    paddingRight: WRAPPER_PADDINGS,
-    height: "100%",
-  },
-  hiddenItem: {
+  }, fadeBlock: {
+    height: "100%", width: WRAPPER_PADDINGS, position: "absolute", zIndex: 2, top: 150, left: 0,
+  }, fade: {
+    width: "100%", height: "100%",
+  }, hiddenWrapper: {
+    paddingVertical: 16, position: "absolute", right: 0, top: 0, paddingRight: WRAPPER_PADDINGS, height: "100%",
+  }, hiddenWrapperBig: {
+    paddingVertical: 16, position: "absolute", right: 0, top: 0, paddingRight: WRAPPER_PADDINGS, height: "100%",
+  }, hiddenItem: {
     alignSelf: "flex-end",
     justifyContent: "center",
     borderLeftColor: COLOR_6,
     borderLeftWidth: 1,
     height: "100%",
     paddingLeft: 14,
-  },
-  hiddenItemBig: {
-    position: "absolute",
-    top: 70,
-    right: 28,
-  },
-  hiddenBlock: {
+  }, hiddenItemBig: {
+    position: "absolute", top: 70, right: 28,
+  }, hiddenBlock: {
     alignItems: "center",
-  },
-  hiddenItemTextBlock: {
-    alignItems: "center",
-    marginTop: 10,
-  },
-  hiddenItemText: {
-    color: "#000",
-    fontSize: 9,
-    fontFamily: "GothamProRegular",
-  },
-  search: {
-    flex: 1,
-    marginRight: 8,
-  },
-  empty: {
-    fontSize: 22,
-    color: COLOR_1,
-    fontFamily: "GothamProRegular",
-    textAlign: "center",
-    marginTop: 40,
+  }, hiddenItemTextBlock: {
+    alignItems: "center", marginTop: 10,
+  }, hiddenItemText: {
+    color: "#000", fontSize: 9, fontFamily: "GothamProRegular",
+  }, search: {
+    flex: 1, marginRight: 8,
+  }, empty: {
+    fontSize: 22, color: COLOR_1, fontFamily: "GothamProRegular", textAlign: "center", marginTop: 40,
   },
 });
 
