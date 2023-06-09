@@ -16,7 +16,10 @@ import { Entypo } from "@expo/vector-icons";
 
 const SearchIcon = require( "../../assets/search.png" );
 
-function MyApplications( { route, navigation } ) {
+function MyApplications( {
+  route,
+  navigation
+} ) {
   const [ activeTab, setActiveTab ] = useState( "В работе" );
   const [ searchValue, setSearchValue ] = useState( "" );
   const [ page, setPage ] = useState( 1 );
@@ -24,44 +27,59 @@ function MyApplications( { route, navigation } ) {
   const { currentPage } = route.params;
   const [ token, setToken ] = useState();
   const dispatch = useDispatch();
-  const { data } = useSelector( ( state ) => state.allCatSlice );
-  const user = useSelector( ( state ) => state.authUserSlice.data.user );
+  const state = useSelector( state1 => state1 );
+  const { data } = state.allCatSlice;
+  const { user } = state.authUserSlice.data;
+
   let aplications = data;
   const [ filteredData, setFilteredData ] = useState( [] );
   const [ isFiltred, setIsFiltred ] = useState( false );
   const timeStamnp = +data[ 0 ]?.date_create?.$date.$numberLong;
-
   useEffect( () => {
-    AsyncStorage.getItem( "token" ).then( ( result ) => {
-      if( result ) {
-        setToken( result );
-        dispatch( authRequest( { secret_token : result } ) );
-      }
-    } );
+    AsyncStorage.getItem( "token" )
+      .then( ( result ) => {
+        if( result ) {
+          setToken( result );
+          dispatch( authRequest( { secret_token : result } ) );
+        }
+      } );
   }, [] );
 
   useEffect( () => {
-    dispatch( allCatRequest( { secret_token : token, tab : activeTab, offset } ) );
+    dispatch( allCatRequest( {
+      secret_token : token,
+      tab : activeTab,
+      offset
+    } ) );
   }, [ token, activeTab ] );
 
-  const renderItem = ( { item, index } ) => {
+
+  const renderItem = ( {
+    item,
+    index
+  } ) => {
     return (
       <View style={ styles.item }>
         <View style={ styles.row }>
           <View style={ styles.img }>
-            <Image
-              source={ {
-                uri : typeof item?.img === "string" ? "https://teus.online/" + item.img : null,
-              } }
-              style={ { height : 50, width : 50, borderRadius : 5 } }
-            />
+            {/*<Image*/ }
+            {/*  source={ {*/ }
+            {/*    uri : typeof item?.img === "string" ? "https://teus.online/" + item.img : null,*/ }
+            {/*  } }*/ }
+            {/*  style={ {*/ }
+            {/*    height : 50,*/ }
+            {/*    width : 50,*/ }
+            {/*    borderRadius : 5*/ }
+            {/*  } }*/ }
+            {/*/>*/ }
           </View>
           <View style={ styles.number }>
             <Text style={ styles.numbertext }>N:{ item.last_id }</Text>
           </View>
           <Text style={ styles.date }>
             { " " }
-            { moment( timeStamnp ).format( "YYYY-MM-DD" ) }
+            { moment( timeStamnp )
+              .format( "YYYY-MM-DD" ) }
           </Text>
         </View>
         <View style={ styles.row }>
@@ -81,8 +99,14 @@ function MyApplications( { route, navigation } ) {
               <ImageOffersArrow/>
               <Text style={ styles.toCity }>{ item?.to_city?.title?.ru }</Text>
             </View>
-            <View style={ { flexDirection : "column", width : "80%" } }>
-              <View style={ { flexDirection : "row", alignItems : "center" } }>
+            <View style={ {
+              flexDirection : "column",
+              width : "80%"
+            } }>
+              <View style={ {
+                flexDirection : "row",
+                alignItems : "center"
+              } }>
                 <Text style={ styles.quantity }>Количество: { item?.count }</Text>
                 <Text style={ styles.priceText }>Цена:</Text>
                 <View style={ styles.price }>
@@ -124,7 +148,10 @@ function MyApplications( { route, navigation } ) {
             setPage( 1 );
             setOffset( 0 );
             setActiveTab( tab );
-            dispatch( allCatRequest( { token, tab } ) );
+            dispatch( allCatRequest( {
+              token,
+              tab
+            } ) );
           } }
         />
         <View style={ styles.searchRow }>
@@ -145,7 +172,10 @@ function MyApplications( { route, navigation } ) {
             style={ { marginLeft : 10 } }
             onPress={ () => filtered( searchValue ) }
           >
-            <Image source={ SearchIcon } style={ { width : 25, height : 25 } }/>
+            <Image source={ SearchIcon } style={ {
+              width : 25,
+              height : 25
+            } }/>
           </TouchableOpacity>
         </View>
       </View>
@@ -156,7 +186,10 @@ function MyApplications( { route, navigation } ) {
     setOffset( offset + 5 );
     setPage( page + 1 );
     dispatch( allCatRequest( {
-      token, tab : activeTab, offset : offset + 5, searchText : searchValue ? searchValue : null,
+      token,
+      tab : activeTab,
+      offset : offset + 5,
+      searchText : searchValue ? searchValue : null,
     } ) );
   };
 
@@ -164,7 +197,10 @@ function MyApplications( { route, navigation } ) {
     setOffset( offset - 5 );
     setPage( page - 1 );
     dispatch( allCatRequest( {
-      token, tab : activeTab, offset : offset - 5, searchText : searchValue ? searchValue : null,
+      token,
+      tab : activeTab,
+      offset : offset - 5,
+      searchText : searchValue ? searchValue : null,
     } ) );
   };
 
@@ -173,7 +209,9 @@ function MyApplications( { route, navigation } ) {
       withContainer
       withoutScrollView
       header={ {
-        currentPage, home : true, navigation,
+        currentPage,
+        home : true,
+        navigation,
       } }
     >
       { data.length && activeTab !== "Архив" ? (
@@ -187,7 +225,11 @@ function MyApplications( { route, navigation } ) {
               return data.length === 5 && activeTab !== "Избранное" ? (
                 <View
                   style={ {
-                    flex : 1, height : 50, alignItems : "center", justifyContent : "center", flexDirection : "row",
+                    flex : 1,
+                    height : 50,
+                    alignItems : "center",
+                    justifyContent : "center",
+                    flexDirection : "row",
                   } }
                 >
                   <View>
@@ -221,7 +263,11 @@ function MyApplications( { route, navigation } ) {
                 <TouchableOpacity
                   style={ styles.hiddenItem }
                   onPress={ () => navigation.navigate( "EditApplication", {
-                    currentPage : "Редактирование заявки", item, token, user_id : user.last_id, activeTab,
+                    currentPage : "Редактирование заявки",
+                    item,
+                    token,
+                    user_id : user?.last_id,
+                    activeTab,
                   } ) }
                 >
                   <View style={ styles.hiddenBlock }>
@@ -252,7 +298,11 @@ function MyApplications( { route, navigation } ) {
             activeTab={ activeTab }
             onPress={ ( tab ) => {
               setActiveTab( tab );
-              dispatch( allCatRequest( { token, tab, offset } ) );
+              dispatch( allCatRequest( {
+                token,
+                tab,
+                offset
+              } ) );
             } }
           />
           <View style={ styles.blankTextBlock }>
@@ -268,7 +318,8 @@ function MyApplications( { route, navigation } ) {
       <AddNew
         end={ true }
         onPress={ () => navigation.navigate( "CreatingApplication", {
-          currentPage : "Создание новой заявки", user,
+          currentPage : "Создание новой заявки",
+          user,
         } ) }
       />
     </Wrapper>
@@ -278,11 +329,18 @@ function MyApplications( { route, navigation } ) {
 const styles = StyleSheet.create( {
   wrapper : {
     height : "100%",
-  }, empty : {
-    fontSize : 22, color : COLOR_1, fontFamily : "GothamProRegular", textAlign : "center", marginTop : 40,
-  }, count : {
+  },
+  empty : {
+    fontSize : 22,
+    color : COLOR_1,
+    fontFamily : "GothamProRegular",
+    textAlign : "center",
+    marginTop : 40,
+  },
+  count : {
     color : "white",
-  }, pageCount : {
+  },
+  pageCount : {
     width : 25,
     height : 25,
     backgroundColor : COLOR_3,
@@ -290,23 +348,30 @@ const styles = StyleSheet.create( {
     alignItems : "center",
     justifyContent : "center",
     marginHorizontal : 16,
-  }, header : {
+  },
+  header : {
     backgroundColor : COLOR_5,
-  }, searchRow : {
+  },
+  searchRow : {
     paddingHorizontal : WRAPPER_PADDINGS,
     marginTop : -20,
     flexDirection : "row",
     justifyContent : "center",
     alignItems : "center",
-  }, item : {
+  },
+  item : {
     backgroundColor : COLOR_5,
     paddingVertical : 20,
     borderBottomColor : COLOR_6,
     borderBottomWidth : 1,
     paddingHorizontal : WRAPPER_PADDINGS,
-  }, row : {
-    flexDirection : "row", alignItems : "center", marginBottom : 10,
-  }, number : {
+  },
+  row : {
+    flexDirection : "row",
+    alignItems : "center",
+    marginBottom : 10,
+  },
+  number : {
     marginRight : 20,
     color : COLOR_5,
     fontSize : 12,
@@ -315,29 +380,68 @@ const styles = StyleSheet.create( {
     paddingHorizontal : 8,
     backgroundColor : COLOR_3,
     borderRadius : 10,
-  }, numbertext : {
-    color : COLOR_5, fontSize : 12, fontFamily : "GothamProMedium",
-  }, date : {
-    color : COLOR_9, fontSize : 10, fontFamily : "GothamProRegular",
-  }, leftBlock : {
-    marginRight : 20, height : 50, justifyContent : "space-between", alignItems : "center",
-  }, type : {
-    color : COLOR_8, fontSize : 10, marginTop : 3, fontFamily : "GothamProRegular",
-  }, type2 : {
-    color : COLOR_8, fontSize : 10, fontFamily : "GothamProRegular",
-  }, rightBlock : {
-    height : 50, justifyContent : "space-between",
-  }, locationInfo : {
-    flexDirection : "row", alignItems : "center", marginBottom : 16,
-  }, fromCity : {
-    marginRight : 10, color : COLOR_8, fontSize : 12, fontFamily : "GothamProMedium",
-  }, toCity : {
-    marginLeft : 10, color : COLOR_8, fontSize : 12, fontFamily : "GothamProMedium",
-  }, quantity : {
-    color : COLOR_8, fontSize : 10, fontFamily : "GothamProRegular", marginRight : 24,
-  }, priceText : {
-    color : COLOR_8, fontSize : 12, fontFamily : "GothamProMedium", marginRight : 8,
-  }, price : {
+  },
+  numbertext : {
+    color : COLOR_5,
+    fontSize : 12,
+    fontFamily : "GothamProMedium",
+  },
+  date : {
+    color : COLOR_9,
+    fontSize : 10,
+    fontFamily : "GothamProRegular",
+  },
+  leftBlock : {
+    marginRight : 20,
+    height : 50,
+    justifyContent : "space-between",
+    alignItems : "center",
+  },
+  type : {
+    color : COLOR_8,
+    fontSize : 10,
+    marginTop : 3,
+    fontFamily : "GothamProRegular",
+  },
+  type2 : {
+    color : COLOR_8,
+    fontSize : 10,
+    fontFamily : "GothamProRegular",
+  },
+  rightBlock : {
+    height : 50,
+    justifyContent : "space-between",
+  },
+  locationInfo : {
+    flexDirection : "row",
+    alignItems : "center",
+    marginBottom : 16,
+  },
+  fromCity : {
+    marginRight : 10,
+    color : COLOR_8,
+    fontSize : 12,
+    fontFamily : "GothamProMedium",
+  },
+  toCity : {
+    marginLeft : 10,
+    color : COLOR_8,
+    fontSize : 12,
+    fontFamily : "GothamProMedium",
+  },
+  quantity : {
+    color : COLOR_8,
+    fontSize : 10,
+    fontFamily : "GothamProRegular",
+    marginRight : 24,
+  },
+  priceText : {
+    color : COLOR_8,
+    fontSize : 12,
+    fontFamily : "GothamProMedium",
+    marginRight : 8,
+  },
+  price : {
     color : COLOR_5,
     fontSize : 12,
     fontFamily : "GothamProMedium",
@@ -345,39 +449,79 @@ const styles = StyleSheet.create( {
     paddingHorizontal : 8,
     backgroundColor : COLOR_2,
     borderRadius : 10,
-  }, fadeBlock : {
-    height : "100%", width : WRAPPER_PADDINGS, position : "absolute", zIndex : 2, top : 150, left : 0,
-  }, fade : {
-    width : "100%", height : "100%",
-  }, hiddenWrapper : {
-    paddingVertical : 16, position : "absolute", right : 0, top : 0, paddingRight : WRAPPER_PADDINGS, height : "100%",
-  }, hiddenItem : {
+  },
+  fadeBlock : {
+    height : "100%",
+    width : WRAPPER_PADDINGS,
+    position : "absolute",
+    zIndex : 2,
+    top : 150,
+    left : 0,
+  },
+  fade : {
+    width : "100%",
+    height : "100%",
+  },
+  hiddenWrapper : {
+    paddingVertical : 16,
+    position : "absolute",
+    right : 0,
+    top : 0,
+    paddingRight : WRAPPER_PADDINGS,
+    height : "100%",
+  },
+  hiddenItem : {
     alignSelf : "flex-end",
     justifyContent : "center",
     borderLeftColor : COLOR_6,
     borderLeftWidth : 1,
     height : "100%",
     paddingLeft : 8,
-  }, hiddenBlock : {
+  },
+  hiddenBlock : {
     alignItems : "center",
-  }, hiddenItemTextBlock : {
-    alignItems : "center", marginTop : 10,
-  }, hiddenItemText : {
-    color : "#000", fontSize : 9, fontFamily : "GothamProRegular",
-  }, commentBlock : {
+  },
+  hiddenItemTextBlock : {
+    alignItems : "center",
+    marginTop : 10,
+  },
+  hiddenItemText : {
+    color : "#000",
+    fontSize : 9,
+    fontFamily : "GothamProRegular",
+  },
+  commentBlock : {
     marginTop : 8,
-  }, commentHeader : {
-    color : COLOR_8, fontSize : 10, fontFamily : "GothamProMedium", marginBottom : 8,
-  }, commentText : {
-    color : COLOR_8, fontSize : 10, fontFamily : "GothamProRegular", lineHeight : 11,
-  }, blankTextBlock : {
+  },
+  commentHeader : {
+    color : COLOR_8,
+    fontSize : 10,
+    fontFamily : "GothamProMedium",
+    marginBottom : 8,
+  },
+  commentText : {
+    color : COLOR_8,
+    fontSize : 10,
+    fontFamily : "GothamProRegular",
+    lineHeight : 11,
+  },
+  blankTextBlock : {
     marginTop : 70,
-  }, blankText : {
-    alignSelf : "center", marginBottom : 10, color : COLOR_1, fontFamily : "GothamProRegular", fontSize : 14,
-  }, blankImage : {
-    alignSelf : "center", marginTop : 50,
-  }, img : {
-    position : "absolute", right : 0,
+  },
+  blankText : {
+    alignSelf : "center",
+    marginBottom : 10,
+    color : COLOR_1,
+    fontFamily : "GothamProRegular",
+    fontSize : 14,
+  },
+  blankImage : {
+    alignSelf : "center",
+    marginTop : 50,
+  },
+  img : {
+    position : "absolute",
+    right : 0,
   },
 } );
 

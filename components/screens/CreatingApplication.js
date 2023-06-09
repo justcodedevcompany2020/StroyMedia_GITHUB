@@ -28,7 +28,9 @@ const typespay = [ "Любой вариант", "безналичный расч
 const reestrized = [ "Любой исключен", "включен" ];
 
 function CreatingApplication( props ) {
-  const [ secondaryTabs, setSecondaryTabs ] = useState( [ "Продажа КТК", "Поиск КТК", "Выдача КТК", "Поездной сервис", "Заявка на ТЭО", ] );
+  const [ secondaryTabs, setSecondaryTabs ] = useState( [
+    "Продажа КТК", "Поиск КТК", "Выдача КТК", "Поездной сервис", "Заявка на ТЭО",
+  ] );
   const [ activeSecondaryTab, setActiveSecondaryTab ] = useState( "Продажа КТК" );
   const [ whereFrom, setWhereFrom ] = useState( "" );
   const [ whereTo, setWhereTo ] = useState( "" );
@@ -47,8 +49,14 @@ function CreatingApplication( props ) {
   const [ weight, setWeight ] = useState( "" );
   const [ citys, setCitys ] = useState( [] );
   const dispatch = useDispatch();
-  const { route, navigation } = props;
-  const { currentPage, user } = route.params;
+  const {
+    route,
+    navigation
+  } = props;
+  const {
+    currentPage,
+    user
+  } = route.params;
   const [ openCitys, setOpenCitys ] = useState( false );
   const [ openCitysFrom, setOpenCitysFrom ] = useState( false );
   const [ typeContainer, setTypeContiner ] = useState();
@@ -97,7 +105,13 @@ function CreatingApplication( props ) {
     currency : currency + "",
   };
   const compareDataSales = {
-    ...compareData, typePay : typePay, conditation : conditation, comment, selectedImage, restrict, to_city : "10",
+    ...compareData,
+    typePay : typePay,
+    conditation : conditation,
+    comment,
+    selectedImage,
+    restrict,
+    to_city : "10",
   };
 
   const save = () => {
@@ -123,16 +137,22 @@ function CreatingApplication( props ) {
     data.append( "responsible", user?.last_id + "" );
     data.append( "_type_op", saveAsDraft ? "draft" : "onwork" );
 
-    activeSecondaryTab === "Продажа КТК" && _.every( Object.values( compareDataSales ) ) && dispatch( sendCatRequest( data ) ).unwrap().then( () => navigation.pop( 2 ) ).catch( ( e ) => {
-      showMessage( {
-        message : "Все поля должны быть заполнены", type : "danger",
+    activeSecondaryTab === "Продажа КТК" && _.every( Object.values( compareDataSales ) ) && dispatch( sendCatRequest( data ) )
+      .unwrap()
+      .then( () => navigation.goBack() )
+      .catch( ( e ) => {
+        showMessage( {
+          message : "Все поля должны быть заполнены",
+          type : "danger",
+        } );
       } );
-    } );
     activeSecondaryTab === "Продажа КТК" && !_.every( Object.values( compareDataSales ) ) && showMessage( {
-      message : "Все поля должны быть заполнены", type : "danger",
+      message : "Все поля должны быть заполнены",
+      type : "danger",
     } );
     activeSecondaryTab !== "Продажа КТК" && !_.every( Object.values( compareData ) ) && showMessage( {
-      message : "Все поля должны быть заполнены", type : "danger",
+      message : "Все поля должны быть заполнены",
+      type : "danger",
     } );
 
     activeSecondaryTab !== "Продажа КТК" && _.every( Object.values( compareData ) ) && dispatch( sendCatRequest( {
@@ -148,32 +168,42 @@ function CreatingApplication( props ) {
       currency : currency === 0 ? "3" : currency + " ",
       responsible : user?.last_id + "",
       _type_op : saveAsDraft ? "draft" : "onwork",
-    } ) ).unwrap().then( ( e ) => {
-      setLoading( false );
-      props.navigation.pop( 2 );
-    } ).catch( ( e ) => {
-      setLoading( false );
-      showMessage( {
-        message : "Все поля должны быть заполнены", type : "danger",
+    } ) )
+      .unwrap()
+      .then( ( e ) => {
+        setLoading( false );
+        props.navigation.goBack();
+      } )
+      .catch( ( e ) => {
+        setLoading( false );
+        showMessage( {
+          message : "Все поля должны быть заполнены",
+          type : "danger",
+        } );
       } );
-    } );
   };
 
   useEffect( () => {
     const getCytys = () => {
-      dispatch( getCitys() ).unwrap().then( ( result ) => {
-        setCitys( result.data.data.citys );
-      } );
+      dispatch( getCitys() )
+        .unwrap()
+        .then( ( result ) => {
+          setCitys( result.data.data.citys );
+        } );
     };
     getCytys();
   }, [] );
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync( {
-      mediaTypes : ImagePicker.MediaTypeOptions.Images, allowsEditing : true, aspect : [ 1, 1 ], quality : 0,
+      mediaTypes : ImagePicker.MediaTypeOptions.Images,
+      allowsEditing : true,
+      aspect : [ 1, 1 ],
+      quality : 0,
     } );
     if( !result.canceled ) {
-      setFileName( result.assets[ 0 ].uri.split( "/" ).pop() );
+      setFileName( result.assets[ 0 ].uri.split( "/" )
+        .pop() );
       setSelectedImage( result.assets[ 0 ].uri );
     }
   };
@@ -212,10 +242,11 @@ function CreatingApplication( props ) {
   };
 
   useEffect( () => {
-    AsyncStorage.getItem( "token" ).then( ( result ) => {
-      setToken( result );
-      dispatch( authRequest( { secret_token : result } ) );
-    } );
+    AsyncStorage.getItem( "token" )
+      .then( ( result ) => {
+        setToken( result );
+        dispatch( authRequest( { secret_token : result } ) );
+      } );
   }, [] );
 
   useEffect( () => {
@@ -311,7 +342,10 @@ function CreatingApplication( props ) {
         <View style={ styles.containerStyle }>
           <SelectDropdown
             searchInputStyle={ {
-              borderColor : "black", borderWidth : 0.2, marginVertical : 10, height : 40,
+              borderColor : "black",
+              borderWidth : 0.2,
+              marginVertical : 10,
+              height : 40,
             } }
             ref={ DrowDownTypeContainerRef }
             dropdownIconPosition="right"
@@ -322,9 +356,15 @@ function CreatingApplication( props ) {
             } }
             defaultButtonText="Выберите тип контейнера"
             buttonTextStyle={ {
-              color : COLOR_1, fontSize : 14, textAlign : "left",
+              color : COLOR_1,
+              fontSize : 14,
+              textAlign : "left",
             } }
-            buttonStyle={ { height : 40, width : "100%", borderRadius : 8 } }
+            buttonStyle={ {
+              height : 40,
+              width : "100%",
+              borderRadius : 8
+            } }
             // search
             data={ container }
             onSelect={ ( selectedItem, index ) => {
@@ -337,7 +377,8 @@ function CreatingApplication( props ) {
               borderBottomColor : "white",
             } }
             rowTextStyle={ {
-              textAlign : "left", fontSize : 16,
+              textAlign : "left",
+              fontSize : 16,
             } }
           />
         </View>
@@ -371,9 +412,15 @@ function CreatingApplication( props ) {
               );
             } }
             buttonTextStyle={ {
-              color : COLOR_1, fontSize : 14, textAlign : "left",
+              color : COLOR_1,
+              fontSize : 14,
+              textAlign : "left",
             } }
-            buttonStyle={ { height : 40, width : "100%", borderRadius : 8 } }
+            buttonStyle={ {
+              height : 40,
+              width : "100%",
+              borderRadius : 8
+            } }
             data={ valuta }
             onSelect={ ( selectedItem, index ) => {
               setCurrency( index );
@@ -385,7 +432,8 @@ function CreatingApplication( props ) {
               borderBottomColor : "white",
             } }
             rowTextStyle={ {
-              textAlign : "left", fontSize : 16,
+              textAlign : "left",
+              fontSize : 16,
             } }
           />
         </View>
@@ -399,7 +447,8 @@ function CreatingApplication( props ) {
         <View style={ styles.containerStyle }>
           <SelectDropdown
             searchInputStyle={ {
-              marginVertical : 10, height : 40,
+              marginVertical : 10,
+              height : 40,
             } }
             ref={ DrowDownTypeContainerRef }
             defaultButtonText="Выберите тип контейнера"
@@ -410,9 +459,15 @@ function CreatingApplication( props ) {
               );
             } }
             buttonTextStyle={ {
-              color : COLOR_1, fontSize : 14, textAlign : "left",
+              color : COLOR_1,
+              fontSize : 14,
+              textAlign : "left",
             } }
-            buttonStyle={ { height : 40, width : "100%", borderRadius : 8 } }
+            buttonStyle={ {
+              height : 40,
+              width : "100%",
+              borderRadius : 8
+            } }
             // search
             data={ container }
             onSelect={ ( selectedItem, index ) => {
@@ -425,7 +480,8 @@ function CreatingApplication( props ) {
               borderBottomColor : "white",
             } }
             rowTextStyle={ {
-              textAlign : "left", fontSize : 16,
+              textAlign : "left",
+              fontSize : 16,
             } }
           />
         </View>
@@ -452,9 +508,15 @@ function CreatingApplication( props ) {
             } }
             defaultButtonText="Валюта"
             buttonTextStyle={ {
-              color : COLOR_1, fontSize : 14, textAlign : "left",
+              color : COLOR_1,
+              fontSize : 14,
+              textAlign : "left",
             } }
-            buttonStyle={ { height : 40, width : "100%", borderRadius : 8 } }
+            buttonStyle={ {
+              height : 40,
+              width : "100%",
+              borderRadius : 8
+            } }
             data={ valuta }
             onSelect={ ( selectedItem, index ) => {
               setCurrency( index );
@@ -466,7 +528,8 @@ function CreatingApplication( props ) {
               borderBottomColor : "white",
             } }
             rowTextStyle={ {
-              textAlign : "left", fontSize : 16,
+              textAlign : "left",
+              fontSize : 16,
             } }
           />
         </View>
@@ -514,7 +577,10 @@ function CreatingApplication( props ) {
         <View style={ styles.containerStyle }>
           <SelectDropdown
             searchInputStyle={ {
-              borderColor : "black", borderWidth : 0.2, marginVertical : 10, height : 40,
+              borderColor : "black",
+              borderWidth : 0.2,
+              marginVertical : 10,
+              height : 40,
             } }
             ref={ DropDownRef }
             dropdownIconPosition="right"
@@ -525,9 +591,15 @@ function CreatingApplication( props ) {
             } }
             defaultButtonText="Состояние"
             buttonTextStyle={ {
-              color : COLOR_1, fontSize : 14, textAlign : "left",
+              color : COLOR_1,
+              fontSize : 14,
+              textAlign : "left",
             } }
-            buttonStyle={ { height : 40, width : "100%", borderRadius : 8 } }
+            buttonStyle={ {
+              height : 40,
+              width : "100%",
+              borderRadius : 8
+            } }
             data={ conditations }
             onSelect={ ( selectedItem, index ) => {
               setConditation( selectedItem );
@@ -539,14 +611,17 @@ function CreatingApplication( props ) {
               borderBottomColor : "white",
             } }
             rowTextStyle={ {
-              textAlign : "left", fontSize : 16,
+              textAlign : "left",
+              fontSize : 16,
             } }
           />
         </View>
         <TouchableOpacity onPress={ pickImage }>
           <Text
             style={ {
-              fontFamily : "GothamProRegular", color : COLOR_1, marginVertical : 40,
+              fontFamily : "GothamProRegular",
+              color : COLOR_1,
+              marginVertical : 40,
             } }
           >
             Добавить фото
@@ -573,7 +648,10 @@ function CreatingApplication( props ) {
         <View style={ styles.containerStyle }>
           <SelectDropdown
             searchInputStyle={ {
-              borderColor : "black", borderWidth : 0.2, marginVertical : 10, height : 40,
+              borderColor : "black",
+              borderWidth : 0.2,
+              marginVertical : 10,
+              height : 40,
             } }
             ref={ DropDownRef }
             dropdownIconPosition="right"
@@ -584,9 +662,15 @@ function CreatingApplication( props ) {
             } }
             defaultButtonText="Условия оплаты"
             buttonTextStyle={ {
-              color : COLOR_1, fontSize : 14, textAlign : "left",
+              color : COLOR_1,
+              fontSize : 14,
+              textAlign : "left",
             } }
-            buttonStyle={ { height : 40, width : "100%", borderRadius : 8 } }
+            buttonStyle={ {
+              height : 40,
+              width : "100%",
+              borderRadius : 8
+            } }
             data={ typespay }
             onSelect={ ( selectedItem, index ) => {
               setTypePay( selectedItem );
@@ -598,14 +682,18 @@ function CreatingApplication( props ) {
               borderBottomColor : "white",
             } }
             rowTextStyle={ {
-              textAlign : "left", fontSize : 16,
+              textAlign : "left",
+              fontSize : 16,
             } }
           />
         </View>
         <View style={ styles.containerStyle }>
           <SelectDropdown
             searchInputStyle={ {
-              borderColor : "black", borderWidth : 0.2, marginVertical : 10, height : 40,
+              borderColor : "black",
+              borderWidth : 0.2,
+              marginVertical : 10,
+              height : 40,
             } }
             ref={ DropDownRef }
             dropdownIconPosition="right"
@@ -616,9 +704,15 @@ function CreatingApplication( props ) {
               );
             } }
             buttonTextStyle={ {
-              color : COLOR_1, fontSize : 14, textAlign : "left",
+              color : COLOR_1,
+              fontSize : 14,
+              textAlign : "left",
             } }
-            buttonStyle={ { height : 40, width : "100%", borderRadius : 8 } }
+            buttonStyle={ {
+              height : 40,
+              width : "100%",
+              borderRadius : 8
+            } }
             data={ reestrized }
             onSelect={ ( selectedItem, index ) => {
               setRestrict( selectedItem );
@@ -630,7 +724,8 @@ function CreatingApplication( props ) {
               borderBottomColor : "white",
             } }
             rowTextStyle={ {
-              textAlign : "left", fontSize : 16,
+              textAlign : "left",
+              fontSize : 16,
             } }
           />
         </View>
@@ -726,7 +821,10 @@ function CreatingApplication( props ) {
         <View style={ styles.containerStyle }>
           <SelectDropdown
             searchInputStyle={ {
-              borderColor : "black", borderWidth : 0.2, marginVertical : 10, height : 40,
+              borderColor : "black",
+              borderWidth : 0.2,
+              marginVertical : 10,
+              height : 40,
             } }
             ref={ DrowDownTypeContainerRef }
             dropdownIconPosition="right"
@@ -737,9 +835,15 @@ function CreatingApplication( props ) {
             } }
             defaultButtonText="Выберите тип контейнера"
             buttonTextStyle={ {
-              color : COLOR_1, fontSize : 14, textAlign : "left",
+              color : COLOR_1,
+              fontSize : 14,
+              textAlign : "left",
             } }
-            buttonStyle={ { height : 40, width : "100%", borderRadius : 8 } }
+            buttonStyle={ {
+              height : 40,
+              width : "100%",
+              borderRadius : 8
+            } }
             data={ container }
             onSelect={ ( selectedItem, index ) => {
               setTypeContiner( index );
@@ -751,7 +855,8 @@ function CreatingApplication( props ) {
               borderBottomColor : "white",
             } }
             rowTextStyle={ {
-              textAlign : "left", fontSize : 16,
+              textAlign : "left",
+              fontSize : 16,
             } }
           />
         </View>
@@ -786,9 +891,15 @@ function CreatingApplication( props ) {
             dropdownIconPosition="right"
             defaultButtonText="Валюта"
             buttonTextStyle={ {
-              color : COLOR_1, fontSize : 14, textAlign : "left",
+              color : COLOR_1,
+              fontSize : 14,
+              textAlign : "left",
             } }
-            buttonStyle={ { height : 40, width : "100%", borderRadius : 8 } }
+            buttonStyle={ {
+              height : 40,
+              width : "100%",
+              borderRadius : 8
+            } }
             data={ valuta }
             onSelect={ ( selectedItem, index ) => {
               setCurrency( index );
@@ -800,7 +911,8 @@ function CreatingApplication( props ) {
               borderBottomColor : "white",
             } }
             rowTextStyle={ {
-              textAlign : "left", fontSize : 16,
+              textAlign : "left",
+              fontSize : 16,
             } }
           />
         </View>
@@ -896,7 +1008,10 @@ function CreatingApplication( props ) {
         <View style={ styles.containerStyle }>
           <SelectDropdown
             searchInputStyle={ {
-              borderColor : "black", borderWidth : 0.2, marginVertical : 10, height : 40,
+              borderColor : "black",
+              borderWidth : 0.2,
+              marginVertical : 10,
+              height : 40,
             } }
             ref={ DrowDownTypeContainerRef }
             dropdownIconPosition="right"
@@ -907,9 +1022,15 @@ function CreatingApplication( props ) {
             } }
             defaultButtonText="Выберите тип контейнера"
             buttonTextStyle={ {
-              color : COLOR_1, fontSize : 14, textAlign : "left",
+              color : COLOR_1,
+              fontSize : 14,
+              textAlign : "left",
             } }
-            buttonStyle={ { height : 40, width : "100%", borderRadius : 8 } }
+            buttonStyle={ {
+              height : 40,
+              width : "100%",
+              borderRadius : 8
+            } }
             data={ container }
             onSelect={ ( selectedItem, index ) => {
               setTypeContiner( index );
@@ -921,7 +1042,8 @@ function CreatingApplication( props ) {
               borderBottomColor : "white",
             } }
             rowTextStyle={ {
-              textAlign : "left", fontSize : 16,
+              textAlign : "left",
+              fontSize : 16,
             } }
           />
         </View>
@@ -956,9 +1078,15 @@ function CreatingApplication( props ) {
               );
             } }
             buttonTextStyle={ {
-              color : COLOR_1, fontSize : 14, textAlign : "left",
+              color : COLOR_1,
+              fontSize : 14,
+              textAlign : "left",
             } }
-            buttonStyle={ { height : 40, width : "100%", borderRadius : 8 } }
+            buttonStyle={ {
+              height : 40,
+              width : "100%",
+              borderRadius : 8
+            } }
             data={ valuta }
             onSelect={ ( selectedItem, index ) => {
               setCurrency( index );
@@ -970,7 +1098,8 @@ function CreatingApplication( props ) {
               borderBottomColor : "white",
             } }
             rowTextStyle={ {
-              textAlign : "left", fontSize : 16,
+              textAlign : "left",
+              fontSize : 16,
             } }
           />
         </View>
@@ -1069,7 +1198,10 @@ function CreatingApplication( props ) {
         <View style={ styles.containerStyle }>
           <SelectDropdown
             searchInputStyle={ {
-              borderColor : "black", borderWidth : 0.2, marginVertical : 10, height : 40,
+              borderColor : "black",
+              borderWidth : 0.2,
+              marginVertical : 10,
+              height : 40,
             } }
             ref={ DrowDownTypeContainerRef }
             dropdownIconPosition="right"
@@ -1080,9 +1212,15 @@ function CreatingApplication( props ) {
             } }
             defaultButtonText="Выберите тип контейнера"
             buttonTextStyle={ {
-              color : COLOR_1, fontSize : 14, textAlign : "left",
+              color : COLOR_1,
+              fontSize : 14,
+              textAlign : "left",
             } }
-            buttonStyle={ { height : 40, width : "100%", borderRadius : 8 } }
+            buttonStyle={ {
+              height : 40,
+              width : "100%",
+              borderRadius : 8
+            } }
             data={ container }
             onSelect={ ( selectedItem, index ) => {
               setTypeContiner( index );
@@ -1094,7 +1232,8 @@ function CreatingApplication( props ) {
               borderBottomColor : "white",
             } }
             rowTextStyle={ {
-              textAlign : "left", fontSize : 16,
+              textAlign : "left",
+              fontSize : 16,
             } }
           />
         </View>
@@ -1138,7 +1277,10 @@ function CreatingApplication( props ) {
     <Wrapper
       withContainer
       header={ {
-        currentPage, home : false, navigation, onSavePress : save,
+        currentPage,
+        home : false,
+        navigation,
+        onSavePress : save,
       } }
     >
       <NavBar
@@ -1176,36 +1318,65 @@ function CreatingApplication( props ) {
 const styles = StyleSheet.create( {
   wrapper : {
     paddingHorizontal : WRAPPER_PADDINGS,
-  }, containerStyle : {
+  },
+  containerStyle : {
     marginBottom : 20,
     backgroundColor : COLOR_10,
     borderRadius : 6,
     height : 46,
     borderTopColor : "transparent",
     borderTopWidth : 1,
-  }, openModal : {
-    height : 200, marginBottom : 100,
-  }, commentInput : {
-    height : undefined, color : COLOR_8, fontSize : 14, fontFamily : "GothamProRegular",
-  }, select : {
-    backgroundColor : COLOR_10, borderRadius : 10, marginBottom : 20,
-  }, selectText : {
-    color : COLOR_1, fontSize : 12, fontFamily : "GothamProMedium",
-  }, selectHeader : {
-    borderBottomWidth : 0, paddingHorizontal : 10, paddingVertical : 18,
+  },
+  openModal : {
+    height : 200,
+    marginBottom : 100,
+  },
+  commentInput : {
+    height : undefined,
+    color : COLOR_8,
+    fontSize : 14,
+    fontFamily : "GothamProRegular",
+  },
+  select : {
+    backgroundColor : COLOR_10,
+    borderRadius : 10,
+    marginBottom : 20,
+  },
+  selectText : {
+    color : COLOR_1,
+    fontSize : 12,
+    fontFamily : "GothamProMedium",
+  },
+  selectHeader : {
+    borderBottomWidth : 0,
+    paddingHorizontal : 10,
+    paddingVertical : 18,
   },
 
   selectArrowStyle : {
-    top : 20, right : 14,
-  }, button : {
-    alignSelf : "center", marginTop : 20, marginBottom : 20,
-  }, imageStyle : {
-    width : 50, height : 50, borderRadius : 5, marginHorizontal : 5,
-  }, cancelImage : {
-    color : "red", marginLeft : 5,
-  }, citysSearch : {
-    flexDirection : "row", alignItems : "center",
-  }, searchInput : {
+    top : 20,
+    right : 14,
+  },
+  button : {
+    alignSelf : "center",
+    marginTop : 20,
+    marginBottom : 20,
+  },
+  imageStyle : {
+    width : 50,
+    height : 50,
+    borderRadius : 5,
+    marginHorizontal : 5,
+  },
+  cancelImage : {
+    color : "red",
+    marginLeft : 5,
+  },
+  citysSearch : {
+    flexDirection : "row",
+    alignItems : "center",
+  },
+  searchInput : {
     flex : 1,
     borderWidth : 0.5,
     borderColor : COLOR_1,
