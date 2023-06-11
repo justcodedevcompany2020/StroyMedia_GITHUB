@@ -37,7 +37,7 @@ function Messages( {
     loading
   } = useSelector( ( state ) => state.allDialogSlice );
   const forumChats = useSelector( ( state ) => state.forumChatAllSlice.data );
-  const last_messages = useSelector( ( state ) => state.forumChatAllSlice.data );
+  const { last_messages } = useSelector( ( state ) => state.forumChatAllSlice );
   const isloading = useSelector( ( state ) => state.forumChatAllSlice.loading );
   const [ filteredData, setFilteredData ] = useState( [] );
   const [ changed, setChanged ] = useState( true );

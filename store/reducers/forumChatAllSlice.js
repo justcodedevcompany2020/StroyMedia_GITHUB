@@ -31,33 +31,27 @@ const allChatForumSlice = createSlice( {
   },
   reducers : {},
   extraReducers : ( builder ) => {
-    builder
+    builder.addCase( allChatForumRequest.pending, ( state ) => {
+      state.loading = true;
+    } ).addCase( allChatForumRequest.fulfilled, ( state, action ) => {
+      state.data = action.payload.data.data.contacts;
+      // state.last_messages = action.payload.data.data.last_messages;
 
-      .addCase( allChatForumRequest.pending, ( state ) => {
-        state.loading = true;
-      } )
+      if( state.last_messages.length === 0 ) {
+        action.payload?.data?.data?.last_messages.forEach( item => {
+          state.last_messages.push( item[ 0 ]?.comment );
+          // console.log( item[ 0 ]?.comment );
+        } );
+      }
 
-      .addCase( allChatForumRequest.fulfilled, ( state, action ) => {
-        state.data = action.payload.data.data.contacts;
-        // state.last_messages = action.payload.data.data.last_messages;
+      // console.log( state.last_messages, "i" );
 
-        if( state.last_messages.length == 0 ) {
-          action.payload?.data?.data?.last_messages.forEach( item => {
-            state.last_messages.push( item[ 0 ]?.comment );
-            // console.log( item[ 0 ]?.comment );
-          } );
-        }
-
-        // console.log( state.last_messages, "i" );
-
-        state.error = false;
-        state.loading = false;
-      } )
-
-      .addCase( allChatForumRequest.rejected, ( state ) => {
-        state.error = true;
-        state.loading = false;
-      } );
+      state.error = false;
+      state.loading = false;
+    } ).addCase( allChatForumRequest.rejected, ( state ) => {
+      state.error = true;
+      state.loading = false;
+    } );
   },
 } );
 

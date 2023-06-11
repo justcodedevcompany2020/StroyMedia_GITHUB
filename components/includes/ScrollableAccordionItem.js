@@ -52,12 +52,11 @@ function ScrollableAccordionItem( {
 
   const date = +item?.date_create?.$date?.$numberLong;
   useEffect( () => {
-    AsyncStorage.getItem( "token" )
-      .then( ( result ) => {
-        dispatch( allDialogRequest( { token : result } ) );
-        dispatch( authRequest( { secret_token : result } ) );
-        setToken( result );
-      } );
+    AsyncStorage.getItem( "token" ).then( ( result ) => {
+      dispatch( allDialogRequest( { token : result } ) );
+      dispatch( authRequest( { secret_token : result } ) );
+      setToken( result );
+    } );
   }, [] );
 
 
@@ -86,8 +85,7 @@ function ScrollableAccordionItem( {
                 </Text>
               </View>
               <Text style={ styles.time }>
-                { activeTab === "Чаты" ? moment( date )
-                  .format( "HH-MM" ) : "15:36" }
+                { activeTab === "Чаты" ? moment( date ).format( "HH-MM" ) : "15:36" }
               </Text>
             </View>
             <Text
@@ -104,7 +102,7 @@ function ScrollableAccordionItem( {
                 ellipsizeMode={ "tail" }
                 numberOfLines={ 4 }
               >
-                { activeTab == "Диалоги" ? item?.last_message : last_messages }
+                { activeTab == "Диалоги" ? item?.last_message : last_messages[ index ] }
               </Text>
             ) }
 
@@ -113,7 +111,7 @@ function ScrollableAccordionItem( {
               ellipsizeMode={ "tail" }
               numberOfLines={ 1 }
             >
-              { item?.last_message }
+              { activeTab == "Диалоги" ? item?.last_message : last_messages[ index ] }
             </Text>
           </View>
         </View>
