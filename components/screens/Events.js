@@ -36,16 +36,17 @@ function Events( {
     longitude : -119.538330
   } );
   useEffect( () => {
-    AsyncStorage.getItem( "token" ).then( ( result ) => {
-      if( result ) {
-        setToken( result );
-        dispatch( getEventsRequest( {
-          token : result,
-          events_id : 1
-        } ) );
-        // dispatch(getEventsRequest({token: result, events_id: "index"}));
-      }
-    } );
+    AsyncStorage.getItem( "token" )
+      .then( ( result ) => {
+        if( result ) {
+          setToken( result );
+          dispatch( getEventsRequest( {
+            token : result,
+            events_id : 1
+          } ) );
+          // dispatch(getEventsRequest({token: result, events_id: "index"}));
+        }
+      } );
     dispatch( getEventsRequest( {
       token,
       events_id : 1
@@ -53,7 +54,11 @@ function Events( {
     // dispatch(getEventsRequest({token, events_id: "index"}));
   }, [ dispatch ] );
 
-  const titleComponent = ( startTime, endTime, listTitleText ) => {
+  const titleComponent = (
+    startTime,
+    endTime,
+    listTitleText
+  ) => {
     return (
       <View style={ styles.listTitleBlock }>
         <View style={ styles.time }>
@@ -89,7 +94,8 @@ function Events( {
                 <View style={ styles.date }>
                   <ImageCalendar/>
                   <Text style={ styles.dateText }>
-                    { moment( +date ).format( "YYYY-MM-DD" ) }
+                    { moment( +date )
+                      .format( "YYYY-MM-DD" ) }
                   </Text>
                 </View>
                 <TouchableOpacity
@@ -118,8 +124,14 @@ function Events( {
                   title={ s.moderator_post || s.event.title }
                   text={
                     Platform.OS === "android"
-                      ? s?.full?.replace( regex, "" ).replace( simvolRegexp, "" ).replace( spacesRegex, "" ).trim() ||
-                      s?.event?.full?.replace( regex, "" ).replace( spacesRegex, "" ).replace( simvolRegexp, " " ).trim()
+                      ? s?.full?.replace( regex, "" )
+                        .replace( simvolRegexp, "" )
+                        .replace( spacesRegex, "" )
+                        .trim() ||
+                      s?.event?.full?.replace( regex, "" )
+                        .replace( spacesRegex, "" )
+                        .replace( simvolRegexp, " " )
+                        .trim()
                       : (
                       <RenderHtml
                         contentWidth={ width }
@@ -146,14 +158,15 @@ function Events( {
                         token : token,
                         id : s.last_id
                       } )
-                    ).unwrap().then( res => {
-                      console.log( res?.data?.data, "res?.data?.data 1111" );
-                      navigation.navigate( "Chat", {
-                        currentPage : "Чаты",
-                        title : s.event.title,
-                        id : res?.data?.data?.chat_id,
+                    )
+                      .unwrap()
+                      .then( res => {
+                        navigation.navigate( "Chat", {
+                          currentPage : "Чаты",
+                          title : s.event.title,
+                          id : res?.data?.data?.chat_id,
+                        } );
                       } );
-                    } );
                   } }
                   style={ styles.nextArrow }
                 >
@@ -176,8 +189,14 @@ function Events( {
                   title={ s.moderator_post || s.event.title }
                   text={
                     Platform.OS === "android"
-                      ? s?.full?.replace( regex, "" ).replace( spacesRegex, "" ).replace( simvolRegexp, " " ).trim() ||
-                      s?.event?.full?.replace( regex, "" ).replace( spacesRegex, "" ).replace( simvolRegexp, " " ).trim()
+                      ? s?.full?.replace( regex, "" )
+                        .replace( spacesRegex, "" )
+                        .replace( simvolRegexp, " " )
+                        .trim() ||
+                      s?.event?.full?.replace( regex, "" )
+                        .replace( spacesRegex, "" )
+                        .replace( simvolRegexp, " " )
+                        .trim()
                       : (
                       <RenderHtml
                         contentWidth={ width }
@@ -204,13 +223,15 @@ function Events( {
                         token : token,
                         id : s.last_id
                       } )
-                    ).unwrap().then( res => {
-                      navigation.navigate( "Chat", {
-                        currentPage : "Чаты",
-                        title : s.event.title,
-                        id : res?.data?.data?.chat_id,
+                    )
+                      .unwrap()
+                      .then( res => {
+                        navigation.navigate( "Chat", {
+                          currentPage : "Чаты",
+                          title : s.event.title,
+                          id : res?.data?.data?.chat_id,
+                        } );
                       } );
-                    } );
                   } }
                   style={ styles.nextArrow }
                 >

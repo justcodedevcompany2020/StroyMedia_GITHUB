@@ -5,7 +5,7 @@ import axios from "axios";
 export const allCatRequest = createAsyncThunk( "allCat", async ( {
   token,
   tab,
-  offset,
+  // offset,
 } ) => {
   try {
     const result = await api.post( "/cat-request-all", {
@@ -39,7 +39,10 @@ const allCatSlice = createSlice( {
       .addCase( allCatRequest.pending, ( state ) => {
         state.loading = true;
       } )
-      .addCase( allCatRequest.fulfilled, ( state, action ) => {
+      .addCase( allCatRequest.fulfilled, (
+        state,
+        action
+      ) => {
         state.data = action.payload.data.aplications.aplications;
         state.error = false;
         // console.log( "action.payload.data.data.aplications.aplications", action.payload.data.data.aplications.aplications, "action.payload.data.data.aplications.aplications" );

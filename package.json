@@ -45,6 +45,7 @@
     "react-native-animated-spinkit": "^1.5.2",
     "react-native-datepicker": "^1.7.2",
     "react-native-debounce-input": "^1.0.5",
+    "react-native-document-picker": "^9.0.1",
     "react-native-dynamic-search-bar": "^2.0.2",
     "react-native-dynamic-vector-icons": "WrathChaos/react-native-dynamic-vector-icons",
     "react-native-eject": "^0.2.0",

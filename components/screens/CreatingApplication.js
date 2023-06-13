@@ -27,7 +27,10 @@ const conditations = [ "Б/у", "Новый" ];
 const typespay = [ "Любой вариант", "безналичный расчет", "наличный расчет" ];
 const reestrized = [ "Любой исключен", "включен" ];
 
-function CreatingApplication( props ) {
+function CreatingApplication( {
+  route,
+  navigation
+} ) {
   const [ secondaryTabs, setSecondaryTabs ] = useState( [
     "Продажа КТК", "Поиск КТК", "Выдача КТК", "Поездной сервис", "Заявка на ТЭО",
   ] );
@@ -49,14 +52,9 @@ function CreatingApplication( props ) {
   const [ weight, setWeight ] = useState( "" );
   const [ citys, setCitys ] = useState( [] );
   const dispatch = useDispatch();
-  const {
-    route,
-    navigation
-  } = props;
-  const {
-    currentPage,
-    user
-  } = route.params;
+  const state = useSelector( state1 => state1 );
+  const { user } = state.authUserSlice.data;
+  const { currentPage } = route.params;
   const [ openCitys, setOpenCitys ] = useState( false );
   const [ openCitysFrom, setOpenCitysFrom ] = useState( false );
   const [ typeContainer, setTypeContiner ] = useState();
@@ -115,6 +113,17 @@ function CreatingApplication( props ) {
   };
 
   const save = () => {
+
+    // console.log( secret_token, "secret_token" );
+    // console.log( last_id, "last_id" );
+    // console.log( from_city, "from_city" );
+    // console.log( to_city, "to_city" );
+    // console.log( count, "count" );
+    // console.log( date_shipment, "date_shipment" );
+    // console.log( period, "period" );
+    // console.log( price, "price" );
+    // console.log( type_container, "type_container" );
+
     _.every( Object.values( compareData ) ) && setLoading( true );
     _.every( Object.values( compareDataSales ) ) && setLoading( true );
     const data = new FormData();
@@ -130,14 +139,18 @@ function CreatingApplication( props ) {
     data.append( "dislokaciya", from_city + "" );
     data.append( "condition", conditation === "Б/у" ? 3 : conditation === "Новый" ? 2 : "" );
     data.append( "description", comment );
-    data.append( "typepay", typePay === "Любой вариант" ? "4" : typePay === "безналичный расчет" ? "3" : typePay === "наличный расчет" ? "2" : "" );
+    data.append(
+      "typepay",
+      typePay === "Любой вариант" ? 4 : typePay === "безналичный расчет" ? 3 : typePay === "наличный расчет" ? 2 : ""
+    );
     data.append( "reestrrzhd", restrict === "Любой исключен" ? "3" : restrict === "включен" ? "2" : "" );
     data.append( "type_container", typeContainer === 0 || typeContainer === 1 ? "4" : typeContainer + "" );
     data.append( "currency", currency === 0 ? "3" : currency + "" );
     data.append( "responsible", user?.last_id + "" );
     data.append( "_type_op", saveAsDraft ? "draft" : "onwork" );
 
-    activeSecondaryTab === "Продажа КТК" && _.every( Object.values( compareDataSales ) ) && dispatch( sendCatRequest( data ) )
+    activeSecondaryTab === "Продажа КТК" && _.every( Object.values( compareDataSales ) ) && dispatch(
+      sendCatRequest( data ) )
       .unwrap()
       .then( () => navigation.goBack() )
       .catch( ( e ) => {
@@ -146,6 +159,7 @@ function CreatingApplication( props ) {
           type : "danger",
         } );
       } );
+
     activeSecondaryTab === "Продажа КТК" && !_.every( Object.values( compareDataSales ) ) && showMessage( {
       message : "Все поля должны быть заполнены",
       type : "danger",
@@ -157,14 +171,14 @@ function CreatingApplication( props ) {
 
     activeSecondaryTab !== "Продажа КТК" && _.every( Object.values( compareData ) ) && dispatch( sendCatRequest( {
       secret_token : token,
-      last_id : activeSecondaryTab === "Выдача КТК" || activeSecondaryTab === "Поездной сервис" ? "3" : activeSecondaryTab === "Поиск КТК" ? "2" : activeSecondaryTab === "Заявка на ТЭО" ? "7" : "",
+      last_id : activeSecondaryTab === "Выдача КТК" || activeSecondaryTab === "Поездной сервис" ? 3 : activeSecondaryTab === "Поиск КТК" ? 2 : activeSecondaryTab === "Заявка на ТЭО" ? 7 : "",
       from_city : from_city + "",
       to_city : to_city + "",
       count : containerCount + "",
       date_shipment : date + "",
       period : date + "",
       price : price + "",
-      type_container : typeContainer === 0 || typeContainer === 1 ? "4" : typeContainer + "",
+      type_container : typeContainer === 0 || typeContainer === 1 ? 4 : typeContainer + "",
       currency : currency === 0 ? "3" : currency + " ",
       responsible : user?.last_id + "",
       _type_op : saveAsDraft ? "draft" : "onwork",
@@ -247,7 +261,7 @@ function CreatingApplication( props ) {
         setToken( result );
         dispatch( authRequest( { secret_token : result } ) );
       } );
-  }, [] );
+  }, [ dispatch, navigation ] );
 
   useEffect( () => {
     searchValue && filtered( searchValue );
@@ -367,7 +381,10 @@ function CreatingApplication( props ) {
             } }
             // search
             data={ container }
-            onSelect={ ( selectedItem, index ) => {
+            onSelect={ (
+              selectedItem,
+              index
+            ) => {
               setTypeContiner( index );
             } }
             rowStyle={ {
@@ -390,7 +407,10 @@ function CreatingApplication( props ) {
         />
         <DatePicker
           date={ date }
-          setDate={ ( event, date ) => {
+          setDate={ (
+            event,
+            date
+          ) => {
             setShowDatePicker( false );
             return setDate( date );
           } }
@@ -422,7 +442,10 @@ function CreatingApplication( props ) {
               borderRadius : 8
             } }
             data={ valuta }
-            onSelect={ ( selectedItem, index ) => {
+            onSelect={ (
+              selectedItem,
+              index
+            ) => {
               setCurrency( index );
             } }
             rowStyle={ {
@@ -470,7 +493,10 @@ function CreatingApplication( props ) {
             } }
             // search
             data={ container }
-            onSelect={ ( selectedItem, index ) => {
+            onSelect={ (
+              selectedItem,
+              index
+            ) => {
               setTypeContiner( index );
             } }
             rowStyle={ {
@@ -518,7 +544,10 @@ function CreatingApplication( props ) {
               borderRadius : 8
             } }
             data={ valuta }
-            onSelect={ ( selectedItem, index ) => {
+            onSelect={ (
+              selectedItem,
+              index
+            ) => {
               setCurrency( index );
             } }
             rowStyle={ {
@@ -601,7 +630,10 @@ function CreatingApplication( props ) {
               borderRadius : 8
             } }
             data={ conditations }
-            onSelect={ ( selectedItem, index ) => {
+            onSelect={ (
+              selectedItem,
+              index
+            ) => {
               setConditation( selectedItem );
             } }
             rowStyle={ {
@@ -672,7 +704,10 @@ function CreatingApplication( props ) {
               borderRadius : 8
             } }
             data={ typespay }
-            onSelect={ ( selectedItem, index ) => {
+            onSelect={ (
+              selectedItem,
+              index
+            ) => {
               setTypePay( selectedItem );
             } }
             rowStyle={ {
@@ -714,7 +749,10 @@ function CreatingApplication( props ) {
               borderRadius : 8
             } }
             data={ reestrized }
-            onSelect={ ( selectedItem, index ) => {
+            onSelect={ (
+              selectedItem,
+              index
+            ) => {
               setRestrict( selectedItem );
             } }
             rowStyle={ {
@@ -845,7 +883,10 @@ function CreatingApplication( props ) {
               borderRadius : 8
             } }
             data={ container }
-            onSelect={ ( selectedItem, index ) => {
+            onSelect={ (
+              selectedItem,
+              index
+            ) => {
               setTypeContiner( index );
             } }
             rowStyle={ {
@@ -869,7 +910,10 @@ function CreatingApplication( props ) {
         <DatePicker
           body="Cрок"
           date={ date }
-          setDate={ ( event, date ) => {
+          setDate={ (
+            event,
+            date
+          ) => {
             setShowDatePicker( false );
             return setDate( date );
           } }
@@ -901,7 +945,10 @@ function CreatingApplication( props ) {
               borderRadius : 8
             } }
             data={ valuta }
-            onSelect={ ( selectedItem, index ) => {
+            onSelect={ (
+              selectedItem,
+              index
+            ) => {
               setCurrency( index );
             } }
             rowStyle={ {
@@ -1032,7 +1079,10 @@ function CreatingApplication( props ) {
               borderRadius : 8
             } }
             data={ container }
-            onSelect={ ( selectedItem, index ) => {
+            onSelect={ (
+              selectedItem,
+              index
+            ) => {
               setTypeContiner( index );
             } }
             rowStyle={ {
@@ -1056,7 +1106,10 @@ function CreatingApplication( props ) {
         <DatePicker
           body="Cрок"
           date={ date }
-          setDate={ ( event, date ) => {
+          setDate={ (
+            event,
+            date
+          ) => {
             setShowDatePicker( false );
             return setDate( date );
           } }
@@ -1088,7 +1141,10 @@ function CreatingApplication( props ) {
               borderRadius : 8
             } }
             data={ valuta }
-            onSelect={ ( selectedItem, index ) => {
+            onSelect={ (
+              selectedItem,
+              index
+            ) => {
               setCurrency( index );
             } }
             rowStyle={ {
@@ -1222,7 +1278,10 @@ function CreatingApplication( props ) {
               borderRadius : 8
             } }
             data={ container }
-            onSelect={ ( selectedItem, index ) => {
+            onSelect={ (
+              selectedItem,
+              index
+            ) => {
               setTypeContiner( index );
             } }
             rowStyle={ {
@@ -1246,7 +1305,10 @@ function CreatingApplication( props ) {
         <DatePicker
           body="Cрок"
           date={ date }
-          setDate={ ( event, date ) => {
+          setDate={ (
+            event,
+            date
+          ) => {
             setShowDatePicker( false );
             return setDate( date );
           } }

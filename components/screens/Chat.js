@@ -33,7 +33,6 @@ export default function Chat( { route } ) {
   const { currentPage } = route.params;
   const [ id, setId ] = useState();
   const [ token, setToken ] = useState();
-  // const dialog = route.params.currentPage === "Диалоги";
   const state = useSelector( ( state ) => state );
   const { dialog_message } = state.orderForumChatSlice;
   const intervalRef = useRef( null );
@@ -374,7 +373,10 @@ export default function Chat( { route } ) {
     }
   };
 
-  const getItemLayout = ( data, index ) => (
+  const getItemLayout = (
+    data,
+    index
+  ) => (
     {
       length : HEIGHT,
       offset : HEIGHT,
@@ -400,7 +402,10 @@ export default function Chat( { route } ) {
           ListHeaderComponent={ headerComponent() }
           stickyHeaderIndices={ [ 0 ] }
           showsVerticalScrollIndicator={ false }
-          keyExtractor={ ( item, $ ) => item.last_id }
+          keyExtractor={ (
+            item,
+            $
+          ) => item.last_id }
           ListEmptyComponent={ () => (
             <View>
               <Text
@@ -418,7 +423,10 @@ export default function Chat( { route } ) {
             filteredData?.length &&
             messagesRef?.current?.scrollToEnd( 0 );
           } }
-          getItemLayout={ ( data, index ) => {
+          getItemLayout={ (
+            data,
+            index
+          ) => {
             return {
               length : ITEM_HEIGHT,
               offset : ITEM_HEIGHT * index + 100,

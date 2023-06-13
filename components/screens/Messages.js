@@ -79,7 +79,6 @@ function Messages( {
     item,
     index
   } ) => {
-    console.log( last_messages, "last_messages" );
     return (
       <>
         { !deletedId.includes( item.last_id ) && (
@@ -126,10 +125,11 @@ function Messages( {
   };
 
   useEffect( () => {
-    setFilteredData( activeTab === "Чаты" ? convertForumChatToArray : searchMessages?.length ? searchMessages : Object.keys( data )
-      .map( ( key ) => {
-        return data[ key ];
-      } ) );
+    setFilteredData(
+      activeTab === "Чаты" ? convertForumChatToArray : searchMessages?.length ? searchMessages : Object.keys( data )
+        .map( ( key ) => {
+          return data[ key ];
+        } ) );
   }, [ data.length, activeTab, searchMessages ] );
 
   const filteredMessages = ( searchText ) => {

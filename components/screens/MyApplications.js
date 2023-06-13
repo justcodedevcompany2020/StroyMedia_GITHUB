@@ -43,7 +43,7 @@ function MyApplications( {
           dispatch( authRequest( { secret_token : result } ) );
         }
       } );
-  }, [] );
+  }, [ navigation, dispatch ] );
 
   useEffect( () => {
     dispatch( allCatRequest( {
@@ -319,7 +319,6 @@ function MyApplications( {
         end={ true }
         onPress={ () => navigation.navigate( "CreatingApplication", {
           currentPage : "Создание новой заявки",
-          user,
         } ) }
       />
     </Wrapper>
