@@ -8,13 +8,13 @@ import { ImageAttach, ImageSend, } from "../helpers/images";
 import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment";
-import * as ImagePicker from "expo-image-picker";
 import { sendForumMessageRequest } from "../../store/reducers/sendForumMessageSlice";
 import { chatForumOrderRequest } from "./../../store/reducers/orderForumChatSlice";
 import { useNavigation } from "@react-navigation/native";
 import { ImagesViewModal } from "../includes/ImagesViewModal";
-import * as FileSystem from "expo-file-system";
 import { showMessage } from "react-native-flash-message";
+import * as DocumentPicker from "expo-document-picker";
+import { Ionicons } from "@expo/vector-icons";
 
 const SearchIcon = require( "../../assets/search.png" );
 const HEIGHT = Dimensions.get( "window" ).width;
@@ -38,6 +38,7 @@ export default function Chat( { route } ) {
   const intervalRef = useRef( null );
   const [ filePath, setFilePath ] = useState( "" );
   const [ fileName, setFileName ] = useState( "" );
+  const [ fileType, setFileType ] = useState( "" );
   const [ selectedFile, setSelectedFile ] = useState( "" );
   const [ filteredData, setFilteredData ] = useState( [] );
 
@@ -52,50 +53,59 @@ export default function Chat( { route } ) {
     return afterDot;
   }
 
-  const getFileInfo = async ( fileURI ) => {
-    const fileInfo = await FileSystem.getInfoAsync( fileURI );
-    return fileInfo;
-  };
+  // const getFileInfo = async ( fileURI ) => {
+  //   const fileInfo = await FileSystem.getInfoAsync( fileURI );
+  //   return fileInfo;
+  // };
 
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync( {
-      mediaTypes : ImagePicker.MediaTypeOptions.Images,
-      allowsEditing : true,
-      aspect : [ 1, 1 ],
-      quality : 0,
+    // let result = await ImagePicker.launchImageLibraryAsync( {
+    //   mediaTypes : ImagePicker.MediaTypeOptions.Images,
+    //   allowsEditing : true,
+    //   aspect : [ 1, 1 ],
+    //   quality : 0,
+    // } );
+    let result = await DocumentPicker.getDocumentAsync( {
+      type : [ "*/*", ]
     } );
+
+
+    console.log( result );
     const {
       type,
-      uri
-    } = result.assets[ 0 ];
-    const fileInfo = await getFileInfo( result.assets[ 0 ].uri );
+      uri,
+      mimeType,
+      size,
+      name
+    } = result;
+
+    // const fileInfo = await getFileInfo( result.assets[ 0 ].uri );
 
 
-    if( fileInfo.size < 10000 ) {
-      if( !result.canceled ) {
-        getImageFormat( result.assets[ 0 ].uri );
-        setFileName( result.assets[ 0 ].uri.split( "/" )
-          .pop() );
-        setFilePath( result.assets[ 0 ].uri );
+    if( size < 500000 ) {
+      if( type === "success" ) {
+        // getImageFormat( uri );
+        // setFileName( uri.split( "/" )
+        //   .pop() );
+        setFileName( name );
+        setFilePath( uri );
+        setFileType( mimeType );
       }
     } else {
       showMessage( {
         type : "info",
-        message : "Размер фото не должен превышать 1 МВ",
+        message : "Размер фото не должен превышать 5 МВ",
         color : "green"
       } );
     }
   };
 
-  const actionHandler = useCallback(
-    () => {
-      dispatch( chatForumOrderRequest( {
-        token : token,
-        id : route.params.id
-      } ) );
-    },
-    [ dialog_message ]
-  );
+  const actionHandler = useCallback( () => {
+    dispatch( chatForumOrderRequest( {
+      token : token,
+      id : route.params.id
+    } ) );
+  }, [ dialog_message ] );
 
   useEffect( () => {
     if( intervalRef.current ) {
@@ -115,8 +125,7 @@ export default function Chat( { route } ) {
   const sendMessage = async () => {
 
     setFilteredData( ( state ) => [
-      ...state,
-      {
+      ...state, {
         comment : inputValue,
         user : {
           avatar_person : user?.avatar_person,
@@ -135,29 +144,22 @@ export default function Chat( { route } ) {
     ] );
 
     let data = new FormData();
-    data.append(
-      "file_forum",
-      filePath && {
-        uri : filePath,
-        // Platform.OS === "android"
-        //   ? filePath
-        //   : filePath.replace("file://", ""),
-        name : fileName,
-        // type: `image/${getImageFormat(filePath)}`,
-        type : `image/jpg`,
-      }
-    );
+    data.append( "file_forum", filePath && {
+      uri : filePath, // Platform.OS === "android"
+      //   ? filePath
+      //   : filePath.replace("file://", ""),
+      name : fileName, // type: `image/${getImageFormat(filePath)}`,
+      type : fileType,
+    } );
     data.append( "secret_token", token );
     data.append( "last_id", route.params.id );
     data.append( "message", inputValue );
-    dispatch(
-      // sendForumMessageRequest({
+    dispatch( // sendForumMessageRequest({
       //   secret_token: token,
       //   last_id: route.params.id,
       //   message: inputValue,
       // })
-      sendForumMessageRequest( { data } )
-    );
+      sendForumMessageRequest( { data } ) );
     setInputValue( "" );
     setFilePath( "" );
     setInputHeight( 40 );
@@ -176,13 +178,13 @@ export default function Chat( { route } ) {
       <>
         { filePath ? (
           <View style={ styles.selectImage }>
-            <Image
+            { fileType == "image/png" || "image/jpg" || "image/jpeg" ? <Image
               source={ { uri : filePath } }
               style={ {
                 width : 60,
                 height : 60,
               } }
-            />
+            /> : <Ionicons name="document" size={ 45 } color="black"/> }
 
             <Text onPress={ () => setFilePath( "" ) } style={ styles.cancel }>
               X
@@ -211,30 +213,25 @@ export default function Chat( { route } ) {
               maxHeight={ 100 }
               multiline
               onContentSizeChange={ ( event ) => {
-                setInputBottom(
-                  countInputBottom( event?.nativeEvent?.contentSize?.height )
-                );
+                setInputBottom( countInputBottom( event?.nativeEvent?.contentSize?.height ) );
                 setInputHeight( event?.nativeEvent?.contentSize?.height );
               } }
               placeholder={ "Напишите сообщение..." }
-              sendComponent={
-                inputValue || filePath && inputValue ? (
-                  <TouchableOpacity
-                    style={ [
-                      styles.send,
-                      { bottom : countSendBottom( inputBottom ) },
-                    ] }
-                    onPress={ sendMessage }
-                  >
-                    <View style={ {
-                      paddingTop : 8,
-                      paddingRight : HEIGHT / 8
-                    } }>
-                      <ImageSend/>
-                    </View>
-                  </TouchableOpacity>
-                ) : null
-              }
+              sendComponent={ inputValue || filePath && inputValue ? (
+                <TouchableOpacity
+                  style={ [
+                    styles.send, { bottom : countSendBottom( inputBottom ) },
+                  ] }
+                  onPress={ sendMessage }
+                >
+                  <View style={ {
+                    paddingTop : 8,
+                    paddingRight : HEIGHT / 8
+                  } }>
+                    <ImageSend/>
+                  </View>
+                </TouchableOpacity>
+              ) : null }
             />
           </View>
         </View>
@@ -243,11 +240,9 @@ export default function Chat( { route } ) {
   };
 
   const filteredMessages = ( searchText ) => {
-    setFilteredData(
-      filteredData.filter( ( m ) => {
-        return m?.comment?.includes( searchText );
-      } )
-    );
+    setFilteredData( filteredData.filter( ( m ) => {
+      return m?.comment?.includes( searchText );
+    } ) );
   };
 
   const resetText = () => {
@@ -299,16 +294,10 @@ export default function Chat( { route } ) {
             <View style={ styles.row }>
               <View style={ styles.nameBlock }>
                 <Text style={ styles.name }>
-                  {
-                    item?.user?.contact_person
-                  }
+                  { item?.user?.contact_person }
                 </Text>
                 <Text style={ styles.companyName }>
-                  {
-                    item?.user?.name !== "undefined"
-                      ? item?.user?.name
-                      : ""
-                  }
+                  { item?.user?.name !== "undefined" ? item?.user?.name : "" }
                 </Text>
               </View>
               <View style={ styles.timeBlock }>
@@ -327,22 +316,19 @@ export default function Chat( { route } ) {
                   onPress={ () => {
                     setSelectedFile( item );
                   } }
-                  // style={{
-                  //   zIndex: 0,
-                  //   width: 20,
-                  //   height: 20,
-                  // }}
                 >
-                  <Image
-                    // source={{
-                    //   uri: "https://teus.online/" + item?.user?.avatar_person,
-                    // }}
-                    source={ { uri : item.local ? item.files : "https://teus.online" + item.files } }
-                    style={ {
-                      width : 60,
-                      height : 60,
-                    } }
-                  />
+                  { item.files.split( "." )
+                    .pop() == "png" || "jpg" || "jpeg" ?
+
+                    <Image
+                      source={ { uri : item.local ? item.files : "https://teus.online/" + item.files } }
+                      style={ {
+                        width : 60,
+                        height : 60,
+                      } }
+                    /> : <Ionicons name="document" size={ 45 } color="black"/>
+
+                  }
                 </TouchableOpacity>
               ) : (
                 <></>
@@ -420,8 +406,7 @@ export default function Chat( { route } ) {
             </View>
           ) }
           onContentSizeChange={ () => {
-            filteredData?.length &&
-            messagesRef?.current?.scrollToEnd( 0 );
+            filteredData?.length && messagesRef?.current?.scrollToEnd( 0 );
           } }
           getItemLayout={ (
             data,
@@ -474,12 +459,10 @@ const styles = StyleSheet.create( {
   },
   listWrapper : {
     // flex: 1,
-    height : "100%",
-    // width: "100%",
+    height : "100%", // width: "100%",
     // height:
     //   Dimensions.get("window").height - Platform.OS === "ios" ? -120 : -100,
-    paddingBottom : 80,
-    // backgroundColor: "red",
+    paddingBottom : 80, // backgroundColor: "red",
   },
   item : {
     marginBottom : 20,
@@ -490,8 +473,7 @@ const styles = StyleSheet.create( {
   footer : {
     paddingHorizontal : WRAPPER_PADDINGS,
     flexDirection : "row",
-    alignItems : "center",
-    // justifyContent: "space-between",
+    alignItems : "center", // justifyContent: "space-between",
     position : "absolute",
     bottom : 0,
     zIndex : 9999,

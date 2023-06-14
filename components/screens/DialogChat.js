@@ -11,10 +11,10 @@ import { sendMessageRequest } from "../../store/reducers/sendMessageSlice";
 import { useNavigation } from "@react-navigation/native";
 import { chatOrderRequest } from "../../store/reducers/chatDialogOrderSlice";
 import { ImagesViewModal } from "../includes/ImagesViewModal";
-import * as FileSystem from "expo-file-system";
 import { showMessage } from "react-native-flash-message";
 import { Search } from "../includes/Search";
-import ImagePicker from "expo-image-picker";
+import * as DocumentPicker from "expo-document-picker";
+import { Ionicons } from "@expo/vector-icons";
 
 const SearchIcon = require( "../../assets/search.png" );
 const HEIGHT = Dimensions.get( "window" ).width;
@@ -36,6 +36,7 @@ export const DialogChat = ( { route } ) => {
   const [ token, setToken ] = useState();
   const [ filePath, setFilePath ] = useState( "" );
   const [ fileName, setFileName ] = useState( "" );
+  const [ fileType, setFileType ] = useState( "" );
   const [ selectedFile, setSelectedFile ] = useState( "" );
   const [ filteredData, setFilteredData ] = useState( [] );
   const state = useSelector( state1 => state1 );
@@ -55,40 +56,50 @@ export const DialogChat = ( { route } ) => {
       } );
   }, [ navigation ] );
 
-  function getImageFormat( str ) {
-    const afterDot = str.substr( str.indexOf( "." ) + 1 );
-    return afterDot;
-  }
+  // function getImageFormat( str ) {
+  //   const afterDot = str.substr( str.indexOf( "." ) + 1 );
+  //   return afterDot;
+  // }
 
-  const getFileInfo = async ( fileURI ) => {
-    const fileInfo = await FileSystem.getInfoAsync( fileURI );
-    return fileInfo;
-  };
+  // const getFileInfo = async ( fileURI ) => {
+  //   console.log( fileURI, "fileURI" );
+  //   const fileInfo = await FileSystem.getInfoAsync( fileURI );
+  //   return fileInfo;
+  // };
 
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync( {
-      mediaTypes : ImagePicker.MediaTypeOptions.All,
-      allowsEditing : true,
-      aspect : [ 1, 1 ],
-      quality : 0,
+    // let result = await ImagePicker.launchImageLibraryAsync( {
+    //   mediaTypes : ImagePicker.MediaTypeOptions.All,
+    //   allowsEditing : true,
+    //   aspect : [ 1, 1 ],
+    //   quality : 0,
+    // } );
+
+    let result = await DocumentPicker.getDocumentAsync( {
+      type : [ "*/*", ]
     } );
 
 
     console.log( result );
     const {
       type,
-      uri
-    } = result.assets[ 0 ];
+      uri,
+      mimeType,
+      size,
+      name
+    } = result;
 
-    const fileInfo = await getFileInfo( result.assets[ 0 ].uri );
+    // const fileInfo = await getFileInfo( result );
+    // console.log( fileInfo );
 
-    console.log( type );
-    if( fileInfo.size < 50000 ) {
-      if( !result.canceled ) {
-        getImageFormat( result.assets[ 0 ].uri );
-        setFileName( result.assets[ 0 ].uri.split( "/" )
-          .pop() );
-        setFilePath( result.assets[ 0 ].uri );
+    if( size < 500000 ) {
+      if( type === "success" ) {
+        // getImageFormat( uri );
+        // setFileName( uri.split( "/" )
+        //   .pop() );
+        setFileName( name );
+        setFilePath( uri );
+        setFileType( mimeType );
       }
     } else {
       showMessage( {
@@ -97,6 +108,8 @@ export const DialogChat = ( { route } ) => {
         color : "green"
       } );
     }
+    console.log( fileName, "fileName" );
+    console.log( filePath, "filePath" );
   };
 
   const sendMessage = async () => {
@@ -124,7 +137,8 @@ export const DialogChat = ( { route } ) => {
       //   ? filePath
       //   : filePath.replace("file://", ""),
       name : fileName, // type: `image/${getImageFormat(filePath)}`,
-      type : `image/jpg`,
+      // type : `image/jpg`,
+      type : fileType,
     } );
     data.append( "secret_token", token );
     data.append( "last_id", route.params.id );
@@ -150,7 +164,6 @@ export const DialogChat = ( { route } ) => {
   useEffect( () => {
     if( messages?.length > 0 ) {
       setFilteredData( messages );
-
     }
   }, [ messages ] );
 
@@ -173,16 +186,13 @@ export const DialogChat = ( { route } ) => {
       <>
         { filePath ? (
           <View style={ styles.selectImage }>
-            {
-
-            }
-            <Image
+            { fileType == "image/png" || "image/jpg" || "image/jpeg" ? <Image
               source={ { uri : filePath } }
               style={ {
                 width : 60,
                 height : 60,
               } }
-            />
+            /> : <Ionicons name="document" size={ 45 } color="black"/> }
 
             <Text onPress={ () => setFilePath( "" ) } style={ styles.cancel }>
               X
@@ -316,14 +326,18 @@ export const DialogChat = ( { route } ) => {
                     setSelectedFile( item );
                   } }
                 >
+                  { item.files.split( "." )
+                    .pop() == "png" || "jpg" || "jpeg" ?
 
-                  <Image
-                    source={ { uri : item.local ? item.files : "https://teus.online/" + item.files } }
-                    style={ {
-                      width : 60,
-                      height : 60,
-                    } }
-                  />
+                    <Image
+                      source={ { uri : item.local ? item.files : "https://teus.online/" + item.files } }
+                      style={ {
+                        width : 60,
+                        height : 60,
+                      } }
+                    /> : <Ionicons name="document" size={ 45 } color="black"/>
+
+                  }
                 </TouchableOpacity>
               ) : (
 

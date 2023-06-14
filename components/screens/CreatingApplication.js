@@ -47,8 +47,8 @@ function CreatingApplication( {
   const [ saveAsDraft, setSaveAsDraft ] = useState( false );
   const [ whereToCount, setWhereToCount ] = useState( 1 );
   const [ termOfUse, setTermOfUse ] = useState( null );
-  const [ from_city, setFrom_city ] = useState();
-  const [ to_city, setTo_city ] = useState();
+  const [ from_city, setFrom_city ] = useState( "" );
+  const [ to_city, setTo_city ] = useState( "" );
   const [ weight, setWeight ] = useState( "" );
   const [ citys, setCitys ] = useState( [] );
   const dispatch = useDispatch();
@@ -58,13 +58,13 @@ function CreatingApplication( {
   const [ openCitys, setOpenCitys ] = useState( false );
   const [ openCitysFrom, setOpenCitysFrom ] = useState( false );
   const [ typeContainer, setTypeContiner ] = useState();
-  const [ fromCityName, setFromCityName ] = useState();
-  const [ toCityName, setToCityName ] = useState();
-  const [ conditation, setConditation ] = useState();
-  const [ typePay, setTypePay ] = useState();
-  const [ restrict, setRestrict ] = useState();
+  const [ fromCityName, setFromCityName ] = useState( "" );
+  const [ toCityName, setToCityName ] = useState( "" );
+  const [ conditation, setConditation ] = useState( "" );
+  const [ typePay, setTypePay ] = useState( "" );
+  const [ restrict, setRestrict ] = useState( "" );
   const [ selectedImage, setSelectedImage ] = useState( "" );
-  const [ fileName, setFileName ] = useState();
+  const [ fileName, setFileName ] = useState( "" );
   const [ searchValue, setSearchValue ] = useState( "" );
   const [ hash, setHash ] = useState( null );
   const [ loading, setLoading ] = useState( false );
@@ -96,11 +96,11 @@ function CreatingApplication( {
   const compareData = {
     from_city,
     to_city,
-    typeContainer : typeContainer + "",
-    containerCount : containerCount + "",
+    typeContainer : typeContainer == 0 || typeContainer == 1 ? "4" : typeContainer + "",
+    containerCount : containerCount,
     date,
-    price : price + "",
-    currency : currency + "",
+    price : price,
+    currency : currency === 0 ? "3" : currency + "",
   };
   const compareDataSales = {
     ...compareData,
@@ -113,7 +113,7 @@ function CreatingApplication( {
   };
 
   const save = () => {
-
+    console.log( Object.entries( compareDataSales ) );
     // console.log( secret_token, "secret_token" );
     // console.log( last_id, "last_id" );
     // console.log( from_city, "from_city" );
@@ -134,36 +134,40 @@ function CreatingApplication( {
     } );
     data.append( "secret_token", token );
     data.append( "last_id", 5 );
-    data.append( "count", containerCount + "" );
-    data.append( "price", price + "" );
-    data.append( "dislokaciya", from_city + "" );
+    data.append( "count", containerCount );
+    data.append( "price", price );
+    data.append( "dislokaciya", from_city );
     data.append( "condition", conditation === "Б/у" ? 3 : conditation === "Новый" ? 2 : "" );
     data.append( "description", comment );
     data.append(
       "typepay",
-      typePay === "Любой вариант" ? 4 : typePay === "безналичный расчет" ? 3 : typePay === "наличный расчет" ? 2 : ""
+      typePay === "Любой вариант" ? "4" : typePay === "безналичный расчет" ? "3" : typePay === "наличный расчет" ? "2" : ""
     );
     data.append( "reestrrzhd", restrict === "Любой исключен" ? "3" : restrict === "включен" ? "2" : "" );
-    data.append( "type_container", typeContainer === 0 || typeContainer === 1 ? "4" : typeContainer + "" );
-    data.append( "currency", currency === 0 ? "3" : currency + "" );
+    data.append( "type_container", typeContainer );
+    data.append( "currency", currency );
     data.append( "responsible", user?.last_id + "" );
     data.append( "_type_op", saveAsDraft ? "draft" : "onwork" );
 
-    activeSecondaryTab === "Продажа КТК" && _.every( Object.values( compareDataSales ) ) && dispatch(
-      sendCatRequest( data ) )
-      .unwrap()
-      .then( () => navigation.goBack() )
-      .catch( ( e ) => {
-        showMessage( {
-          message : "Все поля должны быть заполнены",
-          type : "danger",
+    if( activeSecondaryTab === "Продажа КТК" ) {
+      _.every( Object.values( compareDataSales ) ) && dispatch( sendCatRequest( data ) )
+        .unwrap()
+        .then( ( res ) => {
+          console.log( res );
+          navigation.goBack();
+        } )
+        .catch( ( e ) => {
+          showMessage( {
+            message : "Все поля должны быть заполнены",
+            type : "danger",
+          } );
         } );
-      } );
-
+    }
     activeSecondaryTab === "Продажа КТК" && !_.every( Object.values( compareDataSales ) ) && showMessage( {
       message : "Все поля должны быть заполнены",
       type : "danger",
     } );
+
     activeSecondaryTab !== "Продажа КТК" && !_.every( Object.values( compareData ) ) && showMessage( {
       message : "Все поля должны быть заполнены",
       type : "danger",
@@ -178,15 +182,15 @@ function CreatingApplication( {
       date_shipment : date + "",
       period : date + "",
       price : price + "",
-      type_container : typeContainer === 0 || typeContainer === 1 ? 4 : typeContainer + "",
-      currency : currency === 0 ? "3" : currency + " ",
+      type_container : typeContainer,
+      currency : currency,
       responsible : user?.last_id + "",
       _type_op : saveAsDraft ? "draft" : "onwork",
     } ) )
       .unwrap()
       .then( ( e ) => {
         setLoading( false );
-        props.navigation.goBack();
+        navigation.goBack();
       } )
       .catch( ( e ) => {
         setLoading( false );
