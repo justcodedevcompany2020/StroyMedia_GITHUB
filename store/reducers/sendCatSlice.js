@@ -1,30 +1,52 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-export const sendCatRequest = createAsyncThunk( "sendCat", async (
-  data,
-  {
-    rejectWithValue
-  }
-) => {
-  console.log( "data", data, "data" );
+export const sendCatRequest = createAsyncThunk( "sendCat", async ( {
+  formdata,
+  myHeaders,
+  form_data
+} ) => {
   try {
-    const response = fetch( "https://teus.online/api/cat-serv-send", {
+    // var myHeaders = new Headers();
+    // var formdata = new FormData();
+    //
+    // myHeaders.append( "Content-Type", "multipart/form-data" );
+    //
+    // formdata.append( "secret_token", data.token );
+    // formdata.append( "last_id", data.changed_tab );
+    // formdata.append( "price", data.price );
+    // formdata.append( "dislokaciya", data.from_city.toString() );
+    // formdata.append( "condition", data.new_or_used );
+    // formdata.append( "description", data.comment );
+    // formdata.append( "typepay", data.payType );
+    // formdata.append( "reestrrzhd", data.restrick );
+    // formdata.append( "type_container", data.typeKTK );
+    // formdata.append( "currency", data.price_type );
+    // formdata.append( "responsible", data.user );
+    // formdata.append(
+    //   "img",
+    //   data.selectedImage,
+    //   // name : data.fileName,
+    //   // type : data.fileType
+    // );
+    // formdata.append( "_type_op", data.saveAsDraft ? "draft" : "onwork" );
+
+    // console.log( data );
+    var requestOptions = {
       method : "POST",
-      headers : { "Content-Type" : "multipart/form-data" },
-      body : data
-    } )
-      .then( response => response.json() )
-      .then( result => {
-        console.log( "result", result, "result" );
-        return result;
-      } );
+      headers : myHeaders,
+      body : formdata || form_data,
+      redirect : "follow"
+    };
 
-    // const result = await response.json();
+    console.log( "data", formdata, "data" );
+    const response = await fetch( "https://teus.online/api/cat-serv-send", requestOptions );
 
-    // return result;
+    const result = await response.json();
+    console.log( result );
+    return result;
   } catch( error ) {
     console.log( "error", error, "error" );
-    return rejectWithValue( error );
+    return rejectWithValue( error.response );
   }
 } );
 

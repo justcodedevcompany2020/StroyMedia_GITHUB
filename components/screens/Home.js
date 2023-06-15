@@ -12,41 +12,43 @@ class Home extends React.Component {
     return (
       <Wrapper
         withImage
-        header={{
-          home: true,
+        header={ {
+          home : true,
           navigation,
-        }}
+        } }
       >
-        <View style={styles.wrapper}>
-          <View style={styles.block}>
-            <View style={styles.logoView}>
-              <ImageLogo style={styles.logo} />
+        <View style={ styles.wrapper }>
+          <View style={ styles.block }>
+            <View style={ styles.logoView }>
+              <ImageLogo style={ styles.logo }/>
             </View>
           </View>
-          <HomeMainButtons navigation={navigation} />
-          <HomeFooterButtons navigation={navigation} />
+          <HomeMainButtons navigation={ navigation }/>
+          <HomeFooterButtons navigation={ navigation }/>
         </View>
       </Wrapper>
     );
   }
 }
 
-const styles = StyleSheet.create({
-  block: {
-    marginTop: (Dimensions.get("window").height * 20) / 100,
+const styles = StyleSheet.create( {
+  block : {
+    marginTop : (
+      Dimensions.get( "window" ).height * 20
+    ) / 100,
   },
-  logoView: {
-    width: "100%",
-    alignItems: "center",
-    marginBottom: 40,
+  logoView : {
+    width : "100%",
+    alignItems : "center",
+    marginBottom : 40,
   },
-  logo: {
-    width: 120,
-    height: 32,
+  logo : {
+    width : 120,
+    height : 32,
   },
-  wrapper: {
-    paddingHorizontal: WRAPPER_PADDINGS,
+  wrapper : {
+    paddingHorizontal : WRAPPER_PADDINGS,
   },
-});
+} );
 
 export default Home;

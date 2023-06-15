@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, FlatList, Image, Platform, StyleSheet, Text, TouchableOpacity, View, } from "react-native";
+import { ActivityIndicator, FlatList, Image, StyleSheet, Text, TouchableOpacity, View, } from "react-native";
 import Wrapper from "../helpers/Wrapper";
 import { useDispatch, useSelector } from "react-redux";
 import NavBar from "../includes/NavBar";
@@ -18,8 +18,8 @@ import * as ImagePicker from "expo-image-picker";
 import { Entypo } from "@expo/vector-icons";
 import { showMessage } from "react-native-flash-message";
 import Modal from "react-native-modal";
-import _ from "lodash";
 import DelayInput from "react-native-debounce-input";
+import * as DocumentPicker from "expo-document-picker";
 
 const container = [ "40 ST", "20 (30)", "20 (24)", "40 HQ" ];
 const valuta = [ "₽", "€", "$" ];
@@ -65,6 +65,7 @@ function CreatingApplication( {
   const [ restrict, setRestrict ] = useState( "" );
   const [ selectedImage, setSelectedImage ] = useState( "" );
   const [ fileName, setFileName ] = useState( "" );
+  const [ fileType, setFileType ] = useState( "" );
   const [ searchValue, setSearchValue ] = useState( "" );
   const [ hash, setHash ] = useState( null );
   const [ loading, setLoading ] = useState( false );
@@ -86,6 +87,65 @@ function CreatingApplication( {
     return afterDot;
   }
 
+
+  const pickImage = async () => {
+    // let result = await ImagePicker.launchImageLibraryAsync( {
+    //   mediaTypes : ImagePicker.MediaTypeOptions.Images,
+    //   allowsEditing : true,
+    //   aspect : [ 1, 1 ],
+    //   quality : 0,
+    // } );
+
+    // if( !result.canceled ) {
+    //   setFileName( result.assets[ 0 ].uri.split( "/" )
+    //     .pop() );
+    //   setSelectedImage( result.assets[ 0 ].uri );
+    // }
+
+
+    let result = await DocumentPicker.getDocumentAsync( {
+      type : [ "image/*", ]
+    } );
+
+
+    const {
+      type,
+      uri,
+      mimeType,
+      size,
+      name
+    } = result;
+
+
+    if( size < 500000 ) {
+      if( type === "success" ) {
+        // getImageFormat( uri );
+        // setFileName( uri.split( "/" )
+        //   .pop() );
+        setFileName( name );
+        setSelectedImage( uri );
+        setFileType( mimeType );
+      }
+    } else {
+      showMessage( {
+        type : "info",
+        message : "Размер фото не должен превышать 5 МВ",
+        color : "green"
+      } );
+    }
+  };
+
+
+  useEffect( () => {
+    AsyncStorage.getItem( "token" )
+      .then( ( result ) => {
+        if( result ) {
+          setToken( result );
+          dispatch( authRequest( { secret_token : result } ) );
+        }
+      } );
+  }, [ navigation, dispatch ] );
+
   const openCitysModal = () => {
     setOpenCitys( !openCitys );
   };
@@ -93,14 +153,43 @@ function CreatingApplication( {
   const openCytysFromModal = () => {
     setOpenCitysFrom( !openCitysFrom );
   };
+  // const compareData = {
+  //   from_city,
+  //   to_city,
+  //   typeContainer : typeContainer,
+  //   containerCount : containerCount,
+  //   date,
+  //   price : price,
+  //   currency : currency,
+  // };
+  // const compareDataSales = {
+  //   ...compareData,
+  //   typePay : typePay,
+  //   conditation : conditation,
+  //   comment,
+  //   selectedImage,
+  //   restrict,
+  //   to_city : "10",
+  // };
   const compareData = {
+    // from_city,
+    // to_city,
+    // typeContainer : typeContainer,
+    // containerCount : containerCount,
+    // date,
+    // price : price,
+    // currency : currency,
+
+
+    activeSecondaryTab,
+    typePay,
+    conditation,
+    restrict,
+    currency,
+    typeContainer,
+    price,
     from_city,
-    to_city,
-    typeContainer : typeContainer == 0 || typeContainer == 1 ? "4" : typeContainer + "",
-    containerCount : containerCount,
-    date,
-    price : price,
-    currency : currency === 0 ? "3" : currency + "",
+    containerCount
   };
   const compareDataSales = {
     ...compareData,
@@ -111,81 +200,149 @@ function CreatingApplication( {
     restrict,
     to_city : "10",
   };
-
   const save = () => {
-    console.log( Object.entries( compareDataSales ) );
-    // console.log( secret_token, "secret_token" );
-    // console.log( last_id, "last_id" );
-    // console.log( from_city, "from_city" );
-    // console.log( to_city, "to_city" );
-    // console.log( count, "count" );
-    // console.log( date_shipment, "date_shipment" );
-    // console.log( period, "period" );
-    // console.log( price, "price" );
-    // console.log( type_container, "type_container" );
+    let changed_tab = "";
+    let payType = "";
+    let new_or_used = "";
+    let restrick = "";
+    let price_type = "";
+    let typeKTK = "";
 
-    _.every( Object.values( compareData ) ) && setLoading( true );
-    _.every( Object.values( compareDataSales ) ) && setLoading( true );
-    const data = new FormData();
-    data.append( "img", {
-      uri : Platform.OS === "android" ? selectedImage : selectedImage.replace( "file://", "" ),
-      name : fileName,
-      type : `image/${ getImageFormat( selectedImage ) }`,
-    } );
-    data.append( "secret_token", token );
-    data.append( "last_id", 5 );
-    data.append( "count", containerCount );
-    data.append( "price", price );
-    data.append( "dislokaciya", from_city );
-    data.append( "condition", conditation === "Б/у" ? 3 : conditation === "Новый" ? 2 : "" );
-    data.append( "description", comment );
-    data.append(
-      "typepay",
-      typePay === "Любой вариант" ? "4" : typePay === "безналичный расчет" ? "3" : typePay === "наличный расчет" ? "2" : ""
+    if( activeSecondaryTab == "Продажа КТК" ) {
+      changed_tab = "5";
+    } else if( activeSecondaryTab == "Поиск КТК" ) {
+      changed_tab = "2";
+    } else if( activeSecondaryTab == "Выдача КТК" ) {
+      changed_tab = "3";
+    } else if( activeSecondaryTab == "Поездной сервис" ) {
+      changed_tab = "6";
+    } else if( activeSecondaryTab == "Заявка на ТЭО" ) {
+      changed_tab = "7";
+    }
+
+    if( typePay == "Любой вариант" ) {
+      payType = "4";
+    } else if( typePay == "безналичный расчет" ) {
+      payType = "3";
+    } else if( typePay == "наличный расчет" ) {
+      payType = "2";
+    }
+
+    if( conditation == "Б/у" ) {
+      new_or_used = "3";
+    } else if( conditation == "Новый" ) {
+      new_or_used = "2";
+    }
+
+
+    if( restrict == "Любой исключен" ) {
+      restrick = "3";
+    } else if( restrict == "включен" ) {
+      restrick = "2";
+    }
+
+    if( currency == "₽" ) {
+      price_type = "1";
+    } else if( currency == "$" ) {
+      price_type = "2";
+    } else if( currency == "€" ) {
+      price_type = "3";
+    }
+
+    if( typeContainer == "40 ST" ) {
+      typeKTK = "4";
+    } else if( typeContainer == "20 (30)" ) {
+      typeKTK = "4";
+    } else if( typeContainer == "40 HQ" ) {
+      typeKTK = "3";
+    } else if( typeContainer == "20 (24)" ) {
+      typeKTK = "2";
+    }
+
+    var myHeaders = new Headers();
+    var formdata = new FormData();
+
+    myHeaders.append( "Content-Type", "multipart/form-data" );
+
+    formdata.append( "secret_token", token );
+    formdata.append( "last_id", changed_tab );
+    formdata.append( "price", price );
+    formdata.append( "dislokaciya", from_city );
+    formdata.append( "condition", new_or_used );
+    formdata.append( "description", comment );
+    formdata.append( "typepay", payType );
+    formdata.append( "reestrrzhd", restrick );
+    formdata.append( "type_container", typeKTK );
+    formdata.append( "currency", price_type );
+    formdata.append( "responsible", user?.last_id );
+    formdata.append( "img", selectedImage, // name : data.fileName,
+      // type : data.fileType
     );
-    data.append( "reestrrzhd", restrict === "Любой исключен" ? "3" : restrict === "включен" ? "2" : "" );
-    data.append( "type_container", typeContainer );
-    data.append( "currency", currency );
-    data.append( "responsible", user?.last_id + "" );
-    data.append( "_type_op", saveAsDraft ? "draft" : "onwork" );
+    formdata.append( "_type_op", saveAsDraft ? "draft" : "onwork" );
 
-    if( activeSecondaryTab === "Продажа КТК" ) {
-      _.every( Object.values( compareDataSales ) ) && dispatch( sendCatRequest( data ) )
+
+    setLoading( true );
+    if( activeSecondaryTab == "Продажа КТК" ) {
+      dispatch( sendCatRequest( {
+        formdata,
+        myHeaders,
+        form_data
+      } ) )
         .unwrap()
         .then( ( res ) => {
-          console.log( res );
-          navigation.goBack();
+          setLoading( false );
+          if( res?.success ) {
+            navigation.goBack();
+          }
         } )
         .catch( ( e ) => {
+          setLoading( false );
           showMessage( {
             message : "Все поля должны быть заполнены",
             type : "danger",
           } );
         } );
     }
-    activeSecondaryTab === "Продажа КТК" && !_.every( Object.values( compareDataSales ) ) && showMessage( {
-      message : "Все поля должны быть заполнены",
-      type : "danger",
-    } );
+    // activeSecondaryTab === "Продажа КТК" && !_.every( Object.values( compareDataSales ) ) && showMessage( {
+    //   message : "Все поля должны быть заполнены",
+    //   type : "danger",
+    // } );
+    //
+    // activeSecondaryTab !== "Продажа КТК" && !_.every( Object.values( compareData ) ) && showMessage( {
+    //   message : "Все поля должны быть заполнены",
+    //   type : "danger",
+    // } );
+    var form_data = new FormData();
 
-    activeSecondaryTab !== "Продажа КТК" && !_.every( Object.values( compareData ) ) && showMessage( {
-      message : "Все поля должны быть заполнены",
-      type : "danger",
-    } );
+    form_data.append( "secret_token", token );
+    form_data.append( "last_id", changed_tab );
+    form_data.append( "from_city", from_city );
+    form_data.append( "to_city", to_city );
+    form_data.append( "count", new_or_used );
+    form_data.append( "date_shipment", date );
+    form_data.append( "period", date );
+    form_data.append( "price", price );
+    form_data.append( "type_container", typeKTK );
+    form_data.append( "currency", price_type );
+    form_data.append( "responsible", user?.last_id );
+    // form_data.append( "img", selectedImage, // name : data.fileName,
+    form_data.append( "_type_op", saveAsDraft ? "draft" : "onwork" );
 
-    activeSecondaryTab !== "Продажа КТК" && _.every( Object.values( compareData ) ) && dispatch( sendCatRequest( {
-      secret_token : token,
-      last_id : activeSecondaryTab === "Выдача КТК" || activeSecondaryTab === "Поездной сервис" ? 3 : activeSecondaryTab === "Поиск КТК" ? 2 : activeSecondaryTab === "Заявка на ТЭО" ? 7 : "",
-      from_city : from_city + "",
-      to_city : to_city + "",
-      count : containerCount + "",
-      date_shipment : date + "",
-      period : date + "",
-      price : price + "",
-      type_container : typeContainer,
-      currency : currency,
-      responsible : user?.last_id + "",
-      _type_op : saveAsDraft ? "draft" : "onwork",
+    activeSecondaryTab !== "Продажа КТК" && dispatch( sendCatRequest( {
+      // secret_token : token,
+      // last_id : changed_tab,
+      // from_city : from_city,
+      // to_city : to_city ,
+      // count : containerCount + "",
+      // date_shipment : date + "",
+      // period : date + "",
+      // price : price + "",
+      // type_container : typeContainer,
+      // currency : currency,
+      // responsible : user?.last_id + "",
+      // _type_op : saveAsDraft ? "draft" : "onwork",
+      form_data,
+      myHeaders,
     } ) )
       .unwrap()
       .then( ( e ) => {
@@ -212,19 +369,6 @@ function CreatingApplication( {
     getCytys();
   }, [] );
 
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync( {
-      mediaTypes : ImagePicker.MediaTypeOptions.Images,
-      allowsEditing : true,
-      aspect : [ 1, 1 ],
-      quality : 0,
-    } );
-    if( !result.canceled ) {
-      setFileName( result.assets[ 0 ].uri.split( "/" )
-        .pop() );
-      setSelectedImage( result.assets[ 0 ].uri );
-    }
-  };
 
   useEffect( () => {
     (
@@ -389,7 +533,7 @@ function CreatingApplication( {
               selectedItem,
               index
             ) => {
-              setTypeContiner( index );
+              setTypeContiner( selectedItem );
             } }
             rowStyle={ {
               flex : 1,
@@ -450,7 +594,8 @@ function CreatingApplication( {
               selectedItem,
               index
             ) => {
-              setCurrency( index );
+              console.log( selectedItem );
+              setCurrency( selectedItem );
             } }
             rowStyle={ {
               flex : 1,
@@ -501,7 +646,7 @@ function CreatingApplication( {
               selectedItem,
               index
             ) => {
-              setTypeContiner( index );
+              setTypeContiner( selectedItem );
             } }
             rowStyle={ {
               flex : 1,
@@ -552,7 +697,7 @@ function CreatingApplication( {
               selectedItem,
               index
             ) => {
-              setCurrency( index );
+              setCurrency( selectedItem );
             } }
             rowStyle={ {
               flex : 1,
@@ -891,7 +1036,7 @@ function CreatingApplication( {
               selectedItem,
               index
             ) => {
-              setTypeContiner( index );
+              setTypeContiner( selectedItem );
             } }
             rowStyle={ {
               flex : 1,
@@ -953,7 +1098,7 @@ function CreatingApplication( {
               selectedItem,
               index
             ) => {
-              setCurrency( index );
+              setCurrency( selectedItem );
             } }
             rowStyle={ {
               flex : 1,
@@ -1087,7 +1232,7 @@ function CreatingApplication( {
               selectedItem,
               index
             ) => {
-              setTypeContiner( index );
+              setTypeContiner( selectedItem );
             } }
             rowStyle={ {
               flex : 1,
@@ -1149,7 +1294,7 @@ function CreatingApplication( {
               selectedItem,
               index
             ) => {
-              setCurrency( index );
+              setCurrency( selectedItem );
             } }
             rowStyle={ {
               flex : 1,
@@ -1286,7 +1431,7 @@ function CreatingApplication( {
               selectedItem,
               index
             ) => {
-              setTypeContiner( index );
+              setTypeContiner( selectedItem );
             } }
             rowStyle={ {
               flex : 1,
