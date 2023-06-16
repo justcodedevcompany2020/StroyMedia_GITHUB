@@ -1,57 +1,58 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { api } from "../../Api";
+import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import {api} from "../../Api";
 import axios from "axios";
 
-export const allCatRequest = createAsyncThunk( "allCat", async ( {
-  token,
-  tab,
-  // offset,
-} ) => {
-  try {
-    const result = await api.post( "/cat-request-all", {
-      secret_token : token,
-      type_request : tab === "В работе" ? "onwork" : "draft",
-      // offset,
-    } );
-    return result.data;
-  } catch( err ) {
-    if( axios.isAxiosError( err ) ) {
-      let error = err;
-      if( !error.response ) {
-        throw err;
+export const allCatRequest = createAsyncThunk(
+  "allCat", async ({
+    token,
+    tab,
+    offset,
+  }) => {
+    try {
+      const result = await api.post("/cat-request-all", {
+        secret_token: token,
+        type_request: tab === "В работе" ? "onwork" : "draft",
+        offset,
+      });
+      return result.data;
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        let error = err;
+        if (!error.response) {
+          throw err;
+        }
+        return error.response.data;
       }
-      return rejectWithValue( error.response.data );
+      throw err;
     }
-    throw err;
-  }
-} );
+  });
 
-const allCatSlice = createSlice( {
-  name : "allCat",
-  initialState : {
-    loading : false,
-    error : false,
-    data : [],
+const allCatSlice = createSlice({
+  name: "allCat",
+  initialState: {
+    loading: false,
+    error: false,
+    data: [],
   },
-  reducers : {},
-  extraReducers : ( builder ) => {
+  reducers: {},
+  extraReducers: (builder) => {
     builder
-      .addCase( allCatRequest.pending, ( state ) => {
+      .addCase(allCatRequest.pending, (state) => {
         state.loading = true;
-      } )
-      .addCase( allCatRequest.fulfilled, (
+      })
+      .addCase(allCatRequest.fulfilled, (
         state,
         action
       ) => {
         state.data = action.payload.data.aplications.aplications;
         state.error = false;
         // console.log( "action.payload.data.data.aplications.aplications", action.payload.data.data.aplications.aplications, "action.payload.data.data.aplications.aplications" );
-      } )
-      .addCase( allCatRequest.rejected, ( state ) => {
+      })
+      .addCase(allCatRequest.rejected, (state) => {
         state.error = true;
         state.loading = false;
-      } );
+      });
   },
-} );
+});
 
 export default allCatSlice.reducer;

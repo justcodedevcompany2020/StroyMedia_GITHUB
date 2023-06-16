@@ -7,7 +7,7 @@ export const authRequest = createAsyncThunk(
     try {
       const result = await api.post( "/get-auth-data", secret_token );
       return result.data;
-    } catch( error ) {
+    } catch ( error ) {
       return error;
     }
   }

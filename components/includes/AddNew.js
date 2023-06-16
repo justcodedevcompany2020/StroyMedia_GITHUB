@@ -1,21 +1,24 @@
-import React, { Component } from "react";
-import { ImageAddNew } from "../helpers/images";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import React, {Component} from "react";
+import {ImageAddNew} from "../helpers/images";
+import {StyleSheet, TouchableOpacity} from "react-native";
 
 class AddNew extends Component {
   render() {
-    const { onPress, end } = this.props;
+    const {
+      onPress,
+      end
+    } = this.props;
     return (
       <TouchableOpacity
         onPress={onPress}
         style={[
           styles.wrapper,
-          { alignSelf: end ? "flex-end" : "center" },
-          { right: end && 15 },
+          {alignSelf: end ? "flex-end" : "center"},
+          {right: end && 15},
         ]}
         activeOpacity={0.6}
       >
-        <ImageAddNew />
+        <ImageAddNew/>
       </TouchableOpacity>
     );
   }

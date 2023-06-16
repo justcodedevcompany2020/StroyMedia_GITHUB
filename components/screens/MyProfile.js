@@ -1,46 +1,37 @@
-import React, { useEffect, useState, useCallback } from "react";
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  Image,
-  View,
-  FlatList,
-} from "react-native";
+import React, {useEffect, useState} from "react";
+import {FlatList, Image, StyleSheet, Text, TouchableOpacity, View,} from "react-native";
 import Wrapper from "../helpers/Wrapper";
-import { useDispatch, useSelector } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import * as ImagePicker from "expo-image-picker";
 import AccordionItem from "../includes/AccordionItem";
 import MyInput from "../includes/MyInput";
-import { COLOR_1, COLOR_6, WRAPPER_PADDINGS } from "../helpers/Variables";
+import {COLOR_1, COLOR_6, WRAPPER_PADDINGS} from "../helpers/Variables";
 import BlockWithSwitchButton from "../includes/BlockWithSwitchButton";
 import QRCode from "react-native-qrcode-svg";
 import QrModal from "../includes/QrModal";
-import { deleteUserRequest } from "../../store/reducers/deleteUserSlice";
-import { offerMessageRequest } from "../../store/reducers/offerMessageSlice";
-import { offerlNotificationRequest } from "../../store/reducers/offerNotificationSlice";
-import { globallMessageRequest } from "../../store/reducers/globalMessageSlice";
-import { globallNotificationRequest } from "../../store/reducers/globalNotificationSlice";
-import { hideUserRequest } from "../../store/reducers/hideUserDataSlice";
-import { personalMessageRequest } from "../../store/reducers/personalMessageSlice";
-import { personalNotificationRequest } from "../../store/reducers/personalNotificationSlice";
+import {deleteUserRequest} from "../../store/reducers/deleteUserSlice";
+import {offerMessageRequest} from "../../store/reducers/offerMessageSlice";
+import {offerlNotificationRequest} from "../../store/reducers/offerNotificationSlice";
+import {globallMessageRequest} from "../../store/reducers/globalMessageSlice";
+import {globallNotificationRequest} from "../../store/reducers/globalNotificationSlice";
+import {hideUserRequest} from "../../store/reducers/hideUserDataSlice";
+import {personalMessageRequest} from "../../store/reducers/personalMessageSlice";
+import {personalNotificationRequest} from "../../store/reducers/personalNotificationSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import LogOutModal from "../includes/LogOutModal";
 import * as Updates from "expo-updates";
-import { logout } from "../../store/reducers/loginSlice";
-import { editUserDataRequest } from "../../store/reducers/editUserDataSlice";
-import { getCitys } from "../../store/reducers/getCitysSlice";
-import { getCountrys } from "../../store/reducers/getCountrysSlice";
-import SelectDropdown from "react-native-select-dropdown";
-import { showMessage } from "react-native-flash-message";
-import { AntDesign } from "@expo/vector-icons";
+import {logout} from "../../store/reducers/loginSlice";
+import {editUserDataRequest} from "../../store/reducers/editUserDataSlice";
+import {getCitys} from "../../store/reducers/getCitysSlice";
+import {getCountrys} from "../../store/reducers/getCountrysSlice";
+import {showMessage} from "react-native-flash-message";
+import {MaterialIcons} from "@expo/vector-icons";
 import SectionedMultiSelect from "react-native-sectioned-multi-select";
-import { MaterialIcons } from "@expo/vector-icons";
 import DelayInput from "react-native-debounce-input";
 import * as FileSystem from "expo-file-system";
-import { authRequest } from "../../store/reducers/authUserSlice";
-import * as Contacts from "expo-contacts";
+import {authRequest} from "../../store/reducers/authUserSlice";
 import vCard from "vcard-creator";
+
 const items = [
   {
     id: "owner",
@@ -68,8 +59,8 @@ const items = [
   },
 ];
 
-const MyProfile = ({ route, navigation }) => {
-  const { currentPage } = route.params;
+const MyProfile = ({route, navigation}) => {
+  const {currentPage} = route.params;
   const user = useSelector((state) => state.authUserSlice.data.user);
 
   const [name, setName] = useState("");
@@ -114,6 +105,7 @@ const MyProfile = ({ route, navigation }) => {
   );
   const dispatch = useDispatch();
   const [query, setQuery] = useState(false);
+
   function getImageFormat(str) {
     const afterDot = str?.substr(str?.indexOf(".") + 1);
     return afterDot;
@@ -179,10 +171,10 @@ const MyProfile = ({ route, navigation }) => {
     };
     getCountris();
   }, []);
-  const countrysRenderItem = ({ item }) => {
+  const countrysRenderItem = ({item}) => {
     return (
       <TouchableOpacity
-        style={{ marginVertical: 5 }}
+        style={{marginVertical: 5}}
         onPress={() => {
           setCompanyCountryName(item.title.ru.replace(/\(RU\)/, ""));
           setCountry(item.last_id);
@@ -216,14 +208,14 @@ const MyProfile = ({ route, navigation }) => {
     data.append("country", country ? country : user?.country?.last_id);
     data.append("city", companyCity ? companyCity : user?.city?.last_id);
     selectedItems.length
-      ? selectedItems.map((c, index) => {
-          data.append("role[]", selectedItems[index]);
-        })
-      : Object.values(activeRole).map((c) => {
-          if (c) {
-            data.append("role[]", c);
-          }
-        });
+    ? selectedItems.map((c, index) => {
+      data.append("role[]", selectedItems[index]);
+    })
+    : Object.values(activeRole).map((c) => {
+      if (c) {
+        data.append("role[]", c);
+      }
+    });
     dispatch(editUserDataRequest(data))
       .unwrap()
       .then(() => {
@@ -253,7 +245,7 @@ const MyProfile = ({ route, navigation }) => {
     //   try {
     AsyncStorage.getItem("token").then((token) => {
       setToken(token);
-      dispatch(authRequest({ secret_token: token }));
+      dispatch(authRequest({secret_token: token}));
     });
     AsyncStorage.getItem("hide_person").then((result) => {
       if (result) {
@@ -368,36 +360,36 @@ const MyProfile = ({ route, navigation }) => {
     }
   };
 
-  const renderItem = ({ item }) => {
+  const renderItem = ({item}) => {
     return (
       <TouchableOpacity
         onPress={() => {
           setCytyName(
             !item.title.ru
-              ? item.title.replace(/\(RU\)/, "")
-              : item.title.ru.replace(/\(RU\)/, "")
+            ? item.title.replace(/\(RU\)/, "")
+            : item.title.ru.replace(/\(RU\)/, "")
           );
           setCity(item.last_id);
         }}
       >
-        <Text style={{ marginBottom: 8 }}>{item.title.ru || item.title}</Text>
+        <Text style={{marginBottom: 8}}>{item.title.ru || item.title}</Text>
       </TouchableOpacity>
     );
   };
 
-  const renderCompanyCitys = ({ item }) => {
+  const renderCompanyCitys = ({item}) => {
     return (
       <TouchableOpacity
         onPress={() => {
           setCompanyCityName(
             !item.title.ru
-              ? item.title.replace(/\(RU\)/, "")
-              : item.title.ru.replace(/\(RU\)/, "")
+            ? item.title.replace(/\(RU\)/, "")
+            : item.title.ru.replace(/\(RU\)/, "")
           );
           setCompanyCity(item.last_id);
         }}
       >
-        <Text style={{ marginBottom: 8 }}>{item?.title?.ru || item.title}</Text>
+        <Text style={{marginBottom: 8}}>{item?.title?.ru || item.title}</Text>
       </TouchableOpacity>
     );
   };
@@ -480,10 +472,10 @@ const MyProfile = ({ route, navigation }) => {
               <Image
                 source={{
                   uri: image
-                    ? image.assets[0].uri
-                    : user?.avatar_person
-                    ? "https://teus.online/" + user?.avatar_person
-                    : "https://vyshnevyi-partners.com/wp-content/uploads/2016/12/no-avatar.png",
+                       ? image.assets[0].uri
+                       : user?.avatar_person
+                         ? "https://teus.online/" + user?.avatar_person
+                         : "https://vyshnevyi-partners.com/wp-content/uploads/2016/12/no-avatar.png",
                 }}
                 style={styles.image}
               />
@@ -510,8 +502,7 @@ const MyProfile = ({ route, navigation }) => {
             phoneNumber={phoneNumber}
             // placeholder={phoneNumber}
             onChangeText={(e) => setPhoneNumber(e)}
-            keyboardType={showToOthersPhone ? "default" : "phone-pad"}
-            secureTextEntry={showToOthersPhone}
+            keyboardType={"phone-pad"}
             editable={!showToOthersPhone}
             value={phoneNumber}
           />
@@ -548,8 +539,8 @@ const MyProfile = ({ route, navigation }) => {
               titleComponent={
                 <Text style={styles.selectText}>
                   {cityNmae
-                    ? cityNmae
-                    : user?.city_person?.title.ru.split(" ")[0] || "Город"}
+                   ? cityNmae
+                   : user?.city_person?.title.ru.split(" ")[0] || "Город"}
                 </Text>
               }
               wrapperStyle={{
@@ -570,7 +561,7 @@ const MyProfile = ({ route, navigation }) => {
                   style={styles.searchInput}
                 />
               </View>
-              <View style={{ marginBottom: 60 }}>
+              <View style={{marginBottom: 60}}>
                 {citys?.length === 0 && (
                   <Text style={styles.no_product}>Не найдено</Text>
                 )}
@@ -604,8 +595,8 @@ const MyProfile = ({ route, navigation }) => {
               titleComponent={
                 <Text style={styles.selectText}>
                   {companyCityName
-                    ? companyCityName
-                    : user?.city?.title.ru.split(" ")[0] || "Город"}
+                   ? companyCityName
+                   : user?.city?.title.ru.split(" ")[0] || "Город"}
                 </Text>
               }
               wrapperStyle={{
@@ -626,7 +617,7 @@ const MyProfile = ({ route, navigation }) => {
                   style={styles.searchInput}
                 />
               </View>
-              <View style={{ marginBottom: 60 }}>
+              <View style={{marginBottom: 60}}>
                 {!citys?.length && (
                   <Text style={styles.no_product}>Не найдено</Text>
                 )}
@@ -645,17 +636,17 @@ const MyProfile = ({ route, navigation }) => {
               titleComponent={
                 <Text style={styles.selectText}>
                   {companyCountryName
-                    ? companyCountryName
-                    : user?.country?.title.ru.split(" ")[0] || "Страна"}
+                   ? companyCountryName
+                   : user?.country?.title.ru.split(" ")[0] || "Страна"}
                 </Text>
               }
-              wrapperStyle={{ height: openCompanyCountry ? 200 : 40 }}
+              wrapperStyle={{height: openCompanyCountry ? 200 : 40}}
               headerStyle={styles.selectHeader}
               arrowStyle={styles.selectArrowStyle}
               isopenModal={openCompanyCountryModal}
             >
               <FlatList
-                style={{ height: "80%" }}
+                style={{height: "80%"}}
                 data={countrys}
                 keyExtractor={(item) => item.last_id}
                 renderItem={countrysRenderItem}
@@ -675,18 +666,18 @@ const MyProfile = ({ route, navigation }) => {
           <View
             style={
               !selectedItems.length
-                ? styles.sectionSelect
-                : selectedItems.length === 1 || selectedItems.length === 2
-                ? { height: 130 }
+              ? styles.sectionSelect
+              : selectedItems.length === 1 || selectedItems.length === 2
+                ? {height: 130}
                 : selectedItems.length === 3 || selectedItems.length === 4
-                ? { height: 170 }
-                : selectedItems.length === 5 || selectedItems.length === 6
-                ? { height: 210 }
-                : { height: 70 }
+                  ? {height: 170}
+                  : selectedItems.length === 5 || selectedItems.length === 6
+                    ? {height: 210}
+                    : {height: 70}
             }
           >
             {!selectedItems.length && (
-              <Text style={{ position: "absolute", left: 16, top: 16 }}>
+              <Text style={{position: "absolute", left: 16, top: 16}}>
                 Профиль деятельности
               </Text>
             )}
@@ -856,7 +847,7 @@ const MyProfile = ({ route, navigation }) => {
                 changGlobalMessage();
                 setGroupMessagesEmail(val);
                 return dispatch(
-                  globallMessageRequest({ token: token, name: val ? "1" : "0" })
+                  globallMessageRequest({token: token, name: val ? "1" : "0"})
                 );
               }}
             />
@@ -896,7 +887,7 @@ const MyProfile = ({ route, navigation }) => {
                 changOfferMessage();
                 setNewMessagesEmail(val ? !val : val);
                 return dispatch(
-                  offerMessageRequest({ token: token, name: val ? "1" : "0" })
+                  offerMessageRequest({token: token, name: val ? "1" : "0"})
                 );
               }}
             />
@@ -938,23 +929,21 @@ const MyProfile = ({ route, navigation }) => {
               setHideProfile(val);
               changeHide();
               return dispatch(
-                hideUserRequest({ token: token, hideNumber: val ? 1 : 0 })
+                hideUserRequest({token: token, hideNumber: val ? 1 : 0})
               );
             }}
           />
           <BlockWithSwitchButton
             title={"Удалить профиль"}
             titleStyle={styles.bigSwitchTitle}
-            r
             style={[styles.switchBlock, styles.bigSwitch]}
             description={
               "Удаление данных о вашем личном профиле, но не о компании"
             }
             isOn={deleteProfile}
             onToggle={() => {
-              dispatch(deleteUserRequest({ token: token }));
               setDeleteProfile(!deleteProfile);
-              return Updates.reloadAsync();
+              // return Updates.reloadAsync();
             }}
           />
         </AccordionItem>
@@ -962,6 +951,7 @@ const MyProfile = ({ route, navigation }) => {
       <LogOutModal
         onSubmit={() => {
           dispatch(logout());
+          dispatch(deleteUserRequest({token: token}));
           return Updates.reloadAsync();
         }}
         deleted

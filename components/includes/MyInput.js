@@ -6,28 +6,28 @@ import {AntDesign} from "@expo/vector-icons";
 import MaskInput from "react-native-mask-input";
 
 function MyInput({
-                   label,
-                   phoneNumber,
-                   style,
-                   labelStyle,
-                   error,
-                   onEyePressed,
-                   showEye,
-                   sendComponent,
-                   keyboardType,
-                   filtered,
-                   resetText,
-                   textarea,
-                   numberTel,
-                   isGray,
-                   placeholder,
-                   secureTextEntry,
-                   value,
-                   onChangeText,
-                   editable,
-                   multiline,
-                   isChat
-                 }) {
+  label,
+  phoneNumber,
+  style,
+  labelStyle,
+  error,
+  onEyePressed,
+  showEye,
+  sendComponent,
+  keyboardType,
+  filtered,
+  resetText,
+  textarea,
+  numberTel,
+  isGray,
+  placeholder,
+  secureTextEntry,
+  value,
+  onChangeText,
+  editable,
+  multiline,
+  isChat
+}) {
   const [isActive, setIsActive] = useState(false);
   useEffect(() => {
     if (!editable) {
@@ -50,7 +50,6 @@ function MyInput({
           style={[
             styles.input,
             {borderColor: isActive ? COLOR_9 : COLOR_6},
-            {letterSpacing: 2},
           ]}
           mask={[
             "+",
@@ -74,29 +73,29 @@ function MyInput({
           ]}
         />
       ) : (
-        <TextInput
-          value={value}
-          onChangeText={onChangeText}
-          // maxLength={numberTel ? 10 : 100000}
-          keyboardType={keyboardType}
-          placeholderTextColor={"black"}
-          secureTextEntry={secureTextEntry}
-          editable={editable}
-          placeholder={placeholder}
-          onFocus={() => setIsActive(true)}
-          onBlur={() => setIsActive(false)}
-          multiline={multiline}
-          style={[
-            styles.input,
-            {borderColor: isActive && !textarea ? COLOR_9 : COLOR_6},
-            showEye && {paddingRight: 50},
-            style,
-            textarea && [styles.input, {height: 125, verticalAlign: "top"}],
-            isGray && [styles.input, {backgroundColor: "#EEEEEE"}],
-            // numberTel && [styles.input, { letterSpacing: 2 }],
-          ]}
-        />
-      )}
+         <TextInput
+           value={value}
+           onChangeText={onChangeText}
+           // maxLength={numberTel ? 10 : 100000}
+           keyboardType={keyboardType}
+           placeholderTextColor={"black"}
+           secureTextEntry={secureTextEntry}
+           editable={editable}
+           placeholder={placeholder}
+           onFocus={() => setIsActive(true)}
+           onBlur={() => setIsActive(false)}
+           multiline={multiline}
+           style={[
+             styles.input,
+             {borderColor: isActive && !textarea ? COLOR_9 : COLOR_6},
+             showEye && {paddingRight: 50},
+             style,
+             textarea && [styles.input, {height: 125, verticalAlign: "top"}],
+             isGray && [styles.input, {backgroundColor: "#EEEEEE"}],
+             // numberTel && [styles.input, { letterSpacing: 2 }],
+           ]}
+         />
+       )}
       {filtered && (
         <TouchableOpacity onPress={resetText} style={styles.cancelIcon}>
           <AntDesign name="closecircle" size={20} color="black"/>
@@ -110,8 +109,8 @@ function MyInput({
           {!secureTextEntry ? (
             <ImageSeePassword style={styles.see}/>
           ) : (
-            <ImageUnSeePassword style={styles.unsee}/>
-          )}
+             <ImageUnSeePassword style={styles.unsee}/>
+           )}
         </TouchableOpacity>
       ) : null}
       {sendComponent && sendComponent}

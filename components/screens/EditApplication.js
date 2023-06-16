@@ -1,33 +1,20 @@
-import React, { useEffect, useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  FlatList,
-  ActivityIndicator,
-  TextInput,
-} from "react-native";
+import React, {useEffect, useState} from "react";
+import {ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View,} from "react-native";
 import Wrapper from "../helpers/Wrapper";
 import MyInput from "../includes/MyInput";
-import {
-  COLOR_1,
-  COLOR_10,
-  COLOR_8,
-  WRAPPER_PADDINGS,
-} from "../helpers/Variables";
+import {COLOR_1, COLOR_10, COLOR_8, WRAPPER_PADDINGS,} from "../helpers/Variables";
 import AccordionItem from "../includes/AccordionItem";
 import BlockWithSwitchButton from "../includes/BlockWithSwitchButton";
-import { useDispatch, useSelector } from "react-redux";
-import { editAplicationsRequest } from "../../store/reducers/editAplicationsSlice";
-import { getCitys } from "../../store/reducers/getCitysSlice";
-import { showMessage } from "react-native-flash-message";
+import {useDispatch, useSelector} from "react-redux";
+import {editAplicationsRequest} from "../../store/reducers/editAplicationsSlice";
+import {getCitys} from "../../store/reducers/getCitysSlice";
+import {showMessage} from "react-native-flash-message";
 import Modal from "react-native-modal";
 import DelayInput from "react-native-debounce-input";
 
 function EditApplication(props) {
-  const { route, navigation } = props;
-  const { currentPage, item, user, token } = route.params;
+  const {route, navigation} = props;
+  const {currentPage, item, user, token} = route.params;
   const [citys, setCitys] = useState();
   const [fromCityName, setFromCityName] = useState();
   const [toCityName, setToCityName] = useState();
@@ -39,7 +26,7 @@ function EditApplication(props) {
   const [from_city, setFrom_city] = useState();
   const [to_city, setTo_city] = useState();
   const [searchValue, setSearchValue] = useState("");
-  const { loading } = useSelector((state) => state.editAplicationsSlice);
+  const {loading} = useSelector((state) => state.editAplicationsSlice);
   let allCitys = useSelector(
     (state) => state.getCitysSlice?.data?.data?.data?.citys
   );
@@ -116,8 +103,8 @@ function EditApplication(props) {
           titleComponent={
             <Text style={styles.selectText}>
               {fromCityName
-                ? fromCityName
-                : item?.from_city?.title?.ru || "Откуда"}
+               ? fromCityName
+               : item?.from_city?.title?.ru || "Откуда"}
             </Text>
           }
           wrapperStyle={openCitys ? styles.openModal : styles.select}
@@ -138,7 +125,7 @@ function EditApplication(props) {
           <FlatList
             data={citys}
             keyExtractor={(item) => item.last_id}
-            renderItem={({ item }) => {
+            renderItem={({item}) => {
               return (
                 <TouchableOpacity
                   onPress={() => {
@@ -146,7 +133,7 @@ function EditApplication(props) {
                     setFrom_city(item.last_id);
                   }}
                 >
-                  <Text style={{ marginBottom: 8 }}>
+                  <Text style={{marginBottom: 8}}>
                     {item.title.ru || item.title}
                   </Text>
                 </TouchableOpacity>
@@ -180,7 +167,7 @@ function EditApplication(props) {
           <FlatList
             data={citys}
             keyExtractor={(item) => item.last_id}
-            renderItem={({ item }) => {
+            renderItem={({item}) => {
               return (
                 <TouchableOpacity
                   onPress={() => {
@@ -188,7 +175,7 @@ function EditApplication(props) {
                     setTo_city(item.last_id);
                   }}
                 >
-                  <Text style={{ marginBottom: 8 }}>
+                  <Text style={{marginBottom: 8}}>
                     {item.title.ru || item.title}
                   </Text>
                 </TouchableOpacity>
@@ -201,14 +188,14 @@ function EditApplication(props) {
         <MyInput
           label={"Количество контейнеров"}
           value={containerCount}
-          placeholder={item?.count + ""}
+          placeholder={item?.count}
           onChangeText={(val) => setContainerCount(val)}
           keyboardType={"numeric"}
         />
         <MyInput
           label={"Ставка"}
           value={price}
-          placeholder={item?.price + ""}
+          placeholder={item?.price}
           onChangeText={(val) => setPrice(val)}
           keyboardType={"numeric"}
         />
@@ -221,7 +208,7 @@ function EditApplication(props) {
         {loading && (
           <Modal backdropOpacity={0.75} isVisible={true}>
             <View>
-              <ActivityIndicator size="large" />
+              <ActivityIndicator size="large"/>
             </View>
           </Modal>
         )}

@@ -1,12 +1,12 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 import Modal from "react-native-modal";
-import { View, Text, StyleSheet } from "react-native";
+import {StyleSheet, Text, View} from "react-native";
 import MyButton from "./MyButton";
-import { COLOR_1, COLOR_5 } from "../helpers/Variables";
+import {COLOR_1, COLOR_5} from "../helpers/Variables";
 
 class LogOutModal extends Component {
   render() {
-    const { onSubmit, onCancel, isVisible, deleted } = this.props;
+    const {onSubmit, onCancel, isVisible, deleted} = this.props;
     return (
       <Modal
         style={styles.modal}
@@ -27,10 +27,10 @@ class LogOutModal extends Component {
               Вы уверены, что хотите выйти из Приложения?
             </Text>
           ) : (
-            <Text style={styles.title}>
-              Вы уверены, что хотите удалить свой аккаунт ?
-            </Text>
-          )}
+             <Text style={styles.title}>
+               Вы уверены, что хотите удалить свой аккаунт ?
+             </Text>
+           )}
           <View style={styles.buttonRow}>
             <MyButton onPress={onSubmit} style={styles.button}>
               Да
