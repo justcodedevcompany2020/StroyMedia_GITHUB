@@ -1,8 +1,14 @@
-import React, {useEffect, useState} from "react";
-import {StyleSheet, Text, TextInput, TouchableOpacity, View,} from "react-native";
-import {COLOR_1, COLOR_6, COLOR_9} from "../helpers/Variables";
-import {ImageSeePassword, ImageUnSeePassword} from "../helpers/images";
-import {AntDesign} from "@expo/vector-icons";
+import React, { useEffect, useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { COLOR_1, COLOR_6, COLOR_9 } from "../helpers/Variables";
+import { ImageSeePassword, ImageUnSeePassword } from "../helpers/images";
+import { AntDesign } from "@expo/vector-icons";
 import MaskInput from "react-native-mask-input";
 
 function MyInput({
@@ -26,7 +32,7 @@ function MyInput({
   onChangeText,
   editable,
   multiline,
-  isChat
+  isChat,
 }) {
   const [isActive, setIsActive] = useState(false);
   useEffect(() => {
@@ -47,10 +53,7 @@ function MyInput({
           keyboardType={keyboardType}
           onFocus={() => setIsActive(true)}
           onBlur={() => setIsActive(false)}
-          style={[
-            styles.input,
-            {borderColor: isActive ? COLOR_9 : COLOR_6},
-          ]}
+          style={[styles.input, { borderColor: isActive ? COLOR_9 : COLOR_6 }]}
           mask={[
             "+",
             "7",
@@ -73,32 +76,32 @@ function MyInput({
           ]}
         />
       ) : (
-         <TextInput
-           value={value}
-           onChangeText={onChangeText}
-           // maxLength={numberTel ? 10 : 100000}
-           keyboardType={keyboardType}
-           placeholderTextColor={"black"}
-           secureTextEntry={secureTextEntry}
-           editable={editable}
-           placeholder={placeholder}
-           onFocus={() => setIsActive(true)}
-           onBlur={() => setIsActive(false)}
-           multiline={multiline}
-           style={[
-             styles.input,
-             {borderColor: isActive && !textarea ? COLOR_9 : COLOR_6},
-             showEye && {paddingRight: 50},
-             style,
-             textarea && [styles.input, {height: 125, verticalAlign: "top"}],
-             isGray && [styles.input, {backgroundColor: "#EEEEEE"}],
-             // numberTel && [styles.input, { letterSpacing: 2 }],
-           ]}
-         />
-       )}
+        <TextInput
+          value={value}
+          onChangeText={onChangeText}
+          // maxLength={numberTel ? 10 : 100000}
+          keyboardType={keyboardType}
+          placeholderTextColor={"black"}
+          secureTextEntry={secureTextEntry}
+          editable={editable}
+          placeholder={placeholder}
+          onFocus={() => setIsActive(true)}
+          onBlur={() => setIsActive(false)}
+          multiline={multiline}
+          style={[
+            styles.input,
+            { borderColor: isActive && !textarea ? COLOR_9 : COLOR_6 },
+            showEye && { paddingRight: 50 },
+            style,
+            textarea && [styles.input, { height: 125, verticalAlign: "top" }],
+            isGray && [styles.input, { backgroundColor: "#EEEEEE" }],
+            // numberTel && [styles.input, { letterSpacing: 2 }],
+          ]}
+        />
+      )}
       {filtered && (
         <TouchableOpacity onPress={resetText} style={styles.cancelIcon}>
-          <AntDesign name="closecircle" size={20} color="black"/>
+          <AntDesign name="closecircle" size={20} color="black" />
         </TouchableOpacity>
       )}
       {showEye ? (
@@ -107,10 +110,10 @@ function MyInput({
           onPress={() => onEyePressed(secureTextEntry)}
         >
           {!secureTextEntry ? (
-            <ImageSeePassword style={styles.see}/>
+            <ImageSeePassword style={styles.see} />
           ) : (
-             <ImageUnSeePassword style={styles.unsee}/>
-           )}
+            <ImageUnSeePassword style={styles.unsee} />
+          )}
         </TouchableOpacity>
       ) : null}
       {sendComponent && sendComponent}

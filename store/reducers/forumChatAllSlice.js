@@ -35,16 +35,15 @@ const allChatForumSlice = createSlice( {
       state.loading = true;
     } ).addCase( allChatForumRequest.fulfilled, ( state, action ) => {
       state.data = action.payload.data.data.contacts;
-      // state.last_messages = action.payload.data.data.last_messages;
 
       if( state.last_messages.length === 0 ) {
         action.payload?.data?.data?.last_messages.forEach( item => {
           state.last_messages.push( item[ 0 ]?.comment );
-          // console.log( item[ 0 ]?.comment );
+         
         } );
       }
 
-      // console.log( state.last_messages, "i" );
+      
 
       state.error = false;
       state.loading = false;

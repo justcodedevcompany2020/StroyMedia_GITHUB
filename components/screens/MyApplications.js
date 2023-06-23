@@ -1,98 +1,170 @@
-import React, {useEffect, useState} from "react";
-import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ActivityIndicator,
+  Modal,
+} from "react-native";
 import Wrapper from "../helpers/Wrapper";
-import {useDispatch, useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import NavBar from "../includes/NavBar";
-import {COLOR_1, COLOR_2, COLOR_3, COLOR_5, COLOR_6, COLOR_8, COLOR_9, WRAPPER_PADDINGS,} from "../helpers/Variables";
-import {SwipeListView} from "react-native-swipe-list-view";
-import {allCatRequest} from "../../store/reducers/allCatSlice";
-import {ImageBlankApplications, ImageEdit, ImageFadePart, ImageOffersArrow,} from "../helpers/images";
-import {Search} from "../includes/Search";
+import {
+  COLOR_1,
+  COLOR_2,
+  COLOR_3,
+  COLOR_5,
+  COLOR_6,
+  COLOR_8,
+  COLOR_9,
+  WRAPPER_PADDINGS,
+} from "../helpers/Variables";
+import { SwipeListView } from "react-native-swipe-list-view";
+import { allCatRequest } from "../../store/reducers/allCatSlice";
+import {
+  ImageBlankApplications,
+  ImageEdit,
+  ImageFadePart,
+  ImageOffersArrow,
+} from "../helpers/images";
+import { Search } from "../includes/Search";
 import AddNew from "../includes/AddNew";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment";
-import {authRequest} from "../../store/reducers/authUserSlice";
-import {Entypo} from "@expo/vector-icons";
+import { authRequest } from "../../store/reducers/authUserSlice";
+import { Entypo } from "@expo/vector-icons";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 const SearchIcon = require("../../assets/search.png");
 
-function MyApplications({
-  route,
-  navigation
-}) {
+function MyApplications() {
+  const navigation = useNavigation();
+  const route = useRoute();
   const [activeTab, setActiveTab] = useState("В работе");
   const [searchValue, setSearchValue] = useState("");
   const [page, setPage] = useState(1);
-  const [offset, setOffset] = useState(5);
-  const {currentPage} = route.params;
+  const [offset, setOffset] = useState(0);
+  const { currentPage } = route.params;
   const [token, setToken] = useState();
   const dispatch = useDispatch();
-  const state = useSelector(state1 => state1);
-  // const {data} = state.allCatSlice;
+  const state = useSelector((state1) => state1);
+  const { loading } = state.allCatSlice;
   const user = state.authUserSlice?.data?.user;
-
 
   const [filteredData, setFilteredData] = useState([]);
   const [isFiltred, setIsFiltred] = useState(false);
   const timeStamnp = +filteredData[0]?.date_create?.$date.$numberLong;
+
   useEffect(() => {
-    AsyncStorage.getItem("token")
-      .then((result) => {
-        if (result) {
-          setToken(result);
-          dispatch(authRequest({secret_token: result}))
-            .then(res => {
-              setToken(res.payload?.data?.token);
-            });
-        }
-      });
+    AsyncStorage.getItem("token").then((result) => {
+      if (result) {
+        setToken(result);
+        dispatch(authRequest({ secret_token: result })).then((res) => {
+          setToken(res.payload?.data?.token);
+        });
+      }
+    });
   }, [navigation]);
 
   useEffect(() => {
-    dispatch(allCatRequest({
-      secret_token: token,
-      tab: activeTab,
-      // offset
-    })).then(res => {
-      console.log(res.payload, 'response')
+    const isFocused = navigation.addListener("focus", () => {
+    console.log(activeTab,73);
 
-      setFilteredData(res.payload.data.aplications.aplications)
+      dispatch(
+        allCatRequest({
+          token,
+          tab: activeTab,
+          offset,
+        })
+      ).then((res) => {
+        if (res.payload) {
+          setFilteredData(res.payload?.data?.aplications?.aplications);
+          // setActiveTab(
+          //   res.payload?.data?.aplications?.type == "onwork"
+          //     ? "В работе"
+          //     : "Черновик"
+          // );
+        }
+      });
     });
-  }, [token, activeTab]);
 
+    return () => {
+      isFocused();
+    };
+  }, [navigation]);
 
-  const renderItem = ({
-    item,
-    index
-  }) => {
+  // useEffect(() => {
+  //   console.log(activeTab,98)
+  //   dispatch(
+  //     allCatRequest({
+  //       token,
+  //       tab: activeTab,
+  //       offset,
+  //     })
+  //   ).then((res) => {
+  //     if (res.payload) {
+  //       setFilteredData(res.payload?.data?.aplications?.aplications);
+  //       setActiveTab(
+  //         res.payload?.data?.aplications?.type == "onwork"
+  //           ? "В работе"
+  //           : "Черновик"
+  //       );
+  //     }
+  //   });
+  // }, [activeTab]);
+
+  // if (loading) {
+  //   return (
+  //     <View
+  //       style={{
+  //         alignItems: "center",
+  //         justifyContent: "center",
+  //         flex: 1,
+  //         backgroundColor: "transparent",
+  //       }}
+  //     >
+  //       <ActivityIndicator color={COLOR_1} size={"large"} />
+  //     </View>
+  //   );
+  // }
+
+  const renderItem = ({ item, index }) => {
     return (
       <View style={styles.item}>
         <View style={styles.row}>
           <View style={styles.img}>
-            {/*<Image*/}
-            {/*  source={ {*/}
-            {/*    uri : typeof item?.img === "string" ? "https://teus.online/" + item.img : null,*/}
-            {/*  } }*/}
-            {/*  style={ {*/}
-            {/*    height : 50,*/}
-            {/*    width : 50,*/}
-            {/*    borderRadius : 5*/}
-            {/*  } }*/}
-            {/*/>*/}
+            <Image
+              source={{
+                uri:
+                  typeof item?.img === "string"
+                    ? "https://teus.online/" + item.img
+                    : null,
+              }}
+              style={{
+                height: 50,
+                width: 50,
+                borderRadius: 5,
+              }}
+            />
           </View>
-          <View style={styles.number}>
-            <Text style={styles.numbertext}>N:{item.last_id}</Text>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <View style={styles.number}>
+              <Text style={styles.numbertext}>N:{item.last_id}</Text>
+            </View>
+            <Text style={styles.date}>
+              {" "}
+              {moment(timeStamnp).format("YYYY-MM-DD")}
+            </Text>
           </View>
-          <Text style={styles.date}>
-            {" "}
-            {moment(timeStamnp)
-              .format("YYYY-MM-DD")}
-          </Text>
         </View>
         <View style={styles.row}>
           <View style={styles.leftBlock}>
             <Text style={styles.type}>
-              {typeof item?.service?.title === "string" ? item?.service?.title : item?.service?.title?.ru}
+              {typeof item?.service?.title === "string"
+                ? item?.service?.title
+                : item?.service?.title?.ru}
             </Text>
             <Text style={styles.type2}>
               Тип КТК: {item?.type_container?.title}{" "}
@@ -103,17 +175,21 @@ function MyApplications({
               <Text style={styles.fromCity}>
                 {item?.from_city?.title?.ru || item?.dislokaciya?.title.ru}
               </Text>
-              <ImageOffersArrow/>
+              <ImageOffersArrow />
               <Text style={styles.toCity}>{item?.to_city?.title?.ru}</Text>
             </View>
-            <View style={{
-              flexDirection: "column",
-              width: "80%"
-            }}>
-              <View style={{
-                flexDirection: "row",
-                alignItems: "center"
-              }}>
+            <View
+              style={{
+                flexDirection: "column",
+                width: "80%",
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
                 <Text style={styles.quantity}>Количество: {item?.count}</Text>
                 <Text style={styles.priceText}>Цена:</Text>
                 <View style={styles.price}>
@@ -134,9 +210,11 @@ function MyApplications({
 
   const filtered = (searchText) => {
     setIsFiltred(true);
-    setFilteredData(filteredData.filter((m) => {
-      return m?.title?.includes(searchText);
-    }));
+    setFilteredData(
+      filteredData.filter((m) => {
+        return m?.title?.includes(searchText);
+      })
+    );
   };
 
   const resetText = () => {
@@ -150,19 +228,27 @@ function MyApplications({
         <NavBar
           tabs={["В работе", "Черновик", "Архив"]}
           activeTab={activeTab}
-          onPress={(tab) => {
+          onPress={async (tab) => {
             setIsFiltred(false);
             setPage(1);
             setOffset(0);
             setActiveTab(tab);
-            dispatch(allCatRequest({
-              token,
-              tab
-            }));
+            await AsyncStorage.setItem('activTab',activeTab)
+            dispatch(
+              allCatRequest({
+                token,
+                tab,
+                offset,
+              })
+            ).then((res) => {
+              if (res.payload) {
+                setFilteredData(res.payload?.data?.aplications?.aplications);
+              }
+            });
           }}
         />
         <View style={styles.searchRow}>
-          <View style={{flex: 1}}>
+          <View style={{ flex: 1 }}>
             <Search
               style={styles.search}
               keyboardType={"web-search"}
@@ -176,13 +262,16 @@ function MyApplications({
           </View>
           <TouchableOpacity
             activeOpacity={0.2}
-            style={{marginLeft: 10}}
+            style={{ marginLeft: 10 }}
             onPress={() => filtered(searchValue)}
           >
-            <Image source={SearchIcon} style={{
-              width: 25,
-              height: 25
-            }}/>
+            <Image
+              source={SearchIcon}
+              style={{
+                width: 25,
+                height: 25,
+              }}
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -192,23 +281,35 @@ function MyApplications({
   const nextPage = () => {
     setOffset(offset + 5);
     setPage(page + 1);
-    dispatch(allCatRequest({
-      token,
-      tab: activeTab,
-      offset: offset + 5,
-      searchText: searchValue ? searchValue : null,
-    }));
+    dispatch(
+      allCatRequest({
+        token,
+        tab: activeTab,
+        offset: offset + 5,
+        searchText: searchValue ? searchValue : null,
+      })
+    ).then((res) => {
+      if (res.payload) {
+        setFilteredData(res.payload?.data?.aplications?.aplications);
+      }
+    });
   };
 
   const previusPage = () => {
     setOffset(offset - 5);
     setPage(page - 1);
-    dispatch(allCatRequest({
-      token,
-      tab: activeTab,
-      offset: offset - 5,
-      searchText: searchValue ? searchValue : null,
-    }));
+    dispatch(
+      allCatRequest({
+        token,
+        tab: activeTab,
+        offset: offset - 5,
+        searchText: searchValue ? searchValue : null,
+      })
+    ).then((res) => {
+      if (res.payload) {
+        setFilteredData(res.payload?.data?.aplications?.aplications);
+      }
+    });
   };
 
   return (
@@ -221,15 +322,29 @@ function MyApplications({
         navigation,
       }}
     >
+      <Modal visible={loading} transparent={true} statusBarTranslucent>
+        <View
+          style={{
+            alignItems: "center",
+            justifyContent: "center",
+            flex: 1,
+            backgroundColor: "#00000055",
+          }}
+        >
+          <ActivityIndicator color={COLOR_1} size={50} />
+        </View>
+      </Modal>
       {filteredData.length && activeTab !== "Архив" ? (
         <View style={styles.wrapper}>
           <SwipeListView
             data={filteredData}
+            nestedScrollEnabled
+            scrollEnabled
             ListEmptyComponent={() => {
               return <Text style={styles.empty}>ничего не найдено</Text>;
             }}
             ListFooterComponent={() => {
-              return filteredData.length && activeTab !== "Избранное" ? (
+              return filteredData.length ? (
                 <View
                   style={{
                     flex: 1,
@@ -241,10 +356,10 @@ function MyApplications({
                 >
                   <View>
                     <TouchableOpacity
-                      disabled={page === 1 ? true : false}
+                      disabled={page <= 1 ? true : false}
                       onPress={previusPage}
                     >
-                      <Entypo name="chevron-left" size={28} color={"gray"}/>
+                      <Entypo name="chevron-left" size={28} color={"gray"} />
                     </TouchableOpacity>
                   </View>
                   <View>
@@ -254,10 +369,10 @@ function MyApplications({
                   </View>
                   <View>
                     <TouchableOpacity
-                      disabled={filteredData.length ? false : true}
+                      disabled={filteredData.length === 5 ? false : true}
                       onPress={nextPage}
                     >
-                      <Entypo name="chevron-right" size={28} color={"gray"}/>
+                      <Entypo name="chevron-right" size={28} color={"gray"} />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -265,20 +380,47 @@ function MyApplications({
             }}
             renderItem={renderItem}
             ListHeaderComponent={headerComponent()}
-            renderHiddenItem={({item}) => (
+            renderHiddenItem={({ item }) => (
               <View style={styles.hiddenWrapper}>
                 <TouchableOpacity
                   style={styles.hiddenItem}
-                  onPress={() => navigation.navigate("EditApplication", {
-                    currentPage: "Редактирование заявки",
-                    item,
-                    token,
-                    user_id: user?.last_id,
-                    activeTab,
-                  })}
+                  onPress={() => {
+                    navigation.navigate("EditApplication", {
+                      currentPage: "Редактирование заявки",
+                      activeSecondaryTab: item?.service?.title,
+                      typeKTK: item?.type_container?.title,
+                      user: user?.last_id?.toString(),
+                      token,
+                      last_id: item?.last_id?.toString(),
+                      price_: item?.price?.toString(),
+                      count_: item?.count?.toString(),
+                      to_city_: item?.to_city?.title?.ru?.toString(),
+                      from_city_:
+                        item?.from_city?.title?.ru?.toString() ||
+                        item?.dislokaciya?.title.ru?.toString(),
+                      to_city_id: item?.to_city?.last_id?.toString(),
+                      from_city_id:
+                        item?.from_city?.last_id?.toString() ||
+                        item?.dislokaciya?.last_id?.toString(),
+                      date: timeStamnp,
+                      activeTab,
+                      decription: item?.description,
+                      img: item?.img,
+                      valut: item?.currency?.sign,
+                      paymentType: item?.typepay?.title.hasOwnProperty("ru")
+                        ? item?.typepay?.title.ru
+                        : item?.typepay?.title,
+                      reestrrzhd_: item?.reestrrzhd?.title.hasOwnProperty("ru")
+                        ? item?.reestrrzhd?.title?.ru
+                        : item?.reestrrzhd?.title,
+                      condition_: item?.condition?.title.hasOwnProperty("ru")
+                        ? item?.condition?.title?.ru
+                        : item?.condition?.title,
+                    });
+                  }}
                 >
                   <View style={styles.hiddenBlock}>
-                    <ImageEdit/>
+                    <ImageEdit />
 
                     <View style={styles.hiddenItemTextBlock}>
                       <Text style={styles.hiddenItemText}>Редактировать</Text>
@@ -289,44 +431,52 @@ function MyApplications({
             )}
             rightOpenValue={-112}
             disableRightSwipe
-            keyExtractor={(item) => item.last_id}
+            keyExtractor={(item) => item.last_id.toString()}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{flexShrink: 1}}
+            contentContainerStyle={{ flexShrink: 0 }}
             stickyHeaderIndices={[0]}
           />
           <View style={styles.fadeBlock}>
-            <Image source={ImageFadePart} style={styles.fade}/>
+            <Image source={ImageFadePart} style={styles.fade} />
           </View>
         </View>
       ) : (
-         <View style={styles.wrapper}>
-           <NavBar
-             tabs={["В работе", "Черновик", "Архив"]}
-             activeTab={activeTab}
-             onPress={(tab) => {
-               setActiveTab(tab);
-               dispatch(allCatRequest({
-                 token,
-                 tab,
-                 offset
-               }));
-             }}
-           />
-           <View style={styles.blankTextBlock}>
-             <Text style={styles.blankText}>Здесь будут ваши заявки.</Text>
-             <Text style={styles.blankText}>Нажмите на «+» чтобы</Text>
-             <Text style={styles.blankText}>добавить заявку</Text>
-           </View>
-           <View style={styles.blankImage}>
-             <ImageBlankApplications/>
-           </View>
-         </View>
-       )}
+        <View style={styles.wrapper}>
+          <NavBar
+            tabs={["В работе", "Черновик", "Архив"]}
+            activeTab={activeTab}
+            onPress={async (tab) => {
+              setActiveTab(tab);
+              dispatch(
+                allCatRequest({
+                  token,
+                  tab,
+                  offset,
+                })
+              ).then((res) => {
+                if (res.payload) {
+                  setFilteredData(res.payload?.data?.aplications?.aplications);
+                }
+              });
+            }}
+          />
+          <View style={styles.blankTextBlock}>
+            <Text style={styles.blankText}>Здесь будут ваши заявки.</Text>
+            <Text style={styles.blankText}>Нажмите на «+» чтобы</Text>
+            <Text style={styles.blankText}>добавить заявку</Text>
+          </View>
+          <View style={styles.blankImage}>
+            <ImageBlankApplications />
+          </View>
+        </View>
+      )}
       <AddNew
         end={true}
-        onPress={() => navigation.navigate("CreatingApplication", {
-          currentPage: "Создание новой заявки",
-        })}
+        onPress={() =>
+          navigation.navigate("CreatingApplication", {
+            currentPage: "Создание новой заявки",
+          })
+        }
       />
     </Wrapper>
   );
@@ -375,6 +525,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: 10,
   },
   number: {
@@ -455,7 +606,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     backgroundColor: COLOR_2,
     borderRadius: 10,
-
   },
   fadeBlock: {
     height: "100%",

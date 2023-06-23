@@ -6,7 +6,6 @@ export const sendMessageRequest = createAsyncThunk(
     data,
     { rejectedWithValue }
   ) => {
-    console.log( data );
     try {
       await fetch( "https://teus.online/api/chat-send-message", {
         body : data.data,
@@ -14,11 +13,9 @@ export const sendMessageRequest = createAsyncThunk(
       } )
         .then( response => response.json() )
         .then( result => {
-          console.log( result );
           return result;
         } );
     } catch( error ) {
-      console.log( error );
       return rejectedWithValue( error.result.data );
     }
   }

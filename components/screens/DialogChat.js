@@ -1,37 +1,52 @@
-import React, {useCallback, useEffect, useRef, useState} from "react";
-import {Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View,} from "react-native";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
+  Dimensions,
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Modal,
+  ActivityIndicator,
+} from "react-native";
 import Wrapper from "../helpers/Wrapper";
-import {COLOR_1, COLOR_10, COLOR_5, COLOR_8, COLOR_9, WRAPPER_PADDINGS,} from "../helpers/Variables";
+import {
+  COLOR_1,
+  COLOR_10,
+  COLOR_5,
+  COLOR_8,
+  COLOR_9,
+  WRAPPER_PADDINGS,
+} from "../helpers/Variables";
 import MyInput from "../includes/MyInput";
-import {ImageAttach, ImageSend,} from "../helpers/images";
-import {useDispatch, useSelector} from "react-redux";
+import { ImageAttach, ImageSend } from "../helpers/images";
+import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment";
-import {sendMessageRequest} from "../../store/reducers/sendMessageSlice";
-import {useNavigation} from "@react-navigation/native";
-import {chatOrderRequest} from "../../store/reducers/chatDialogOrderSlice";
-import {ImagesViewModal} from "../includes/ImagesViewModal";
-import {showMessage} from "react-native-flash-message";
-import {Search} from "../includes/Search";
+import { sendMessageRequest } from "../../store/reducers/sendMessageSlice";
+import { useNavigation } from "@react-navigation/native";
+import { chatOrderRequest } from "../../store/reducers/chatDialogOrderSlice";
+import { ImagesViewModal } from "../includes/ImagesViewModal";
+import { showMessage } from "react-native-flash-message";
+import { Search } from "../includes/Search";
 import * as DocumentPicker from "expo-document-picker";
-import {Ionicons} from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 
 const SearchIcon = require("../../assets/search.png");
 const HEIGHT = Dimensions.get("window").width;
 const ITEM_HEIGHT = 100;
 
-export const DialogChat = ({route}) => {
+export const DialogChat = ({ route }) => {
   const navigation = useNavigation();
   const messagesRef = useRef(null);
   const [inputValue, setInputValue] = useState("");
   const [inputBottom, setInputBottom] = useState(6);
-  const [inputHeight, setInputHeight] = useState(40);
-  const [isChanged, setIsChanged] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const user = useSelector((state) => state.authUserSlice?.data?.user);
   const dispatch = useDispatch();
   const intervalRef = useRef(null);
-  const {currentPage} = route.params;
+  const { currentPage } = route.params;
   const [id, setId] = useState();
   const [token, setToken] = useState();
   const [filePath, setFilePath] = useState("");
@@ -39,21 +54,24 @@ export const DialogChat = ({route}) => {
   const [fileType, setFileType] = useState("");
   const [selectedFile, setSelectedFile] = useState("");
   const [filteredData, setFilteredData] = useState([]);
-  const state = useSelector(state1 => state1);
-  const {messages} = state.chatDialogOrderSlice.data;
-  const {send_message} = state.sendMessageSlice;
-
+  const state = useSelector((state1) => state1);
+  const { messages } = state.chatDialogOrderSlice.data;
+  const { send_message } = state.sendMessageSlice;
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
-    AsyncStorage.getItem("token")
-      .then((result) => {
-        setToken(result);
-        dispatch(chatOrderRequest({
+    setLoading(true);
+    AsyncStorage.getItem("token").then((result) => {
+      setToken(result);
+      dispatch(
+        chatOrderRequest({
           token: result,
           id: route.params.id,
-          offset: "10"
-        }));
-
+          offset: "10",
+        })
+      ).then((result) => {
+        setLoading(false);
       });
+    });
   }, [navigation]);
 
   // function getImageFormat( str ) {
@@ -62,41 +80,19 @@ export const DialogChat = ({route}) => {
   // }
 
   // const getFileInfo = async ( fileURI ) => {
-  //   console.log( fileURI, "fileURI" );
   //   const fileInfo = await FileSystem.getInfoAsync( fileURI );
   //   return fileInfo;
   // };
 
   const pickImage = async () => {
-    // let result = await ImagePicker.launchImageLibraryAsync( {
-    //   mediaTypes : ImagePicker.MediaTypeOptions.All,
-    //   allowsEditing : true,
-    //   aspect : [ 1, 1 ],
-    //   quality : 0,
-    // } );
-
     let result = await DocumentPicker.getDocumentAsync({
-      type: ["*/*",]
+      type: ["*/*"],
     });
 
-
-    console.log(result);
-    const {
-      type,
-      uri,
-      mimeType,
-      size,
-      name
-    } = result;
-
-    // const fileInfo = await getFileInfo( result );
-    // console.log( fileInfo );
+    const { type, uri, mimeType, size, name } = result;
 
     if (size < 500000) {
       if (type === "success") {
-        // getImageFormat( uri );
-        // setFileName( uri.split( "/" )
-        //   .pop() );
         setFileName(name);
         setFilePath(uri);
         setFileType(mimeType);
@@ -105,16 +101,15 @@ export const DialogChat = ({route}) => {
       showMessage({
         type: "info",
         message: "Размер фото не должен превышать 5 МВ",
-        color: "green"
+        color: "green",
       });
     }
-    console.log(fileName, "fileName");
-    console.log(filePath, "filePath");
   };
 
   const sendMessage = async () => {
     setFilteredData([
-      ...filteredData, {
+      ...filteredData,
+      {
         comment: inputValue,
         from: {
           avatar_person: user?.avatar_person,
@@ -129,36 +124,35 @@ export const DialogChat = ({route}) => {
         last_id: new Date().toISOString(),
         files: filePath ? filePath : "",
         local: true,
-      }
+      },
     ]);
     let data = new FormData();
-    data.append("file_dialog", filePath && {
-      uri: filePath, // Platform.OS === "android"
-      //   ? filePath
-      //   : filePath.replace("file://", ""),
-      name: fileName, // type: `image/${getImageFormat(filePath)}`,
-      // type : `image/jpg`,
-      type: fileType,
-    });
+    data.append(
+      "file_dialog",
+      filePath && {
+        uri: filePath,
+        name: fileName,
+        type: fileType,
+      }
+    );
     data.append("secret_token", token);
     data.append("last_id", route.params.id);
     data.append("message", inputValue);
 
-    dispatch(sendMessageRequest({data}));
-
+    dispatch(sendMessageRequest({ data }));
 
     setInputValue("");
     setFilePath("");
-    setInputHeight(40);
   };
 
-
   const actionHandler = useCallback(() => {
-    dispatch(chatOrderRequest({
-      token: token,
-      id: route.params.id,
-      offset: 20
-    }));
+    dispatch(
+      chatOrderRequest({
+        token: token,
+        id: route.params.id,
+        offset: 20,
+      })
+    );
   }, [messages]);
 
   useEffect(() => {
@@ -186,25 +180,30 @@ export const DialogChat = ({route}) => {
       <>
         {filePath ? (
           <View style={styles.selectImage}>
-            {fileType == "image/png" || "image/jpg" || "image/jpeg" ? <Image
-              source={{uri: filePath}}
-              style={{
-                width: 60,
-                height: 60,
-              }}
-            /> : <Ionicons name="document" size={45} color="black"/>}
+            {fileType == "image/png" || "image/jpg" || "image/jpeg" ? (
+              <Image
+                source={{ uri: filePath }}
+                style={{
+                  width: 60,
+                  height: 60,
+                  borderRadius: 5,
+                }}
+              />
+            ) : (
+              <Ionicons name="document" size={45} color="black" />
+            )}
 
             <Text onPress={() => setFilePath("")} style={styles.cancel}>
               X
             </Text>
           </View>
         ) : (
-           <View></View>
-         )}
+          <View></View>
+        )}
         <View style={styles.footer}>
           <TouchableOpacity onPress={pickImage} style={styles.attach}>
             <View style={styles.attachImage}>
-              <ImageAttach/>
+              <ImageAttach />
             </View>
           </TouchableOpacity>
           <View style={styles.inputView}>
@@ -221,25 +220,32 @@ export const DialogChat = ({route}) => {
               maxHeight={100}
               multiline={true}
               onContentSizeChange={(event) => {
-                setInputBottom(countInputBottom(event?.nativeEvent?.contentSize?.height));
-                setInputHeight(event?.nativeEvent?.contentSize?.height);
+                setInputBottom(
+                  countInputBottom(event?.nativeEvent?.contentSize?.height)
+                );
+                // setInputHeight(event?.nativeEvent?.contentSize?.height);
               }}
               placeholder={"Напишите сообщение..."}
-              sendComponent={inputValue || filePath && inputValue ? (
-                <TouchableOpacity
-                  style={[
-                    styles.send, {bottom: countSendBottom(inputBottom)},
-                  ]}
-                  onPress={sendMessage}
-                >
-                  <View style={{
-                    paddingTop: 8,
-                    paddingRight: HEIGHT / 8
-                  }}>
-                    <ImageSend/>
-                  </View>
-                </TouchableOpacity>
-              ) : null}
+              sendComponent={
+                inputValue || (filePath && inputValue) ? (
+                  <TouchableOpacity
+                    style={[
+                      styles.send,
+                      { bottom: countSendBottom(inputBottom) },
+                    ]}
+                    onPress={sendMessage}
+                  >
+                    <View
+                      style={{
+                        paddingTop: 8,
+                        paddingRight: HEIGHT / 8,
+                      }}
+                    >
+                      <ImageSend />
+                    </View>
+                  </TouchableOpacity>
+                ) : null
+              }
             />
           </View>
         </View>
@@ -248,14 +254,18 @@ export const DialogChat = ({route}) => {
   };
 
   const filteredMessages = (searchText) => {
-    setFilteredData(filteredData.filter((m) => {
-      return m?.comment?.includes(searchText);
-    }));
+    clearInterval(intervalRef.current);
+    setFilteredData(
+      filteredData.filter((m) => {
+        return m?.comment?.includes(searchText);
+      })
+    );
   };
 
   const resetText = () => {
     setSearchValue("");
     filteredMessages("");
+    actionHandler();
   };
 
   const headerComponent = () => {
@@ -266,7 +276,12 @@ export const DialogChat = ({route}) => {
           <Search
             style={styles.search}
             value={searchValue}
-            onSearchText={(val) => setSearchValue(val)}
+            onSearchText={(val) => {
+              if (val.trim() == "") {
+                resetText();
+              }
+              setSearchValue(val);
+            }}
             resetText={resetText}
           />
           <TouchableOpacity
@@ -275,86 +290,78 @@ export const DialogChat = ({route}) => {
               filteredMessages(searchValue);
             }}
           >
-            <Image source={SearchIcon} style={{
-              width: 25,
-              height: 25
-            }}/>
+            <Image
+              source={SearchIcon}
+              style={{
+                width: 25,
+                height: 25,
+              }}
+            />
           </TouchableOpacity>
         </View>
       </View>
     );
   };
 
-
-  const renderItem = ({
-    item,
-    index
-  }) => {
+  const renderItem = ({ item, index }) => {
     return (
       <View style={styles.item}>
         <Image
           style={styles.photo}
           source={{
-            uri: "https://teus.online/" + item?.from?.avatar_person
+            uri: "https://teus.online/" + item?.from?.avatar_person,
           }}
         />
         <View style={styles.messagesList}>
           <View style={styles.messageBlock}>
             <View style={styles.row}>
               <View style={styles.nameBlock}>
-                <Text style={styles.name}>
-                  {item?.from?.contact_person}
-                </Text>
+                <Text style={styles.name}>{item?.from?.contact_person}</Text>
                 <Text style={styles.companyName}>
                   {item?.from?.name !== "undefined" ? item?.from?.name : ""}
                 </Text>
               </View>
-              <View style={styles.timeBlock}>
-                <View>
-                  <Text style={styles.time}>
-                    {moment(+item?.date?.$date?.$numberLong)
-                      .format("hh:mm")}
-                  </Text>
-                </View>
-              </View>
+              <Text style={styles.time}>
+                {moment(+item?.date?.$date?.$numberLong).format("hh:mm")}
+              </Text>
             </View>
             <Text style={styles.message}>{item.comment} </Text>
-            <View style={!item.comment ? {marginTop: -16} : {marginTop: 8}}>
+            <View style={!item.comment ? { marginTop: -16 } : { marginTop: 8 }}>
               {item.files ? (
                 <TouchableOpacity
                   onPress={() => {
                     setSelectedFile(item);
                   }}
                 >
-                  {item.files.split(".")
-                     .pop() == "png" || "jpg" || "jpeg" ?
-
-                   <Image
-                     source={{uri: item.local ? item.files : "https://teus.online/" + item.files}}
-                     style={{
-                       width: 60,
-                       height: 60,
-                     }}
-                   /> : <Ionicons name="document" size={45} color="black"/>
-
-                  }
+                  {item.files.split(".").pop() == "png" || "jpg" || "jpeg" ? (
+                    <Image
+                      source={{
+                        uri: item.local
+                          ? item.files
+                          : "https://teus.online/" + item.files,
+                      }}
+                      style={{
+                        width: 60,
+                        height: 60,
+                      }}
+                    />
+                  ) : (
+                    <Ionicons name="document" size={45} color="black" />
+                  )}
                 </TouchableOpacity>
               ) : (
-
-                 <></>
-               )}
+                <></>
+              )}
             </View>
           </View>
-          <View style={styles.triangle}/>
+          <View style={styles.triangle} />
         </View>
       </View>
     );
   };
 
   const countInputBottom = (height) => {
-    const lines = Math.floor((
-      Math.round(height) - 26
-    ) / 14);
+    const lines = Math.floor((Math.round(height) - 26) / 14);
     return lines < 5 ? lines * 8 : 42;
   };
 
@@ -387,6 +394,18 @@ export const DialogChat = ({route}) => {
         navigation,
       }}
     >
+      <Modal visible={loading} transparent>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "#00000055",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <ActivityIndicator size={50} color={COLOR_5} />
+        </View>
+      </Modal>
       <View style={styles.listWrapper}>
         <FlatList
           data={filteredData}
@@ -395,10 +414,7 @@ export const DialogChat = ({route}) => {
           ListHeaderComponent={headerComponent()}
           stickyHeaderIndices={[0]}
           showsVerticalScrollIndicator={false}
-          keyExtractor={(
-            item,
-            $
-          ) => item.last_id}
+          keyExtractor={(item, $) => item.last_id}
           ListEmptyComponent={() => (
             <View>
               <Text
@@ -408,17 +424,14 @@ export const DialogChat = ({route}) => {
                   fontSize: 20,
                 }}
               >
-                У Вас нет сообщений
+                Не найдено
               </Text>
             </View>
           )}
           onContentSizeChange={() => {
             filteredData?.length > 0 && messagesRef?.current?.scrollToEnd(0);
           }}
-          getItemLayout={(
-            data,
-            index
-          ) => {
+          getItemLayout={(data, index) => {
             return {
               length: ITEM_HEIGHT,
               offset: ITEM_HEIGHT * index + 100,
@@ -428,16 +441,13 @@ export const DialogChat = ({route}) => {
           nestedScrollEnabled
           maxToRenderPerBatch={10}
           updateCellsBatchingPeriod={20}
-
         />
         {footerComponent()}
-
       </View>
 
       <ImagesViewModal
         isVisible={selectedFile ? true : false}
         file={selectedFile}
-
         onCancel={() => {
           setSelectedFile("");
         }}
@@ -472,7 +482,7 @@ const styles = StyleSheet.create({
     // height:
     //   Dimensions.get("window").height - Platform.OS === "ios" ? -120 : -100,
     paddingBottom: 80, // backgroundColor: "red",
-    position: "relative"
+    position: "relative",
   },
   item: {
     marginBottom: 20,
@@ -568,9 +578,6 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
-  },
-  timeBlock: {
-    flexDirection: "row",
     alignItems: "center",
   },
   time: {
@@ -578,6 +585,7 @@ const styles = StyleSheet.create({
     fontFamily: "GothamProRegular",
     color: COLOR_9,
     marginRight: 8,
+    marginBottom: 8,
   },
   message: {
     fontSize: 11,
@@ -592,6 +600,7 @@ const styles = StyleSheet.create({
   },
   selectImage: {
     paddingHorizontal: 20,
+    paddingTop: 10,
     justifyContent: "flex-end",
     flexDirection: "row",
     position: "relative",

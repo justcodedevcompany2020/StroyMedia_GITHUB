@@ -3,11 +3,25 @@ import { api } from "../../Api";
 
 export const editAplicationsRequest = createAsyncThunk(
   "edit/aplication",
-  async (data) => {
+  async ({ formdata, myHeaders }) => {
+    var requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: formdata,
+      redirect: "follow",
+    };
+   console.log(formdata);
     try {
-      const result = await api.post("/cat-serv-edit", data);
+      const response = await fetch(
+        "https://teus.online/api/cat-serv-edit",
+        requestOptions
+      );
+      const result = await response.json();
+      console.log("📢[editAplicationsSlice.js:20]: result: ", result);
       return result;
     } catch (error) {
+      console.log(error);
+      throw error
       return error;
     }
   }

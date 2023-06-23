@@ -34,7 +34,7 @@ function Polls({ route, navigation }) {
     >
       <View style={styles.wrapper}>
         <Text style={styles.title}>Уважаемый пользователь!</Text>
-        {data.map((d) => {
+        {data?.map((d) => {
           const vote1 = d?.vote1?.length || 0;
           const vote2 = d?.vote2?.length || 0;
           const vote3 = d?.vote3?.length || 0;

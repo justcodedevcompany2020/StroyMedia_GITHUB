@@ -4,10 +4,18 @@ import { api } from "../../Api";
 export const editUserDataRequest = createAsyncThunk(
   "etidData",
   async (data) => {
-    const result = await api.post("/edit-user-data", data, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    return result;
+    try {
+      const response = await fetch("https://teus.online/api/edit-user-data", {
+        method: "POST",
+        headers: { "Content-Type": "multipart/form-data" },
+        body: data,
+      });
+      const result = await response.json();
+
+      return result;
+    } catch (err) {
+      throw err;
+    }
   }
 );
 

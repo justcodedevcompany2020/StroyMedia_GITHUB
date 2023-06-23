@@ -31,7 +31,6 @@ const orderChatSlice = createSlice({
         state.loading = true;
       })
       .addCase(chatOrderRequest.fulfilled, (state, action) => {
-        // console.log(action.payload.data.current, "dialog  auth-chat-dialog-order");
         state.data = action.payload.data
         state.loading = false;
       })

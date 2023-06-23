@@ -1,59 +1,63 @@
 import React from "react";
-import {Dimensions, SafeAreaView, ScrollView, StyleSheet, View} from "react-native";
-import {WRAPPER_PADDINGS} from "./Variables";
+import {
+  Dimensions,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
+import { WRAPPER_PADDINGS } from "./Variables";
 import Header from "../includes/Header";
-import {ImageBackGround} from "./images";
+import { ImageBackGround } from "./images";
 import Container from "./Container";
 
-class Wrapper extends React.Component {
-  render() {
-    const {
-      children,
-      withImage,
-      header,
-      withContainer,
-      footer,
-      withoutScrollView,
-      withPaddings,
-    } = this.props;
+export default Wrapper = ({
+  children,
+  withImage,
+  header,
+  withContainer,
+  footer,
+  withoutScrollView,
+  withPaddings,
+  scrollEnabled = true,
+}) => {
+  return (
+    <SafeAreaView style={styles.wrapper}>
+      {withImage && (
+        <ImageBackGround
+          style={styles.backgroundImage}
+          width={Dimensions.get("window").width}
+        />
+      )}
 
-    return (
-      <SafeAreaView style={styles.wrapper}>
-        {withImage && (
-          <ImageBackGround
-            style={styles.backgroundImage}
-            width={Dimensions.get("window").width}
-          />
-        )}
+      {withoutScrollView ? (
+        <View keyboardShouldPersistTaps="handled">
+          <View style={withPaddings && styles.container}>
+            {header && <Header {...header} />}
 
-        {withoutScrollView ? (
-          <View keyboardShouldPersistTaps="handled">
+            {withContainer ? <Container>{children}</Container> : children}
+          </View>
+          {footer ? footer : null}
+        </View>
+      ) : (
+        <>
+          {header && <Header {...header} />}
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            // nestedScrollEnabled={true}
+            scrollEnabled={scrollEnabled}
+          >
             <View style={withPaddings && styles.container}>
-              {header && <Header {...header} />}
-
               {withContainer ? <Container>{children}</Container> : children}
             </View>
             {footer ? footer : null}
-          </View>
-        ) : (
-          <>
-            {header && <Header {...header} />}
-            <ScrollView
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}
-              nestedScrollEnabled={true}
-            >
-              <View style={withPaddings && styles.container}>
-                {withContainer ? <Container>{children}</Container> : children}
-              </View>
-              {footer ? footer : null}
-            </ScrollView>
-          </>
-        )}
-      </SafeAreaView>
-    );
-  }
-}
+          </ScrollView>
+        </>
+      )}
+    </SafeAreaView>
+  );
+};
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -69,5 +73,3 @@ const styles = StyleSheet.create({
     bottom: -100,
   },
 });
-
-export default Wrapper;

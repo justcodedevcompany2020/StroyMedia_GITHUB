@@ -1,9 +1,15 @@
 import React from "react";
-import {StyleSheet, View} from "react-native";
-import {COLOR_6} from "../helpers/Variables";
+import { StyleSheet, View } from "react-native";
+import { COLOR_6 } from "../helpers/Variables";
 import MyInput from "./MyInput";
 
-export const Search = ({style, onSearchText, resetText, value, keyboardType}) => {
+export const Search = ({
+  style,
+  onSearchText,
+  resetText,
+  value,
+  keyboardType,
+}) => {
   return (
     <View style={[styles.wrapper, style]}>
       <MyInput
@@ -13,11 +19,10 @@ export const Search = ({style, onSearchText, resetText, value, keyboardType}) =>
         // filtered={value ? true : false}
         resetText={resetText}
         keyboardType={keyboardType}
-
       />
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   wrapper: {},
@@ -31,5 +36,3 @@ const styles = StyleSheet.create({
     top: 36,
   },
 });
-
-

@@ -1,36 +1,112 @@
-import React, {useEffect, useState} from "react";
-import {ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View,} from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Image,
+} from "react-native";
 import Wrapper from "../helpers/Wrapper";
 import MyInput from "../includes/MyInput";
-import {COLOR_1, COLOR_10, COLOR_8, WRAPPER_PADDINGS,} from "../helpers/Variables";
+import {
+  COLOR_1,
+  COLOR_10,
+  COLOR_8,
+  WRAPPER_PADDINGS,
+} from "../helpers/Variables";
 import AccordionItem from "../includes/AccordionItem";
 import BlockWithSwitchButton from "../includes/BlockWithSwitchButton";
-import {useDispatch, useSelector} from "react-redux";
-import {editAplicationsRequest} from "../../store/reducers/editAplicationsSlice";
-import {getCitys} from "../../store/reducers/getCitysSlice";
-import {showMessage} from "react-native-flash-message";
+import { useDispatch, useSelector } from "react-redux";
+import { editAplicationsRequest } from "../../store/reducers/editAplicationsSlice";
+import { getCitys } from "../../store/reducers/getCitysSlice";
+import { showMessage } from "react-native-flash-message";
 import Modal from "react-native-modal";
 import DelayInput from "react-native-debounce-input";
 
-function EditApplication(props) {
-  const {route, navigation} = props;
-  const {currentPage, item, user, token} = route.params;
+import DatePicker from "../includes/DatePicker";
+import MyButton from "../includes/MyButton";
+import SelectDropdown from "react-native-select-dropdown";
+import { sendCatRequest } from "../../store/reducers/sendCatSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { authRequest } from "../../store/reducers/authUserSlice";
+import { Entypo } from "@expo/vector-icons";
+import * as DocumentPicker from "expo-document-picker";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import _ from "lodash";
+
+const container = ["40 ST", "20 (30)", "20 (24)", "40 HQ"];
+const valuta = ["₽", "€", "$"];
+const conditations = ["Б/у", "Новый"];
+const typespay = ["Любой вариант", "безналичный расчет", "наличный расчет"];
+const reestrized = ["Любой исключен", "включен"];
+
+function EditApplication() {
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+  const route = useRoute();
+  const {
+    currentPage,
+    activeSecondaryTab,
+    typeKTK,
+    user,
+    token,
+    last_id,
+    price_,
+    count_,
+    to_city_,
+    from_city_,
+    activeTab,
+    decription,
+    img,
+    valut,
+    paymentType,
+    reestrrzhd_,
+    condition_,
+    to_city_id,
+    from_city_id,
+  } = route.params;
+  let activeSecondary = activeSecondaryTab.hasOwnProperty("ru")
+    ? activeSecondaryTab.ru
+    : activeSecondaryTab;
+
   const [citys, setCitys] = useState();
-  const [fromCityName, setFromCityName] = useState();
-  const [toCityName, setToCityName] = useState();
+  const [fromCityName, setFromCityName] = useState(from_city_);
+  const [toCityName, setToCityName] = useState(to_city_);
   const [openCitys, setOpenCitys] = useState(false);
   const [openCitysFrom, setOpenCitysFrom] = useState(false);
-  const [containerCount, setContainerCount] = useState("");
-  const [price, setPrice] = useState();
+  const [containerCount, setContainerCount] = useState(count_);
+  const [price, setPrice] = useState(price_);
   const [saveAsDraft, setSaveAsDraft] = useState(false);
-  const [from_city, setFrom_city] = useState();
-  const [to_city, setTo_city] = useState();
+  const [from_city, setFrom_city] = useState(from_city_id);
+  const [to_city, setTo_city] = useState(to_city_id);
   const [searchValue, setSearchValue] = useState("");
-  const {loading} = useSelector((state) => state.editAplicationsSlice);
+  const [date, setDate] = useState(new Date());
+  const [comment, setComment] = useState(decription);
+  const [showDatePicker, setShowDatePicker] = useState("");
+  const [currency, setCurrency] = useState(valut);
+  const [weight, setWeight] = useState("");
+  const state = useSelector((state1) => state1);
+  const [conditation, setConditation] = useState(condition_);
+  const [typePay, setTypePay] = useState(paymentType);
+
+  const [restrict, setRestrict] = useState(
+    reestrrzhd_ == "исключен" ? "Любой исключен" : "включен"
+  );
+  const [selectedImage, setSelectedImage] = useState(
+    img?.length && "https://teus.online/" + img
+  );
+  const [fileName, setFileName] = useState("");
+  const [fileType, setFileType] = useState("");
+  const [loading, setLoading] = useState(false);
+  const DropDownRef = useRef({});
+  const DrowDownTypeContainerRef = useRef({});
+  const [typeContainer, setTypeContiner] = useState(typeKTK);
+
   let allCitys = useSelector(
     (state) => state.getCitysSlice?.data?.data?.data?.citys
   );
-  const dispatch = useDispatch();
 
   const filtered = (searchText) => {
     setCitys(
@@ -41,32 +117,229 @@ function EditApplication(props) {
   };
 
   useEffect(() => {
-    route.params.activeTab !== "В работе" && setSaveAsDraft(true);
+    activeTab !== "В работе" && setSaveAsDraft(true);
   }, [route]);
-  const save = () => {
-    dispatch(
-      editAplicationsRequest({
-        secret_token: token,
-        last_id: item.last_id + "",
-        from_city: from_city ? from_city : item.from_city.last_id,
-        to_city: to_city ? to_city : item.to_city.last_id,
-        count: containerCount ? containerCount + "" : item?.count + "",
-        price: price ? price : item?.price,
-        responsible: user?.last_id + "",
-        _type_op: saveAsDraft ? "draft" : "onwork",
-      })
-    )
-      .unwrap()
-      .then((res) => {
-        navigation.goBack();
-      })
-      .catch((e) => {
-        showMessage({
-          type: "danger",
-          message: "Некорректные данные",
-        });
+
+  const pickImage = async () => {
+    let result = await DocumentPicker.getDocumentAsync({
+      type: ["image/*"],
+    });
+
+    const { type, uri, mimeType, size, name } = result;
+    console.log(result);
+    if (size < 500000) {
+      if (type === "success") {
+        setSelectedImage(uri);
+        setFileName(name);
+        setFileType(mimeType);
+      }
+      console.log(selectedImage);
+    } else {
+      showMessage({
+        type: "info",
+        message: "Размер фото не должен превышать 5 МВ",
+        color: "green",
       });
+    }
   };
+
+  const save = () => {
+    let changed_tab = "";
+    let payType = "";
+    let new_or_used = "";
+    let restrick = "";
+    let price_type = "";
+    let typeKTK = "";
+
+    if (activeSecondaryTab == "Продажа КТК") {
+      changed_tab = "5";
+    } else if (activeSecondaryTab == "Поиск КТК") {
+      changed_tab = "2";
+    } else if (activeSecondaryTab == "Выдача КТК") {
+      changed_tab = "3";
+    } else if (activeSecondaryTab == "Поездной сервис") {
+      changed_tab = "6";
+    } else if (activeSecondaryTab == "Заявка на ТЭО") {
+      changed_tab = "7";
+    }
+
+    if (typePay == "Любой вариант") {
+      payType = "4";
+    } else if (typePay == "безналичный расчет") {
+      payType = "3";
+    } else if (typePay == "наличный расчет") {
+      payType = "2";
+    }
+
+    if (conditation == "Б/у") {
+      new_or_used = "3";
+    } else if (conditation == "Новый") {
+      new_or_used = "2";
+    }
+
+    if (restrict == "Любой исключен") {
+      restrick = "3";
+    } else if (restrict == "включен") {
+      restrick = "2";
+    }
+
+    if (currency == "₽") {
+      price_type = "1";
+    } else if (currency == "$") {
+      price_type = "2";
+    } else if (currency == "€") {
+      price_type = "3";
+    }
+
+    if (typeContainer == "40 ST") {
+      typeKTK = "4";
+    } else if (typeContainer == "20 (30)") {
+      typeKTK = "4";
+    } else if (typeContainer == "40 HQ") {
+      typeKTK = "3";
+    } else if (typeContainer == "20 (24)") {
+      typeKTK = "2";
+    }
+
+    let myHeaders = new Headers();
+    let formdata = new FormData();
+    myHeaders.append("Content-Type", "multipart/form-data");
+    let checkValues = {
+      token,
+      last_id,
+      price,
+      from_city,
+      new_or_used,
+      comment,
+      payType,
+      restrick,
+      typeKTK,
+      price_type,
+      user,
+      selectedImage,
+    };
+    setLoading(true);
+    if (
+      activeSecondary == "Продажа КТК" &&
+      _.every(Object.values(checkValues))
+    ) {
+      formdata.append("secret_token", token);
+      formdata.append("last_id", last_id);
+      formdata.append("price", price);
+      formdata.append("dislokaciya", from_city);
+      formdata.append("condition", new_or_used);
+      formdata.append("description", comment);
+      formdata.append("typepay", payType);
+      formdata.append("reestrrzhd", restrick);
+      formdata.append("type_container", typeKTK);
+      formdata.append("currency", price_type);
+      formdata.append("responsible", user);
+      // formdata.append("img", {
+      //   uri: selectedImage,
+      //   name: fileName.split(".").shift(),
+      //   type: fileType,
+      // });
+      formdata.append("img", selectedImage);
+      formdata.append("_type_op", saveAsDraft ? "draft" : "onwork");
+
+      dispatch(
+        editAplicationsRequest({
+          formdata,
+          myHeaders,
+        })
+      )
+        .unwrap()
+        .then((res) => {
+          setLoading(false);
+          if (res?.success) {
+            navigation.navigate("MyApplications", {
+              currentPage: "Мои заявки",
+            });
+          }
+        })
+        .catch((e) => {
+          setLoading(false);
+          showMessage({
+            message: "Все поля должны быть заполнены",
+            type: "danger",
+          });
+        });
+    } else {
+      setLoading(false);
+      showMessage({
+        message: "Все поля должны быть заполнены",
+        type: "danger",
+      });
+    }
+    // activeSecondaryTab === "Продажа КТК" && !_.every( Object.values( compareDataSales ) ) && showMessage( {
+    //   message : "Все поля должны быть заполнены",
+    //   type : "danger",
+    // } );
+    //
+    // activeSecondaryTab !== "Продажа КТК" && !_.every( Object.values( compareData ) ) && showMessage( {
+    //   message : "Все поля должны быть заполнены",
+    //   type : "danger",
+    // } );
+    let checkValues1 = {
+      token,
+      last_id,
+      from_city,
+      to_city,
+      containerCount,
+      date,
+      date,
+      price,
+      typeKTK,
+      price_type,
+      user,
+    };
+    if (
+      activeSecondaryTab !== "Продажа КТК" &&
+      !_.every(Object.values(checkValues1))
+    ) {
+      formdata.append("secret_token", token);
+      formdata.append("last_id", last_id);
+      formdata.append("from_city", from_city);
+      formdata.append("to_city", to_city);
+      formdata.append("count", containerCount);
+      formdata.append("date_shipment", date.toString());
+      formdata.append("period", date.toString());
+      formdata.append("price", price);
+      formdata.append("type_container", typeKTK);
+      formdata.append("currency", price_type);
+      formdata.append("responsible", user);
+      formdata.append("_type_op", saveAsDraft ? "draft" : "onwork");
+
+      dispatch(
+        editAplicationsRequest({
+          formdata,
+          myHeaders,
+        })
+      )
+        .unwrap()
+        .then((e) => {
+          setLoading(false);
+          if (e.success)
+            navigation.navigate("MyApplications", {
+              currentPage: "Мои заявки",
+            });
+        })
+        .catch((e) => {
+          setLoading(false);
+          showMessage({
+            message: "Все поля должны быть заполнены",
+            type: "danger",
+          });
+        });
+    } else {
+      setLoading(false);
+      showMessage({
+        message: "Все поля должны быть заполнены",
+        type: "danger",
+      });
+    }
+  };
+
   useEffect(() => {
     const getCytys = () => {
       dispatch(getCitys())
@@ -81,6 +354,7 @@ function EditApplication(props) {
   const openCitysModal = () => {
     setOpenCitys(!openCitys);
   };
+
   const openCytysFromModal = () => {
     setOpenCitysFrom(!openCitysFrom);
   };
@@ -88,23 +362,14 @@ function EditApplication(props) {
   useEffect(() => {
     searchValue && filtered(searchValue);
   }, [searchValue]);
-  return (
-    <Wrapper
-      withContainer
-      header={{
-        currentPage,
-        home: false,
-        navigation,
-        onSavePress: save,
-      }}
-    >
-      <View style={styles.wrapper}>
+
+  const searchKTK = () => {
+    return (
+      <>
         <AccordionItem
           titleComponent={
             <Text style={styles.selectText}>
-              {fromCityName
-               ? fromCityName
-               : item?.from_city?.title?.ru || "Откуда"}
+              {fromCityName ? fromCityName : "Откуда"}
             </Text>
           }
           wrapperStyle={openCitys ? styles.openModal : styles.select}
@@ -125,7 +390,9 @@ function EditApplication(props) {
           <FlatList
             data={citys}
             keyExtractor={(item) => item.last_id}
-            renderItem={({item}) => {
+            nestedScrollEnabled={true}
+            scrollEnabled={true}
+            renderItem={({ item }) => {
               return (
                 <TouchableOpacity
                   onPress={() => {
@@ -133,7 +400,1070 @@ function EditApplication(props) {
                     setFrom_city(item.last_id);
                   }}
                 >
-                  <Text style={{marginBottom: 8}}>
+                  <Text style={{ marginBottom: 8 }}>
+                    {item.title.ru || item.title}
+                  </Text>
+                </TouchableOpacity>
+              );
+            }}
+            maxToRenderPerBatch={10}
+            updateCellsBatchingPeriod={20}
+          />
+        </AccordionItem>
+        <AccordionItem
+          titleComponent={
+            <Text style={styles.selectText}>
+              {toCityName ? toCityName : "Куда"}
+            </Text>
+          }
+          wrapperStyle={openCitysFrom ? styles.openModal : styles.select}
+          headerStyle={styles.selectHeader}
+          arrowStyle={styles.selectArrowStyle}
+          isopenModal={openCytysFromModal}
+        >
+          <View style={styles.citysSearch}>
+            <DelayInput
+              placeholder="Search"
+              value={searchValue}
+              minLength={1}
+              onChangeText={(text) => setSearchValue(text)}
+              delayTimeout={500}
+              style={styles.searchInput}
+            />
+          </View>
+          <FlatList
+            data={citys}
+            nestedScrollEnabled={true}
+            scrollEnabled={true}
+            keyExtractor={(item) => item.last_id}
+            renderItem={({ item }) => {
+              return (
+                <TouchableOpacity
+                  onPress={() => {
+                    setToCityName(item?.title?.ru || item.title);
+                    setTo_city(item.last_id);
+                  }}
+                >
+                  <Text style={{ marginBottom: 8 }}>
+                    {item.title.ru || item.title}
+                  </Text>
+                </TouchableOpacity>
+              );
+            }}
+            maxToRenderPerBatch={10}
+            updateCellsBatchingPeriod={20}
+          />
+        </AccordionItem>
+        <View style={styles.containerStyle}>
+          <SelectDropdown
+            searchInputStyle={{
+              borderColor: "black",
+              borderWidth: 0.2,
+              marginVertical: 10,
+              height: 40,
+            }}
+            ref={DrowDownTypeContainerRef}
+            dropdownIconPosition="right"
+            renderDropdownIcon={() => {
+              return (
+                <Entypo name="chevron-small-down" size={32} color={COLOR_1} />
+              );
+            }}
+            defaultButtonText="Выберите тип контейнера"
+            buttonTextStyle={{
+              color: COLOR_1,
+              fontSize: 14,
+              textAlign: "left",
+            }}
+            buttonStyle={{
+              height: 40,
+              width: "100%",
+              borderRadius: 8,
+            }}
+            // search
+            data={container}
+            defaultValue={typeContainer}
+            onSelect={(selectedItem, index) => {
+              setTypeContiner(selectedItem);
+            }}
+            rowStyle={{
+              flex: 1,
+              justifyContent: "space-between",
+              backgroundColor: "white",
+              borderBottomColor: "white",
+            }}
+            rowTextStyle={{
+              textAlign: "left",
+              fontSize: 16,
+            }}
+          />
+        </View>
+        <MyInput
+          label={"Количество контейнеров"}
+          value={containerCount}
+          onChangeText={(val) => setContainerCount(val)}
+          keyboardType={"numeric"}
+        />
+        <DatePicker
+          date={date}
+          setDate={(event, date) => {
+            setShowDatePicker(false);
+            return setDate(date);
+          }}
+        />
+        <MyInput
+          label={"Ставка"}
+          value={price}
+          onChangeText={(val) => setPrice(val)}
+          keyboardType={"numeric"}
+        />
+        <View style={styles.containerStyle}>
+          <SelectDropdown
+            ref={DropDownRef}
+            defaultButtonText="Валюта"
+            dropdownIconPosition="right"
+            renderDropdownIcon={() => {
+              return (
+                <Entypo name="chevron-small-down" size={32} color={COLOR_1} />
+              );
+            }}
+            buttonTextStyle={{
+              color: COLOR_1,
+              fontSize: 14,
+              textAlign: "left",
+            }}
+            buttonStyle={{
+              height: 40,
+              width: "100%",
+              borderRadius: 8,
+            }}
+            data={valuta}
+            defaultValue={valut}
+            onSelect={(selectedItem, index) => {
+              setCurrency(selectedItem);
+            }}
+            rowStyle={{
+              flex: 1,
+              justifyContent: "space-between",
+              backgroundColor: "white",
+              borderBottomColor: "white",
+            }}
+            rowTextStyle={{
+              textAlign: "left",
+              fontSize: 16,
+            }}
+          />
+        </View>
+      </>
+    );
+  };
+
+  const sellKTK = () => {
+    return (
+      <>
+        <View style={styles.containerStyle}>
+          <SelectDropdown
+            searchInputStyle={{
+              marginVertical: 10,
+              height: 40,
+            }}
+            ref={DrowDownTypeContainerRef}
+            defaultButtonText="Выберите тип контейнера"
+            dropdownIconPosition="right"
+            renderDropdownIcon={() => {
+              return (
+                <Entypo name="chevron-small-down" size={32} color={COLOR_1} />
+              );
+            }}
+            buttonTextStyle={{
+              color: COLOR_1,
+              fontSize: 14,
+              textAlign: "left",
+            }}
+            buttonStyle={{
+              height: 40,
+              width: "100%",
+              borderRadius: 8,
+            }}
+            // search
+            data={container}
+            defaultValue={typeContainer}
+            onSelect={(selectedItem, index) => {
+              setTypeContiner(selectedItem);
+            }}
+            rowStyle={{
+              flex: 1,
+              justifyContent: "space-between",
+              backgroundColor: "white",
+              borderBottomColor: "white",
+            }}
+            rowTextStyle={{
+              textAlign: "left",
+              fontSize: 16,
+            }}
+          />
+        </View>
+        <MyInput
+          label={"Количество контейнеров"}
+          value={containerCount}
+          onChangeText={(val) => setContainerCount(val)}
+          keyboardType={"numeric"}
+        />
+        <MyInput
+          label={"Цена"}
+          value={price}
+          onChangeText={(val) => setPrice(val)}
+          keyboardType={"numeric"}
+        />
+        <View style={styles.containerStyle}>
+          <SelectDropdown
+            ref={DropDownRef}
+            dropdownIconPosition="right"
+            renderDropdownIcon={() => {
+              return (
+                <Entypo name="chevron-small-down" size={32} color={COLOR_1} />
+              );
+            }}
+            defaultButtonText="Валюта"
+            buttonTextStyle={{
+              color: COLOR_1,
+              fontSize: 14,
+              textAlign: "left",
+            }}
+            buttonStyle={{
+              height: 40,
+              width: "100%",
+              borderRadius: 8,
+            }}
+            data={valuta}
+            defaultValue={currency}
+            onSelect={(selectedItem, index) => {
+              setCurrency(selectedItem);
+            }}
+            rowStyle={{
+              flex: 1,
+              justifyContent: "space-between",
+              backgroundColor: "white",
+              borderBottomColor: "white",
+            }}
+            rowTextStyle={{
+              textAlign: "left",
+              fontSize: 16,
+            }}
+          />
+        </View>
+        <AccordionItem
+          titleComponent={
+            <Text style={styles.selectText}>
+              {fromCityName ? fromCityName : "Город расположения"}
+            </Text>
+          }
+          wrapperStyle={openCitys ? styles.openModal : styles.select}
+          headerStyle={styles.selectHeader}
+          arrowStyle={styles.selectArrowStyle}
+          isopenModal={openCitysModal}
+        >
+          <View style={styles.citysSearch}>
+            <DelayInput
+              placeholder="Search"
+              value={searchValue}
+              minLength={1}
+              onChangeText={(text) => setSearchValue(text)}
+              delayTimeout={500}
+              style={styles.searchInput}
+            />
+          </View>
+          <FlatList
+            nestedScrollEnabled={true}
+            scrollEnabled={true}
+            data={citys}
+            keyExtractor={(item) => item.last_id}
+            renderItem={({ item }) => {
+              return (
+                <TouchableOpacity
+                  onPress={() => {
+                    setFromCityName(item?.title?.ru || item.title);
+                    setFrom_city(item.last_id);
+                  }}
+                >
+                  <Text style={{ marginBottom: 8 }}>
+                    {item.title.ru || item.title}
+                  </Text>
+                </TouchableOpacity>
+              );
+            }}
+            maxToRenderPerBatch={10}
+            updateCellsBatchingPeriod={20}
+          />
+        </AccordionItem>
+        <View style={styles.containerStyle}>
+          <SelectDropdown
+            searchInputStyle={{
+              borderColor: "black",
+              borderWidth: 0.2,
+              marginVertical: 10,
+              height: 40,
+            }}
+            ref={DropDownRef}
+            dropdownIconPosition="right"
+            renderDropdownIcon={() => {
+              return (
+                <Entypo name="chevron-small-down" size={32} color={COLOR_1} />
+              );
+            }}
+            defaultButtonText="Состояние"
+            buttonTextStyle={{
+              color: COLOR_1,
+              fontSize: 14,
+              textAlign: "left",
+            }}
+            buttonStyle={{
+              height: 40,
+              width: "100%",
+              borderRadius: 8,
+            }}
+            data={conditations}
+            defaultValue={conditation}
+            onSelect={(selectedItem, index) => {
+              setConditation(selectedItem);
+            }}
+            rowStyle={{
+              flex: 1,
+              justifyContent: "space-between",
+              backgroundColor: "white",
+              borderBottomColor: "white",
+            }}
+            rowTextStyle={{
+              textAlign: "left",
+              fontSize: 16,
+            }}
+          />
+        </View>
+        <TouchableOpacity onPress={pickImage}>
+          <Text
+            style={{
+              fontFamily: "GothamProRegular",
+              color: COLOR_1,
+              marginVertical: 40,
+              marginBottom: selectedImage ? 20 : 40,
+            }}
+          >
+            Добавить фото
+          </Text>
+        </TouchableOpacity>
+        {selectedImage ? (
+          <View>
+            <Image
+              source={{
+                uri: selectedImage,
+              }}
+              style={styles.imageStyle}
+            />
+            <TouchableOpacity
+              onPress={() => setSelectedImage("")}
+              style={styles.cancelImage}
+            >
+              <Text style={{ color: "red" }}>X</Text>
+            </TouchableOpacity>
+          </View>
+        ) : null}
+        <MyInput
+          label={"Описание"}
+          value={comment}
+          onChangeText={(val) => setComment(val)}
+          style={styles.commentInput}
+          multiline
+        />
+        <View style={styles.containerStyle}>
+          <SelectDropdown
+            searchInputStyle={{
+              borderColor: "black",
+              borderWidth: 0.2,
+              marginVertical: 10,
+              height: 40,
+            }}
+            ref={DropDownRef}
+            dropdownIconPosition="right"
+            renderDropdownIcon={() => {
+              return (
+                <Entypo name="chevron-small-down" size={32} color={COLOR_1} />
+              );
+            }}
+            defaultButtonText="Условия оплаты"
+            defaultValue={typePay}
+            buttonTextStyle={{
+              color: COLOR_1,
+              fontSize: 14,
+              textAlign: "left",
+            }}
+            buttonStyle={{
+              height: 40,
+              width: "100%",
+              borderRadius: 8,
+            }}
+            data={typespay}
+            onSelect={(selectedItem, index) => {
+              setTypePay(selectedItem);
+            }}
+            rowStyle={{
+              flex: 1,
+              justifyContent: "space-between",
+              backgroundColor: "white",
+              borderBottomColor: "white",
+            }}
+            rowTextStyle={{
+              textAlign: "left",
+              fontSize: 16,
+            }}
+          />
+        </View>
+        <View style={styles.containerStyle}>
+          <SelectDropdown
+            searchInputStyle={{
+              borderColor: "black",
+              borderWidth: 0.2,
+              marginVertical: 10,
+              height: 40,
+            }}
+            ref={DropDownRef}
+            dropdownIconPosition="right"
+            defaultButtonText="Реестр РЖД"
+            renderDropdownIcon={() => {
+              return (
+                <Entypo name="chevron-small-down" size={32} color={COLOR_1} />
+              );
+            }}
+            buttonTextStyle={{
+              color: COLOR_1,
+              fontSize: 14,
+              textAlign: "left",
+            }}
+            buttonStyle={{
+              height: 40,
+              width: "100%",
+              borderRadius: 8,
+            }}
+            data={reestrized}
+            defaultValue={restrict}
+            onSelect={(selectedItem, index) => {
+              setRestrict(selectedItem);
+            }}
+            rowStyle={{
+              flex: 1,
+              justifyContent: "space-between",
+              backgroundColor: "white",
+              borderBottomColor: "white",
+            }}
+            rowTextStyle={{
+              textAlign: "left",
+              fontSize: 16,
+            }}
+          />
+        </View>
+      </>
+    );
+  };
+
+  const extraditionKTK = () => {
+    return (
+      <>
+        <AccordionItem
+          titleComponent={
+            <Text style={styles.selectText}>
+              {fromCityName ? fromCityName : "Откуда"}
+            </Text>
+          }
+          wrapperStyle={openCitys ? styles.openModal : styles.select}
+          headerStyle={styles.selectHeader}
+          arrowStyle={styles.selectArrowStyle}
+          isopenModal={openCitysModal}
+        >
+          <View style={styles.citysSearch}>
+            <DelayInput
+              placeholder="Search"
+              value={searchValue}
+              minLength={1}
+              onChangeText={(text) => setSearchValue(text)}
+              delayTimeout={500}
+              style={styles.searchInput}
+            />
+          </View>
+          <FlatList
+            data={citys}
+            keyExtractor={(item) => item.last_id}
+            nestedScrollEnabled={true}
+            scrollEnabled={true}
+            renderItem={({ item }) => {
+              return (
+                <TouchableOpacity
+                  onPress={() => {
+                    setFromCityName(item?.title?.ru || item.title);
+                    setFrom_city(item.last_id);
+                  }}
+                >
+                  <Text style={{ marginBottom: 8 }}>
+                    {item.title.ru || item.title}
+                  </Text>
+                </TouchableOpacity>
+              );
+            }}
+            maxToRenderPerBatch={10}
+            updateCellsBatchingPeriod={20}
+          />
+        </AccordionItem>
+        <AccordionItem
+          titleComponent={
+            <Text style={styles.selectText}>
+              {toCityName ? toCityName : "Куда"}
+            </Text>
+          }
+          wrapperStyle={openCitysFrom ? styles.openModal : styles.select}
+          headerStyle={styles.selectHeader}
+          arrowStyle={styles.selectArrowStyle}
+          isopenModal={openCytysFromModal}
+        >
+          <View style={styles.citysSearch}>
+            <DelayInput
+              placeholder="Search"
+              value={searchValue}
+              minLength={1}
+              onChangeText={(text) => setSearchValue(text)}
+              delayTimeout={500}
+              style={styles.searchInput}
+            />
+          </View>
+          <FlatList
+            data={citys}
+            keyExtractor={(item) => item.last_id}
+            nestedScrollEnabled={true}
+            scrollEnabled={true}
+            renderItem={({ item }) => {
+              return (
+                <TouchableOpacity
+                  onPress={() => {
+                    setToCityName(item?.title?.ru || item.title);
+                    setTo_city(item.last_id);
+                  }}
+                >
+                  <Text style={{ marginBottom: 8 }}>
+                    {item.title.ru || item.title}
+                  </Text>
+                </TouchableOpacity>
+              );
+            }}
+            maxToRenderPerBatch={10}
+            updateCellsBatchingPeriod={20}
+          />
+        </AccordionItem>
+        <View style={styles.containerStyle}>
+          <SelectDropdown
+            searchInputStyle={{
+              borderColor: "black",
+              borderWidth: 0.2,
+              marginVertical: 10,
+              height: 40,
+            }}
+            ref={DrowDownTypeContainerRef}
+            dropdownIconPosition="right"
+            renderDropdownIcon={() => {
+              return (
+                <Entypo name="chevron-small-down" size={32} color={COLOR_1} />
+              );
+            }}
+            defaultButtonText="Выберите тип контейнера"
+            buttonTextStyle={{
+              color: COLOR_1,
+              fontSize: 14,
+              textAlign: "left",
+            }}
+            buttonStyle={{
+              height: 40,
+              width: "100%",
+              borderRadius: 8,
+            }}
+            data={container}
+            defaultValue={typeContainer}
+            onSelect={(selectedItem, index) => {
+              setTypeContiner(selectedItem);
+            }}
+            rowStyle={{
+              flex: 1,
+              justifyContent: "space-between",
+              backgroundColor: "white",
+              borderBottomColor: "white",
+            }}
+            rowTextStyle={{
+              textAlign: "left",
+              fontSize: 16,
+            }}
+          />
+        </View>
+        <MyInput
+          label={"Количество контейнеров"}
+          value={containerCount}
+          onChangeText={(val) => setContainerCount(val)}
+          keyboardType={"numeric"}
+        />
+        <DatePicker
+          body="Cрок"
+          date={date}
+          setDate={(event, date) => {
+            setShowDatePicker(false);
+            return setDate(date);
+          }}
+        />
+        <MyInput
+          label={"Ставка"}
+          value={price}
+          onChangeText={(val) => setPrice(val)}
+          keyboardType={"numeric"}
+        />
+        <View style={styles.containerStyle}>
+          <SelectDropdown
+            ref={DropDownRef}
+            renderDropdownIcon={() => {
+              return (
+                <Entypo name="chevron-small-down" size={32} color={COLOR_1} />
+              );
+            }}
+            dropdownIconPosition="right"
+            defaultButtonText="Валюта"
+            buttonTextStyle={{
+              color: COLOR_1,
+              fontSize: 14,
+              textAlign: "left",
+            }}
+            buttonStyle={{
+              height: 40,
+              width: "100%",
+              borderRadius: 8,
+            }}
+            data={valuta}
+            onSelect={(selectedItem, index) => {
+              setCurrency(selectedItem);
+            }}
+            rowStyle={{
+              flex: 1,
+              justifyContent: "space-between",
+              backgroundColor: "white",
+              borderBottomColor: "white",
+            }}
+            rowTextStyle={{
+              textAlign: "left",
+              fontSize: 16,
+            }}
+          />
+        </View>
+      </>
+    );
+  };
+
+  const trainService = () => {
+    return (
+      <>
+        <AccordionItem
+          titleComponent={
+            <Text style={styles.selectText}>
+              {fromCityName ? fromCityName : "Откуда"}
+            </Text>
+          }
+          wrapperStyle={openCitys ? styles.openModal : styles.select}
+          headerStyle={styles.selectHeader}
+          arrowStyle={styles.selectArrowStyle}
+          isopenModal={openCitysModal}
+        >
+          <View style={styles.citysSearch}>
+            <DelayInput
+              placeholder="Search"
+              value={searchValue}
+              minLength={1}
+              onChangeText={(text) => setSearchValue(text)}
+              delayTimeout={500}
+              style={styles.searchInput}
+            />
+          </View>
+          <FlatList
+            data={citys}
+            keyExtractor={(item) => item.last_id}
+            nestedScrollEnabled={true}
+            scrollEnabled={true}
+            renderItem={({ item }) => {
+              return (
+                <TouchableOpacity
+                  onPress={() => {
+                    setFromCityName(item?.title?.ru || item.title);
+                    setFrom_city(item.last_id);
+                  }}
+                >
+                  <Text style={{ marginBottom: 8 }}>
+                    {item.title.ru || item.title}
+                  </Text>
+                </TouchableOpacity>
+              );
+            }}
+            maxToRenderPerBatch={10}
+            updateCellsBatchingPeriod={20}
+          />
+        </AccordionItem>
+        <AccordionItem
+          titleComponent={
+            <Text style={styles.selectText}>
+              {toCityName ? toCityName : "Куда"}
+            </Text>
+          }
+          wrapperStyle={openCitysFrom ? styles.openModal : styles.select}
+          headerStyle={styles.selectHeader}
+          arrowStyle={styles.selectArrowStyle}
+          isopenModal={openCytysFromModal}
+        >
+          <View style={styles.citysSearch}>
+            <DelayInput
+              placeholder="Search"
+              value={searchValue}
+              minLength={1}
+              onChangeText={(text) => setSearchValue(text)}
+              delayTimeout={500}
+              style={styles.searchInput}
+            />
+          </View>
+          <FlatList
+            data={citys}
+            keyExtractor={(item) => item.last_id}
+            nestedScrollEnabled={true}
+            scrollEnabled={true}
+            renderItem={({ item }) => {
+              return (
+                <TouchableOpacity
+                  onPress={() => {
+                    setToCityName(item?.title?.ru || item.title);
+                    setTo_city(item.last_id);
+                  }}
+                >
+                  <Text style={{ marginBottom: 8 }}>
+                    {item.title.ru || item.title}
+                  </Text>
+                </TouchableOpacity>
+              );
+            }}
+            maxToRenderPerBatch={10}
+            updateCellsBatchingPeriod={20}
+          />
+        </AccordionItem>
+        <View style={styles.containerStyle}>
+          <SelectDropdown
+            searchInputStyle={{
+              borderColor: "black",
+              borderWidth: 0.2,
+              marginVertical: 10,
+              height: 40,
+            }}
+            ref={DrowDownTypeContainerRef}
+            dropdownIconPosition="right"
+            renderDropdownIcon={() => {
+              return (
+                <Entypo name="chevron-small-down" size={32} color={COLOR_1} />
+              );
+            }}
+            defaultButtonText="Выберите тип контейнера"
+            buttonTextStyle={{
+              color: COLOR_1,
+              fontSize: 14,
+              textAlign: "left",
+            }}
+            buttonStyle={{
+              height: 40,
+              width: "100%",
+              borderRadius: 8,
+            }}
+            data={container}
+            defaultValue={typeContainer}
+            onSelect={(selectedItem, index) => {
+              setTypeContiner(selectedItem);
+            }}
+            rowStyle={{
+              flex: 1,
+              justifyContent: "space-between",
+              backgroundColor: "white",
+              borderBottomColor: "white",
+            }}
+            rowTextStyle={{
+              textAlign: "left",
+              fontSize: 16,
+            }}
+          />
+        </View>
+        <MyInput
+          label={"Количество контейнеров"}
+          value={containerCount}
+          onChangeText={(val) => setContainerCount(val)}
+          keyboardType={"numeric"}
+        />
+        <DatePicker
+          body="Cрок"
+          date={date}
+          setDate={(event, date) => {
+            setShowDatePicker(false);
+            return setDate(date);
+          }}
+        />
+        <MyInput
+          label={"Ставка"}
+          value={price}
+          onChangeText={(val) => setPrice(val)}
+          keyboardType={"numeric"}
+        />
+        <View style={styles.containerStyle}>
+          <SelectDropdown
+            ref={DropDownRef}
+            defaultButtonText="Валюта"
+            dropdownIconPosition="right"
+            renderDropdownIcon={() => {
+              return (
+                <Entypo name="chevron-small-down" size={32} color={COLOR_1} />
+              );
+            }}
+            buttonTextStyle={{
+              color: COLOR_1,
+              fontSize: 14,
+              textAlign: "left",
+            }}
+            buttonStyle={{
+              height: 40,
+              width: "100%",
+              borderRadius: 8,
+            }}
+            data={valuta}
+            defaultValue={currency}
+            onSelect={(selectedItem, index) => {
+              setCurrency(selectedItem);
+            }}
+            rowStyle={{
+              flex: 1,
+              justifyContent: "space-between",
+              backgroundColor: "white",
+              borderBottomColor: "white",
+            }}
+            rowTextStyle={{
+              textAlign: "left",
+              fontSize: 16,
+            }}
+          />
+        </View>
+      </>
+    );
+  };
+
+  const applicationOnTEO = () => {
+    return (
+      <>
+        <AccordionItem
+          titleComponent={
+            <Text style={styles.selectText}>
+              {fromCityName ? fromCityName : "Откуда"}
+            </Text>
+          }
+          wrapperStyle={openCitys ? styles.openModal : styles.select}
+          headerStyle={styles.selectHeader}
+          arrowStyle={styles.selectArrowStyle}
+          isopenModal={openCitysModal}
+        >
+          <View style={styles.citysSearch}>
+            <DelayInput
+              placeholder="Search"
+              value={searchValue}
+              minLength={1}
+              onChangeText={(text) => setSearchValue(text)}
+              delayTimeout={500}
+              style={styles.searchInput}
+            />
+          </View>
+          <FlatList
+            data={citys}
+            nestedScrollEnabled={true}
+            scrollEnabled={true}
+            keyExtractor={(item) => item.last_id}
+            renderItem={({ item }) => {
+              return (
+                <TouchableOpacity
+                  onPress={() => {
+                    setFromCityName(item?.title?.ru || item.title);
+                    setFrom_city(item.last_id);
+                  }}
+                >
+                  <Text style={{ marginBottom: 8 }}>
+                    {item.title.ru || item.title}
+                  </Text>
+                </TouchableOpacity>
+              );
+            }}
+            maxToRenderPerBatch={10}
+            updateCellsBatchingPeriod={20}
+          />
+        </AccordionItem>
+        <AccordionItem
+          titleComponent={
+            <Text style={styles.selectText}>
+              {toCityName ? toCityName : "Куда"}
+            </Text>
+          }
+          wrapperStyle={openCitysFrom ? styles.openModal : styles.select}
+          headerStyle={styles.selectHeader}
+          arrowStyle={styles.selectArrowStyle}
+          isopenModal={openCytysFromModal}
+        >
+          <View style={styles.citysSearch}>
+            <DelayInput
+              placeholder="Search"
+              value={searchValue}
+              minLength={1}
+              onChangeText={(text) => setSearchValue(text)}
+              delayTimeout={500}
+              style={styles.searchInput}
+            />
+          </View>
+
+          <FlatList
+            data={citys}
+            nestedScrollEnabled={true}
+            scrollEnabled={true}
+            keyExtractor={(item) => item.last_id}
+            renderItem={({ item }) => {
+              return (
+                <TouchableOpacity
+                  onPress={() => {
+                    setToCityName(item?.title?.ru || item.title);
+                    setTo_city(item.last_id);
+                  }}
+                >
+                  <Text style={{ marginBottom: 8 }}>
+                    {item.title.ru || item.title}
+                  </Text>
+                </TouchableOpacity>
+              );
+            }}
+            maxToRenderPerBatch={10}
+            updateCellsBatchingPeriod={20}
+          />
+        </AccordionItem>
+        <View style={styles.containerStyle}>
+          <SelectDropdown
+            searchInputStyle={{
+              borderColor: "black",
+              borderWidth: 0.2,
+              marginVertical: 10,
+              height: 40,
+            }}
+            ref={DrowDownTypeContainerRef}
+            dropdownIconPosition="right"
+            renderDropdownIcon={() => {
+              return (
+                <Entypo name="chevron-small-down" size={32} color={COLOR_1} />
+              );
+            }}
+            defaultButtonText="Выберите тип контейнера"
+            buttonTextStyle={{
+              color: COLOR_1,
+              fontSize: 14,
+              textAlign: "left",
+            }}
+            buttonStyle={{
+              height: 40,
+              width: "100%",
+              borderRadius: 8,
+            }}
+            data={container}
+            defaultValue={typeContainer}
+            onSelect={(selectedItem, index) => {
+              setTypeContiner(selectedItem);
+            }}
+            rowStyle={{
+              flex: 1,
+              justifyContent: "space-between",
+              backgroundColor: "white",
+              borderBottomColor: "white",
+            }}
+            rowTextStyle={{
+              textAlign: "left",
+              fontSize: 16,
+            }}
+          />
+        </View>
+        <MyInput
+          label={"Количество контейнеров"}
+          value={containerCount}
+          onChangeText={(val) => setContainerCount(val)}
+          keyboardType={"numeric"}
+        />
+        <DatePicker
+          body="Cрок"
+          date={date}
+          setDate={(event, date) => {
+            setShowDatePicker(false);
+            return setDate(date);
+          }}
+        />
+        <MyInput
+          label={"Груз"}
+          value={weight}
+          onChangeText={(val) => setWeight(val)}
+        />
+        <MyInput
+          label={"Комментарий"}
+          value={comment}
+          onChangeText={(val) => setComment(val)}
+          style={styles.commentInput}
+          multiline
+        />
+      </>
+    );
+  };
+
+  return (
+    <Wrapper
+      withContainer
+      header={{
+        currentPage,
+        home: false,
+        navigation,
+        onSavePress: save,
+      }}
+    >
+      <View style={styles.wrapper}>
+        {/* <AccordionItem
+          titleComponent={
+            <Text style={styles.selectText}>
+              {fromCityName
+                ? fromCityName
+                : item?.from_city?.title?.ru || "Откуда"}
+            </Text>
+          }
+          wrapperStyle={openCitys ? styles.openModal : styles.select}
+          headerStyle={styles.selectHeader}
+          arrowStyle={styles.selectArrowStyle}
+          isopenModal={openCitysModal}
+        >
+          <View style={styles.citysSearch}>
+            <DelayInput
+              placeholder="Search"
+              value={searchValue}
+              minLength={1}
+              onChangeText={(text) => setSearchValue(text)}
+              delayTimeout={500}
+              style={styles.searchInput}
+            />
+          </View>
+          <FlatList
+            data={citys}
+            keyExtractor={(item) => item?.last_id}
+            renderItem={({ item }) => {
+              return (
+                <TouchableOpacity
+                  onPress={() => {
+                    setFromCityName(item?.title?.ru || item.title);
+                    setFrom_city(item?.last_id);
+                  }}
+                >
+                  <Text style={{ marginBottom: 8 }}>
                     {item.title.ru || item.title}
                   </Text>
                 </TouchableOpacity>
@@ -166,16 +1496,16 @@ function EditApplication(props) {
           </View>
           <FlatList
             data={citys}
-            keyExtractor={(item) => item.last_id}
-            renderItem={({item}) => {
+            keyExtractor={(item) => item?.last_id}
+            renderItem={({ item }) => {
               return (
                 <TouchableOpacity
                   onPress={() => {
                     setToCityName(item?.title?.ru || item.title);
-                    setTo_city(item.last_id);
+                    setTo_city(item?.last_id);
                   }}
                 >
-                  <Text style={{marginBottom: 8}}>
+                  <Text style={{ marginBottom: 8 }}>
                     {item.title.ru || item.title}
                   </Text>
                 </TouchableOpacity>
@@ -188,14 +1518,14 @@ function EditApplication(props) {
         <MyInput
           label={"Количество контейнеров"}
           value={containerCount}
-          placeholder={item?.count}
+          placeholder={item?.count.toString()}
           onChangeText={(val) => setContainerCount(val)}
           keyboardType={"numeric"}
         />
         <MyInput
           label={"Ставка"}
           value={price}
-          placeholder={item?.price}
+          placeholder={item?.price.toString()}
           onChangeText={(val) => setPrice(val)}
           keyboardType={"numeric"}
         />
@@ -205,14 +1535,37 @@ function EditApplication(props) {
           onToggle={(val) => setSaveAsDraft(val)}
           isOn={saveAsDraft}
         />
-        {loading && (
-          <Modal backdropOpacity={0.75} isVisible={true}>
-            <View>
-              <ActivityIndicator size="large"/>
-            </View>
-          </Modal>
-        )}
+         */}
       </View>
+      <View style={styles.wrapper}>
+        {activeSecondary === "Поиск КТК"
+          ? searchKTK()
+          : activeSecondary === "Продажа КТК"
+          ? sellKTK()
+          : activeSecondary === "Выдача КТК"
+          ? extraditionKTK()
+          : activeSecondary === "Поездной сервис"
+          ? trainService()
+          : activeSecondary === "Заявка на ТЭО"
+          ? applicationOnTEO()
+          : null}
+        <BlockWithSwitchButton
+          title={"Сохранить как черновик"}
+          titleStyle={styles.selectText}
+          onToggle={(val) => setSaveAsDraft(val)}
+          isOn={saveAsDraft}
+        />
+        <MyButton onPress={save} style={styles.button}>
+          Разместить
+        </MyButton>
+      </View>
+      {loading && (
+        <Modal backdropOpacity={0.75} isVisible={true}>
+          <View>
+            <ActivityIndicator size="large" />
+          </View>
+        </Modal>
+      )}
     </Wrapper>
   );
 }
@@ -220,6 +1573,7 @@ function EditApplication(props) {
 const styles = StyleSheet.create({
   wrapper: {
     paddingHorizontal: WRAPPER_PADDINGS,
+    marginBottom: 20,
   },
   commentInput: {
     height: undefined,
@@ -291,6 +1645,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     padding: 5,
     marginRight: 8,
+  },
+  imageStyle: {
+    width: 80,
+    height: 80,
+    resizeMode: "cover",
   },
 });
 

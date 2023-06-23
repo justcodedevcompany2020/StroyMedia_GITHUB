@@ -17,8 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Modal from "react-native-modal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-function Header(props) {
-  const { currentPage, home, navigation, onSavePress } = props;
+function Header({ currentPage, home, navigation, onSavePress }) {
   const data = useSelector((state) =>
     state.getAllNotificationsSlice?.data?.date_16_08_2022
       ? state.getAllNotificationsSlice?.data?.date_16_08_2022[0]

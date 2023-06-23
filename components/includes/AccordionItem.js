@@ -3,7 +3,7 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { COLOR_6 } from "../helpers/Variables";
 import { ImageArrowDown, ImageArrowUp } from "../helpers/images";
 
-export default AccordionItem = ( {
+export default AccordionItem = ({
   children,
   isopenModal,
   titleComponent,
@@ -13,54 +13,72 @@ export default AccordionItem = ( {
   headerStyle,
   arrowStyle,
   expanded,
-  childrenStyle
-} ) => {
-  const [ expand, setExpandedNew ] = useState( expanded || false );
+  type = false,
+  childrenStyle,
+}) => {
+  const [expand, setExpandedNew] = useState(expanded || false);
 
-  const setExpanded = ( val ) => setExpandedNew( val );
-
+  const setExpanded = (val) => setExpandedNew(val);
+  // console.log(expand,21);
   return (
-    <View style={ [ styles.wrapper, wrapperStyle ] }>
+    <View style={[styles.wrapper, wrapperStyle]}>
       <TouchableOpacity
-        style={ [ styles.header, !expand && styles.headerBorder, headerStyle ] }
-        onPress={ typeof onPress === "function" ? onPress : () => {
-          setExpanded( !expand );
-          isopenModal && isopenModal();
-        } }
-        activeOpacity={ 0.5 }
+        style={[!expanded || (expand && styles.headerBorder), headerStyle]}
+        onPress={
+          typeof isopenModal === "function"
+            ? isopenModal
+            : () => {
+                // alert(typeof onPress)
+                setExpanded(!expand);
+                isopenModal && isopenModal();
+              }
+        }
+        // onPress={isopenModal}
+        activeOpacity={0.5}
       >
-        { titleComponent }
-        <View style={ [ styles.arrowView, arrowStyle ] }>
-          { arrowComponent ? (
+        {titleComponent}
+        <View style={[styles.arrowView, arrowStyle]}>
+          {arrowComponent ? (
             arrowComponent
-          ) : expand ? (
-            <ImageArrowUp/>
+          ) : expanded || expand ? (
+            <ImageArrowUp />
           ) : (
-            <ImageArrowDown/>
-          ) }
+            <ImageArrowDown />
+          )}
         </View>
       </TouchableOpacity>
-      { expand && (
-        <View style={ [ styles.children, childrenStyle ] }>{ children }</View>
-      ) }
+      {type
+        ? expanded && (
+            <View style={[styles.children, childrenStyle]}>{children}</View>
+          )
+        : expand && (
+            <View style={[styles.children, childrenStyle]}>{children}</View>
+          )}
+      {/* {expanded && (
+        <View style={[styles.children, childrenStyle]}>{children}</View>
+      )} */}
     </View>
   );
 };
 
-const styles = StyleSheet.create( {
-  wrapper : {
-    position : "relative",
+const styles = StyleSheet.create({
+  wrapper: {
+    position: "relative",
+    // overflow: "hidden",
   },
-  header : {},
-  headerBorder : {
-    borderBottomWidth : 0,
-    borderBottomColor : COLOR_6,
+  headerBorder: {
+    borderBottomWidth: 0,
+    borderBottomColor: COLOR_6,
   },
-  arrowView : {
-    position : "absolute",
-    right : 8,
+  arrowView: {
+    position: "absolute",
+    right: 8,
   },
-  children : {
-    marginTop : 20,
+  children: {
+    // marginBottom: 50,
+    // position: "absolute",
+    // width: "100%",
+    // height: "100%",
+    // zIndex: 1,
   },
-} );
+});

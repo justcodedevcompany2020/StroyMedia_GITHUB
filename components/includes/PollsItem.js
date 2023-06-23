@@ -48,7 +48,8 @@ function PollsItem({ optionsList, id, total }) {
 
   return submitted ? (
     <View>
-      {optionsList.map((option, index) => {
+      {optionsList?.map((option, index) => {
+        console.log(option,51)
         if (option?.key) {
           return (
             <View key={Math.random()}>
@@ -65,7 +66,7 @@ function PollsItem({ optionsList, id, total }) {
     </View>
   ) : (
     <View>
-      {optionsList.map((option, index) => {
+      {optionsList?.map((option, index) => {
         if (option?.key) {
           return (
             <TouchableOpacity key={option.id} onPress={() => checked(option)}>

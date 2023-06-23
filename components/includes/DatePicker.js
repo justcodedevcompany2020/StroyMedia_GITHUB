@@ -7,7 +7,7 @@ import moment from "moment";
 
 function MyDatePicker(props) {
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const {date, setDate, body } = props;
+  const { date, setDate, body } = props;
   return (
     <TouchableOpacity
       activeOpacity={0.7}

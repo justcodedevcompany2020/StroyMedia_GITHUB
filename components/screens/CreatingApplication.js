@@ -1,36 +1,58 @@
-import React, {useEffect, useRef, useState} from "react";
-import {ActivityIndicator, FlatList, Image, StyleSheet, Text, TouchableOpacity, View,} from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import Wrapper from "../helpers/Wrapper";
-import {useDispatch, useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import NavBar from "../includes/NavBar";
 import MyInput from "../includes/MyInput";
-import {COLOR_1, COLOR_10, COLOR_8, WRAPPER_PADDINGS,} from "../helpers/Variables";
+import {
+  COLOR_1,
+  COLOR_10,
+  COLOR_8,
+  WRAPPER_PADDINGS,
+} from "../helpers/Variables";
 import DatePicker from "../includes/DatePicker";
 import AccordionItem from "../includes/AccordionItem";
 import MyButton from "../includes/MyButton";
 import BlockWithSwitchButton from "../includes/BlockWithSwitchButton";
 import SelectDropdown from "react-native-select-dropdown";
-import {getCitys} from "../../store/reducers/getCitysSlice";
-import {sendCatRequest} from "../../store/reducers/sendCatSlice";
+import { getCitys } from "../../store/reducers/getCitysSlice";
+import { sendCatRequest } from "../../store/reducers/sendCatSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {authRequest} from "../../store/reducers/authUserSlice";
+import { authRequest } from "../../store/reducers/authUserSlice";
 import * as ImagePicker from "expo-image-picker";
-import {Entypo} from "@expo/vector-icons";
-import {showMessage} from "react-native-flash-message";
+import { Entypo } from "@expo/vector-icons";
+import { showMessage } from "react-native-flash-message";
 import Modal from "react-native-modal";
 import DelayInput from "react-native-debounce-input";
 import * as DocumentPicker from "expo-document-picker";
-
+import _ from "lodash";
+import { useNavigation, useRoute } from "@react-navigation/native";
 const container = ["40 ST", "20 (30)", "20 (24)", "40 HQ"];
 const valuta = ["₽", "€", "$"];
 const conditations = ["Б/у", "Новый"];
 const typespay = ["Любой вариант", "безналичный расчет", "наличный расчет"];
 const reestrized = ["Любой исключен", "включен"];
 
-function CreatingApplication({
-  route,
-  navigation
-}) {
+function CreatingApplication() {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { currentPage, activeTab } = route.params;
+  // console.log(activeTab);
+  // let isActiveTab = false;
+
+  // if (activeTab == "Черновик") {
+  //   isActiveTab = true;
+  // } else if (activeTab == "В работе") {
+  //   isActiveTab = false;
+  // }
   const [secondaryTabs, setSecondaryTabs] = useState([
     "Продажа КТК",
     "Поиск КТК",
@@ -48,7 +70,7 @@ function CreatingApplication({
   const [token, setToken] = useState("");
   const [showDatePicker, setShowDatePicker] = useState("");
   const [currency, setCurrency] = useState("");
-  const [saveAsDraft, setSaveAsDraft] = useState(false);
+  const [saveAsDraft, setSaveAsDraft] = useState(activeTab);
   const [whereToCount, setWhereToCount] = useState(1);
   const [termOfUse, setTermOfUse] = useState(null);
   const [from_city, setFrom_city] = useState("");
@@ -56,9 +78,9 @@ function CreatingApplication({
   const [weight, setWeight] = useState("");
   const [citys, setCitys] = useState([]);
   const dispatch = useDispatch();
-  const state = useSelector(state1 => state1);
-  const {user} = state.authUserSlice.data;
-  const {currentPage} = route.params;
+  const state = useSelector((state1) => state1);
+  const user = state.authUserSlice?.data?.user;
+
   const [openCitys, setOpenCitys] = useState(false);
   const [openCitysFrom, setOpenCitysFrom] = useState(false);
   const [typeContainer, setTypeContiner] = useState();
@@ -73,7 +95,9 @@ function CreatingApplication({
   const [searchValue, setSearchValue] = useState("");
   const [hash, setHash] = useState(null);
   const [loading, setLoading] = useState(false);
-  let allCitys = useSelector((state) => state.getCitysSlice?.data?.data?.data?.citys);
+  let allCitys = useSelector(
+    (state) => state.getCitysSlice?.data?.data?.data?.citys
+  );
   const DropDownRef = useRef({});
   const DrowDownTypeContainerRef = useRef({});
   //   const getFileSize = async (fileUri) => {
@@ -91,7 +115,6 @@ function CreatingApplication({
     return afterDot;
   }
 
-
   const pickImage = async () => {
     // let result = await ImagePicker.launchImageLibraryAsync( {
     //   mediaTypes : ImagePicker.MediaTypeOptions.Images,
@@ -106,20 +129,11 @@ function CreatingApplication({
     //   setSelectedImage( result.assets[ 0 ].uri );
     // }
 
-
     let result = await DocumentPicker.getDocumentAsync({
-      type: ["image/*",]
+      type: ["image/*"],
     });
 
-
-    const {
-      type,
-      uri,
-      mimeType,
-      size,
-      name
-    } = result;
-
+    const { type, uri, mimeType, size, name } = result;
 
     if (size < 500000) {
       if (type === "success") {
@@ -134,24 +148,19 @@ function CreatingApplication({
       showMessage({
         type: "info",
         message: "Размер фото не должен превышать 5 МВ",
-        color: "green"
+        color: "green",
       });
     }
   };
 
-
-  useEffect(
-    () => {
-      AsyncStorage.getItem("token")
-        .then((result) => {
-          if (result) {
-            setToken(result);
-            dispatch(authRequest({secret_token: result}));
-          }
-        });
-    },
-    [navigation, dispatch]
-  );
+  useEffect(() => {
+    AsyncStorage.getItem("token").then((result) => {
+      if (result) {
+        setToken(result);
+        dispatch(authRequest({ secret_token: result }));
+      }
+    });
+  }, [navigation, dispatch]);
 
   const openCitysModal = () => {
     setOpenCitys(!openCitys);
@@ -187,7 +196,6 @@ function CreatingApplication({
     // price : price,
     // currency : currency,
 
-
     activeSecondaryTab,
     typePay,
     conditation,
@@ -196,7 +204,7 @@ function CreatingApplication({
     typeContainer,
     price,
     from_city,
-    containerCount
+    containerCount,
   };
   const compareDataSales = {
     ...compareData,
@@ -241,7 +249,6 @@ function CreatingApplication({
       new_or_used = "2";
     }
 
-
     if (restrict == "Любой исключен") {
       restrick = "3";
     } else if (restrict == "включен") {
@@ -268,200 +275,150 @@ function CreatingApplication({
 
     let myHeaders = new Headers();
     let formdata = new FormData();
+    myHeaders.append("Content-Type", "multipart/form-data");
 
-    myHeaders.append(
-      "Content-Type",
-      "multipart/form-data"
-    );
-
+    let checkValues = {
+      token,
+      changed_tab,
+      price,
+      from_city,
+      new_or_used,
+      comment,
+      payType,
+      restrick,
+      typeKTK,
+      price_type,
+      last_id: user?.last_id,
+      selectedImage,
+    };
 
     setLoading(true);
     if (activeSecondaryTab == "Продажа КТК") {
-      formdata.append(
-        "secret_token",
-        token
-      );
-      formdata.append(
-        "last_id",
-        changed_tab
-      );
-      formdata.append(
-        "price",
-        price
-      );
-      formdata.append(
-        "dislokaciya",
-        from_city
-      );
-      formdata.append(
-        "condition",
-        new_or_used
-      );
-      formdata.append(
-        "description",
-        comment
-      );
-      formdata.append(
-        "typepay",
-        payType
-      );
-      formdata.append(
-        "reestrrzhd",
-        restrick
-      );
-      formdata.append(
-        "type_container",
-        typeKTK
-      );
-      formdata.append(
-        "currency",
-        price_type
-      );
-      formdata.append(
-        "responsible",
-        user?.last_id
-      );
-      formdata.append(
-        "img[]",
-        {
-          uri: selectedImage,
-          name: fileName.split('.').shift(),
-          type: fileType
-        }
-      );
-      formdata.append(
-        "_type_op",
-        saveAsDraft ? "draft" : "onwork"
-      );
+      if (_.every(Object.values(checkValues))) {
+        formdata.append("secret_token", token);
+        formdata.append("last_id", changed_tab);
+        formdata.append("price", price);
+        formdata.append("dislokaciya", from_city);
+        formdata.append("condition", new_or_used);
+        formdata.append("description", comment);
+        formdata.append("typepay", payType);
+        formdata.append("reestrrzhd", restrick);
+        formdata.append("type_container", typeKTK);
+        formdata.append("currency", price_type);
+        formdata.append("responsible", user?.last_id);
+        formdata.append("img", selectedImage);
+        formdata.append("_type_op", saveAsDraft ? "draft" : "onwork");
+        // formdata.append("img", {
+        //   uri: selectedImage,
+        //   name: fileName.split(".").shift(),
+        //   type: fileType,
+        // });
 
-
-      dispatch(sendCatRequest({
-        formdata,
-        myHeaders,
-      }))
-        .unwrap()
-        .then((res) => {
-          setLoading(false);
-          if (res?.success) {
-            navigation.goBack();
-          }
-        })
-        .catch((e) => {
-          setLoading(false);
-          showMessage({
-            message: "Все поля должны быть заполнены",
-            type: "danger",
+        dispatch(
+          sendCatRequest({
+            formdata,
+            myHeaders,
+          })
+        )
+          .unwrap()
+          .then((res) => {
+            setLoading(false);
+            if (res?.success) {
+              navigation.goBack();
+            }
+          })
+          .catch((e) => {
+            setLoading(false);
+            showMessage({
+              message: "Все поля должны быть заполнены",
+              type: "danger",
+            });
           });
+      } else if (!_.every(Object.values(checkValues))) {
+        setLoading(false);
+        showMessage({
+          message: "Все поля должны быть заполнены",
+          type: "danger",
         });
+      }
     }
-    // activeSecondaryTab === "Продажа КТК" && !_.every( Object.values( compareDataSales ) ) && showMessage( {
-    //   message : "Все поля должны быть заполнены",
-    //   type : "danger",
-    // } );
-    //
-    // activeSecondaryTab !== "Продажа КТК" && !_.every( Object.values( compareData ) ) && showMessage( {
-    //   message : "Все поля должны быть заполнены",
-    //   type : "danger",
-    // } );
 
+    let checkValues1 = {
+      token,
+      changed_tab,
+      from_city,
+      to_city,
+      containerCount,
+      date,
+      price,
+      typeKTK,
+      price_type,
+      user: user?.last_id,
+    };
 
     if (activeSecondaryTab !== "Продажа КТК") {
-      formdata.append(
-        "secret_token",
-        token
-      );
-      formdata.append(
-        "last_id",
-        changed_tab
-      );
-      formdata.append(
-        "from_city",
-        from_city
-      );
-      formdata.append(
-        "to_city",
-        to_city
-      );
-      formdata.append(
-        "count",
-        containerCount
-      );
-      formdata.append(
-        "date_shipment",
-        date.toString()
-      );
-      formdata.append(
-        "period",
-        date.toString()
-      );
-      formdata.append(
-        "price",
-        price
-      );
-      formdata.append(
-        "type_container",
-        typeKTK
-      );
-      formdata.append(
-        "currency",
-        price_type
-      );
-      formdata.append(
-        "responsible",
-        user?.last_id.toString()
-      );
-      // form_data.append( "img", selectedImage, // name : data.fileName,
-      formdata.append(
-        "_type_op",
-        saveAsDraft ? "draft" : "onwork"
-      );
+      if (_.every(Object.values(checkValues1))) {
+        formdata.append("secret_token", token);
+        formdata.append("last_id", changed_tab);
+        formdata.append("from_city", from_city);
+        formdata.append("to_city", to_city);
+        formdata.append("count", containerCount);
+        formdata.append("date_shipment", date.toString());
+        formdata.append("period", date.toString());
+        formdata.append("price", price);
+        formdata.append("type_container", typeKTK);
+        formdata.append("currency", price_type);
+        formdata.append("responsible", user?.last_id.toString());
+        formdata.append("_type_op", saveAsDraft ? "draft" : "onwork");
 
-
-      dispatch(sendCatRequest({
-        formdata,
-        myHeaders,
-      }))
-        .unwrap()
-        .then((e) => {
-          setLoading(false);
-          if (e.success) navigation.goBack();
-        })
-        .catch((e) => {
-          setLoading(false);
-          showMessage({
-            message: "Все поля должны быть заполнены",
-            type: "danger",
+        dispatch(
+          sendCatRequest({
+            formdata,
+            myHeaders,
+          })
+        )
+          .unwrap()
+          .then((e) => {
+            setLoading(false);
+            if (e.success)
+              navigation.navigate("MyApplications", {
+                currentPage: "Мои заявки",
+              });
+          })
+          .catch((e) => {
+            setLoading(false);
+            showMessage({
+              message: "Все поля должны быть заполнены",
+              type: "danger",
+            });
           });
+      } else if (!_.every(Object.values(checkValues1))) {
+        setLoading(false);
+        showMessage({
+          message: "Все поля должны быть заполнены",
+          type: "danger",
         });
+      }
     }
   };
 
-  useEffect(
-    () => {
-      const getCytys = () => {
-        dispatch(getCitys())
-          .unwrap()
-          .then((result) => {
-            setCitys(result.data.data.citys);
-          });
-      };
-      getCytys();
-    },
-    []
-  );
+  useEffect(() => {
+    const getCytys = () => {
+      dispatch(getCitys())
+        .unwrap()
+        .then((result) => {
+          setCitys(result.data.data.citys);
+        });
+    };
+    getCytys();
+  }, []);
 
-
-  useEffect(
-    () => {
-      (
-        async () => {
-          const status = ImagePicker.requestMediaLibraryPermissionsAsync();
-          setHash(status === "granted");
-        }
-      )();
-    },
-    []
-  );
+  useEffect(() => {
+    (async () => {
+      const status = ImagePicker.requestMediaLibraryPermissionsAsync();
+      setHash(status === "granted");
+    })();
+  }, []);
 
   const resetData = () => {
     setWhereFrom("");
@@ -471,7 +428,7 @@ function CreatingApplication({
     setPrice("");
     setShowDatePicker("");
     setCurrency("");
-    setSaveAsDraft(false);
+    setSaveAsDraft(activeTab);
     setWhereToCount(1);
     setTermOfUse(null);
     setWeight("");
@@ -487,35 +444,33 @@ function CreatingApplication({
     setSearchValue("");
   };
 
-  useEffect(
-    () => {
-      AsyncStorage.getItem("token")
-        .then((result) => {
-          setToken(result);
-          dispatch(authRequest({secret_token: result}));
-        });
-    },
-    [dispatch, navigation]
-  );
+  useEffect(() => {
+    AsyncStorage.getItem("token").then((result) => {
+      setToken(result);
+      dispatch(authRequest({ secret_token: result }));
+    });
+  }, [dispatch, navigation]);
 
-  useEffect(
-    () => {
-      searchValue && filtered(searchValue);
-    },
-    [searchValue]
-  );
+  useEffect(() => {
+    searchValue && filtered(searchValue);
+  }, [searchValue]);
 
   const searchKTK = () => {
     return (
       <>
         <AccordionItem
-          titleComponent={<Text style={styles.selectText}>
-            {fromCityName ? fromCityName : "Откуда"}
-          </Text>}
+          titleComponent={
+            <Text style={styles.selectText}>
+              {fromCityName ? fromCityName : "Откуда"}
+            </Text>
+          }
           wrapperStyle={openCitys ? styles.openModal : styles.select}
           headerStyle={styles.selectHeader}
           arrowStyle={styles.selectArrowStyle}
           isopenModal={openCitysModal}
+          expanded={openCitys}
+          type={true}
+          childrenStyle={{ height: "100%" }}
         >
           <View style={styles.citysSearch}>
             <DelayInput
@@ -532,15 +487,16 @@ function CreatingApplication({
             keyExtractor={(item) => item.last_id}
             nestedScrollEnabled={true}
             scrollEnabled={true}
-            renderItem={({item}) => {
+            renderItem={({ item }) => {
               return (
                 <TouchableOpacity
                   onPress={() => {
                     setFromCityName(item?.title?.ru || item.title);
                     setFrom_city(item.last_id);
+                    openCitysModal();
                   }}
                 >
-                  <Text style={{marginBottom: 8}}>
+                  <Text style={{ marginBottom: 8 }}>
                     {item.title.ru || item.title}
                   </Text>
                 </TouchableOpacity>
@@ -551,13 +507,18 @@ function CreatingApplication({
           />
         </AccordionItem>
         <AccordionItem
-          titleComponent={<Text style={styles.selectText}>
-            {toCityName ? toCityName : "Куда"}
-          </Text>}
+          titleComponent={
+            <Text style={styles.selectText}>
+              {toCityName ? toCityName : "Куда"}
+            </Text>
+          }
           wrapperStyle={openCitysFrom ? styles.openModal : styles.select}
           headerStyle={styles.selectHeader}
           arrowStyle={styles.selectArrowStyle}
           isopenModal={openCytysFromModal}
+          expanded={openCitysFrom}
+          type={true}
+          childrenStyle={{ height: "100%" }}
         >
           <View style={styles.citysSearch}>
             <DelayInput
@@ -571,17 +532,19 @@ function CreatingApplication({
           </View>
           <FlatList
             data={citys}
-            nestedScrollEnabled
+            nestedScrollEnabled={true}
+            scrollEnabled={true}
             keyExtractor={(item) => item.last_id}
-            renderItem={({item}) => {
+            renderItem={({ item }) => {
               return (
                 <TouchableOpacity
                   onPress={() => {
                     setToCityName(item?.title?.ru || item.title);
                     setTo_city(item.last_id);
+                    openCytysFromModal();
                   }}
                 >
-                  <Text style={{marginBottom: 8}}>
+                  <Text style={{ marginBottom: 8 }}>
                     {item.title.ru || item.title}
                   </Text>
                 </TouchableOpacity>
@@ -603,7 +566,7 @@ function CreatingApplication({
             dropdownIconPosition="right"
             renderDropdownIcon={() => {
               return (
-                <Entypo name="chevron-small-down" size={32} color={COLOR_1}/>
+                <Entypo name="chevron-small-down" size={32} color={COLOR_1} />
               );
             }}
             defaultButtonText="Выберите тип контейнера"
@@ -615,14 +578,11 @@ function CreatingApplication({
             buttonStyle={{
               height: 40,
               width: "100%",
-              borderRadius: 8
+              borderRadius: 8,
             }}
             // search
             data={container}
-            onSelect={(
-              selectedItem,
-              index
-            ) => {
+            onSelect={(selectedItem, index) => {
               setTypeContiner(selectedItem);
             }}
             rowStyle={{
@@ -645,10 +605,7 @@ function CreatingApplication({
         />
         <DatePicker
           date={date}
-          setDate={(
-            event,
-            date
-          ) => {
+          setDate={(event, date) => {
             setShowDatePicker(false);
             return setDate(date);
           }}
@@ -666,7 +623,7 @@ function CreatingApplication({
             dropdownIconPosition="right"
             renderDropdownIcon={() => {
               return (
-                <Entypo name="chevron-small-down" size={32} color={COLOR_1}/>
+                <Entypo name="chevron-small-down" size={32} color={COLOR_1} />
               );
             }}
             buttonTextStyle={{
@@ -677,13 +634,10 @@ function CreatingApplication({
             buttonStyle={{
               height: 40,
               width: "100%",
-              borderRadius: 8
+              borderRadius: 8,
             }}
             data={valuta}
-            onSelect={(
-              selectedItem,
-              index
-            ) => {
+            onSelect={(selectedItem, index) => {
               setCurrency(selectedItem);
             }}
             rowStyle={{
@@ -716,7 +670,7 @@ function CreatingApplication({
             dropdownIconPosition="right"
             renderDropdownIcon={() => {
               return (
-                <Entypo name="chevron-small-down" size={32} color={COLOR_1}/>
+                <Entypo name="chevron-small-down" size={32} color={COLOR_1} />
               );
             }}
             buttonTextStyle={{
@@ -727,14 +681,11 @@ function CreatingApplication({
             buttonStyle={{
               height: 40,
               width: "100%",
-              borderRadius: 8
+              borderRadius: 8,
             }}
             // search
             data={container}
-            onSelect={(
-              selectedItem,
-              index
-            ) => {
+            onSelect={(selectedItem, index) => {
               setTypeContiner(selectedItem);
             }}
             rowStyle={{
@@ -767,7 +718,7 @@ function CreatingApplication({
             dropdownIconPosition="right"
             renderDropdownIcon={() => {
               return (
-                <Entypo name="chevron-small-down" size={32} color={COLOR_1}/>
+                <Entypo name="chevron-small-down" size={32} color={COLOR_1} />
               );
             }}
             defaultButtonText="Валюта"
@@ -779,13 +730,10 @@ function CreatingApplication({
             buttonStyle={{
               height: 40,
               width: "100%",
-              borderRadius: 8
+              borderRadius: 8,
             }}
             data={valuta}
-            onSelect={(
-              selectedItem,
-              index
-            ) => {
+            onSelect={(selectedItem, index) => {
               setCurrency(selectedItem);
             }}
             rowStyle={{
@@ -801,13 +749,18 @@ function CreatingApplication({
           />
         </View>
         <AccordionItem
-          titleComponent={<Text style={styles.selectText}>
-            {fromCityName ? fromCityName : "Город расположения"}
-          </Text>}
+          titleComponent={
+            <Text style={styles.selectText}>
+              {fromCityName ? fromCityName : "Город расположения"}
+            </Text>
+          }
           wrapperStyle={openCitys ? styles.openModal : styles.select}
           headerStyle={styles.selectHeader}
           arrowStyle={styles.selectArrowStyle}
           isopenModal={openCitysModal}
+          expanded={openCitys}
+          type={true}
+          childrenStyle={{ height: "100%" }}
         >
           <View style={styles.citysSearch}>
             <DelayInput
@@ -820,18 +773,20 @@ function CreatingApplication({
             />
           </View>
           <FlatList
-            nestedScrollEnabled
+            nestedScrollEnabled={true}
+            scrollEnabled={true}
             data={citys}
             keyExtractor={(item) => item.last_id}
-            renderItem={({item}) => {
+            renderItem={({ item }) => {
               return (
                 <TouchableOpacity
                   onPress={() => {
                     setFromCityName(item?.title?.ru || item.title);
                     setFrom_city(item.last_id);
+                    openCitysModal();
                   }}
                 >
-                  <Text style={{marginBottom: 8}}>
+                  <Text style={{ marginBottom: 8 }}>
                     {item.title.ru || item.title}
                   </Text>
                 </TouchableOpacity>
@@ -853,7 +808,7 @@ function CreatingApplication({
             dropdownIconPosition="right"
             renderDropdownIcon={() => {
               return (
-                <Entypo name="chevron-small-down" size={32} color={COLOR_1}/>
+                <Entypo name="chevron-small-down" size={32} color={COLOR_1} />
               );
             }}
             defaultButtonText="Состояние"
@@ -865,13 +820,10 @@ function CreatingApplication({
             buttonStyle={{
               height: 40,
               width: "100%",
-              borderRadius: 8
+              borderRadius: 8,
             }}
             data={conditations}
-            onSelect={(
-              selectedItem,
-              index
-            ) => {
+            onSelect={(selectedItem, index) => {
               setConditation(selectedItem);
             }}
             rowStyle={{
@@ -899,12 +851,12 @@ function CreatingApplication({
         </TouchableOpacity>
         {selectedImage ? (
           <View>
-            <Image source={{uri: selectedImage}} style={styles.imageStyle}/>
+            <Image source={{ uri: selectedImage }} style={styles.imageStyle} />
             <TouchableOpacity
               onPress={() => setSelectedImage("")}
               style={styles.cancelImage}
             >
-              <Text style={{color: "red"}}>X</Text>
+              <Text style={{ color: "red" }}>X</Text>
             </TouchableOpacity>
           </View>
         ) : null}
@@ -927,7 +879,7 @@ function CreatingApplication({
             dropdownIconPosition="right"
             renderDropdownIcon={() => {
               return (
-                <Entypo name="chevron-small-down" size={32} color={COLOR_1}/>
+                <Entypo name="chevron-small-down" size={32} color={COLOR_1} />
               );
             }}
             defaultButtonText="Условия оплаты"
@@ -939,13 +891,10 @@ function CreatingApplication({
             buttonStyle={{
               height: 40,
               width: "100%",
-              borderRadius: 8
+              borderRadius: 8,
             }}
             data={typespay}
-            onSelect={(
-              selectedItem,
-              index
-            ) => {
+            onSelect={(selectedItem, index) => {
               setTypePay(selectedItem);
             }}
             rowStyle={{
@@ -973,7 +922,7 @@ function CreatingApplication({
             defaultButtonText="Реестр РЖД"
             renderDropdownIcon={() => {
               return (
-                <Entypo name="chevron-small-down" size={32} color={COLOR_1}/>
+                <Entypo name="chevron-small-down" size={32} color={COLOR_1} />
               );
             }}
             buttonTextStyle={{
@@ -984,13 +933,10 @@ function CreatingApplication({
             buttonStyle={{
               height: 40,
               width: "100%",
-              borderRadius: 8
+              borderRadius: 8,
             }}
             data={reestrized}
-            onSelect={(
-              selectedItem,
-              index
-            ) => {
+            onSelect={(selectedItem, index) => {
               setRestrict(selectedItem);
             }}
             rowStyle={{
@@ -1013,13 +959,18 @@ function CreatingApplication({
     return (
       <>
         <AccordionItem
-          titleComponent={<Text style={styles.selectText}>
-            {fromCityName ? fromCityName : "Откуда"}
-          </Text>}
+          titleComponent={
+            <Text style={styles.selectText}>
+              {fromCityName ? fromCityName : "Откуда"}
+            </Text>
+          }
           wrapperStyle={openCitys ? styles.openModal : styles.select}
           headerStyle={styles.selectHeader}
           arrowStyle={styles.selectArrowStyle}
           isopenModal={openCitysModal}
+          expanded={openCitys}
+          type={true}
+          childrenStyle={{ height: "100%" }}
         >
           <View style={styles.citysSearch}>
             <DelayInput
@@ -1034,16 +985,18 @@ function CreatingApplication({
           <FlatList
             data={citys}
             keyExtractor={(item) => item.last_id}
-            nestedScrollEnabled
-            renderItem={({item}) => {
+            nestedScrollEnabled={true}
+            scrollEnabled={true}
+            renderItem={({ item }) => {
               return (
                 <TouchableOpacity
                   onPress={() => {
                     setFromCityName(item?.title?.ru || item.title);
                     setFrom_city(item.last_id);
+                    openCitysModal();
                   }}
                 >
-                  <Text style={{marginBottom: 8}}>
+                  <Text style={{ marginBottom: 8 }}>
                     {item.title.ru || item.title}
                   </Text>
                 </TouchableOpacity>
@@ -1054,13 +1007,18 @@ function CreatingApplication({
           />
         </AccordionItem>
         <AccordionItem
-          titleComponent={<Text style={styles.selectText}>
-            {toCityName ? toCityName : "Куда"}
-          </Text>}
+          titleComponent={
+            <Text style={styles.selectText}>
+              {toCityName ? toCityName : "Куда"}
+            </Text>
+          }
           wrapperStyle={openCitysFrom ? styles.openModal : styles.select}
           headerStyle={styles.selectHeader}
           arrowStyle={styles.selectArrowStyle}
           isopenModal={openCytysFromModal}
+          expanded={openCitysFrom}
+          type={true}
+          childrenStyle={{ height: "100%" }}
         >
           <View style={styles.citysSearch}>
             <DelayInput
@@ -1075,16 +1033,18 @@ function CreatingApplication({
           <FlatList
             data={citys}
             keyExtractor={(item) => item.last_id}
-            nestedScrollEnabled
-            renderItem={({item}) => {
+            nestedScrollEnabled={true}
+            scrollEnabled={true}
+            renderItem={({ item }) => {
               return (
                 <TouchableOpacity
                   onPress={() => {
                     setToCityName(item?.title?.ru || item.title);
                     setTo_city(item.last_id);
+                    openCytysFromModal();
                   }}
                 >
-                  <Text style={{marginBottom: 8}}>
+                  <Text style={{ marginBottom: 8 }}>
                     {item.title.ru || item.title}
                   </Text>
                 </TouchableOpacity>
@@ -1106,7 +1066,7 @@ function CreatingApplication({
             dropdownIconPosition="right"
             renderDropdownIcon={() => {
               return (
-                <Entypo name="chevron-small-down" size={32} color={COLOR_1}/>
+                <Entypo name="chevron-small-down" size={32} color={COLOR_1} />
               );
             }}
             defaultButtonText="Выберите тип контейнера"
@@ -1118,13 +1078,10 @@ function CreatingApplication({
             buttonStyle={{
               height: 40,
               width: "100%",
-              borderRadius: 8
+              borderRadius: 8,
             }}
             data={container}
-            onSelect={(
-              selectedItem,
-              index
-            ) => {
+            onSelect={(selectedItem, index) => {
               setTypeContiner(selectedItem);
             }}
             rowStyle={{
@@ -1148,10 +1105,7 @@ function CreatingApplication({
         <DatePicker
           body="Cрок"
           date={date}
-          setDate={(
-            event,
-            date
-          ) => {
+          setDate={(event, date) => {
             setShowDatePicker(false);
             return setDate(date);
           }}
@@ -1167,7 +1121,7 @@ function CreatingApplication({
             ref={DropDownRef}
             renderDropdownIcon={() => {
               return (
-                <Entypo name="chevron-small-down" size={32} color={COLOR_1}/>
+                <Entypo name="chevron-small-down" size={32} color={COLOR_1} />
               );
             }}
             dropdownIconPosition="right"
@@ -1180,13 +1134,10 @@ function CreatingApplication({
             buttonStyle={{
               height: 40,
               width: "100%",
-              borderRadius: 8
+              borderRadius: 8,
             }}
             data={valuta}
-            onSelect={(
-              selectedItem,
-              index
-            ) => {
+            onSelect={(selectedItem, index) => {
               setCurrency(selectedItem);
             }}
             rowStyle={{
@@ -1209,13 +1160,18 @@ function CreatingApplication({
     return (
       <>
         <AccordionItem
-          titleComponent={<Text style={styles.selectText}>
-            {fromCityName ? fromCityName : "Откуда"}
-          </Text>}
+          titleComponent={
+            <Text style={styles.selectText}>
+              {fromCityName ? fromCityName : "Откуда"}
+            </Text>
+          }
           wrapperStyle={openCitys ? styles.openModal : styles.select}
           headerStyle={styles.selectHeader}
           arrowStyle={styles.selectArrowStyle}
           isopenModal={openCitysModal}
+          expanded={openCitys}
+          type={true}
+          childrenStyle={{ height: "100%" }}
         >
           <View style={styles.citysSearch}>
             <DelayInput
@@ -1230,16 +1186,18 @@ function CreatingApplication({
           <FlatList
             data={citys}
             keyExtractor={(item) => item.last_id}
-            nestedScrollEnabled
-            renderItem={({item}) => {
+            nestedScrollEnabled={true}
+            scrollEnabled={true}
+            renderItem={({ item }) => {
               return (
                 <TouchableOpacity
                   onPress={() => {
                     setFromCityName(item?.title?.ru || item.title);
                     setFrom_city(item.last_id);
+                    openCitysModal();
                   }}
                 >
-                  <Text style={{marginBottom: 8}}>
+                  <Text style={{ marginBottom: 8 }}>
                     {item.title.ru || item.title}
                   </Text>
                 </TouchableOpacity>
@@ -1250,13 +1208,18 @@ function CreatingApplication({
           />
         </AccordionItem>
         <AccordionItem
-          titleComponent={<Text style={styles.selectText}>
-            {toCityName ? toCityName : "Куда"}
-          </Text>}
+          titleComponent={
+            <Text style={styles.selectText}>
+              {toCityName ? toCityName : "Куда"}
+            </Text>
+          }
           wrapperStyle={openCitysFrom ? styles.openModal : styles.select}
           headerStyle={styles.selectHeader}
           arrowStyle={styles.selectArrowStyle}
           isopenModal={openCytysFromModal}
+          expanded={openCitysFrom}
+          type={true}
+          childrenStyle={{ height: "100%" }}
         >
           <View style={styles.citysSearch}>
             <DelayInput
@@ -1271,16 +1234,18 @@ function CreatingApplication({
           <FlatList
             data={citys}
             keyExtractor={(item) => item.last_id}
-            nestedScrollEnabled
-            renderItem={({item}) => {
+            nestedScrollEnabled={true}
+            scrollEnabled={true}
+            renderItem={({ item }) => {
               return (
                 <TouchableOpacity
                   onPress={() => {
                     setToCityName(item?.title?.ru || item.title);
                     setTo_city(item.last_id);
+                    openCytysFromModal();
                   }}
                 >
-                  <Text style={{marginBottom: 8}}>
+                  <Text style={{ marginBottom: 8 }}>
                     {item.title.ru || item.title}
                   </Text>
                 </TouchableOpacity>
@@ -1302,7 +1267,7 @@ function CreatingApplication({
             dropdownIconPosition="right"
             renderDropdownIcon={() => {
               return (
-                <Entypo name="chevron-small-down" size={32} color={COLOR_1}/>
+                <Entypo name="chevron-small-down" size={32} color={COLOR_1} />
               );
             }}
             defaultButtonText="Выберите тип контейнера"
@@ -1314,13 +1279,10 @@ function CreatingApplication({
             buttonStyle={{
               height: 40,
               width: "100%",
-              borderRadius: 8
+              borderRadius: 8,
             }}
             data={container}
-            onSelect={(
-              selectedItem,
-              index
-            ) => {
+            onSelect={(selectedItem, index) => {
               setTypeContiner(selectedItem);
             }}
             rowStyle={{
@@ -1344,10 +1306,7 @@ function CreatingApplication({
         <DatePicker
           body="Cрок"
           date={date}
-          setDate={(
-            event,
-            date
-          ) => {
+          setDate={(event, date) => {
             setShowDatePicker(false);
             return setDate(date);
           }}
@@ -1365,7 +1324,7 @@ function CreatingApplication({
             dropdownIconPosition="right"
             renderDropdownIcon={() => {
               return (
-                <Entypo name="chevron-small-down" size={32} color={COLOR_1}/>
+                <Entypo name="chevron-small-down" size={32} color={COLOR_1} />
               );
             }}
             buttonTextStyle={{
@@ -1376,13 +1335,10 @@ function CreatingApplication({
             buttonStyle={{
               height: 40,
               width: "100%",
-              borderRadius: 8
+              borderRadius: 8,
             }}
             data={valuta}
-            onSelect={(
-              selectedItem,
-              index
-            ) => {
+            onSelect={(selectedItem, index) => {
               setCurrency(selectedItem);
             }}
             rowStyle={{
@@ -1405,13 +1361,18 @@ function CreatingApplication({
     return (
       <>
         <AccordionItem
-          titleComponent={<Text style={styles.selectText}>
-            {fromCityName ? fromCityName : "Откуда"}
-          </Text>}
+          titleComponent={
+            <Text style={styles.selectText}>
+              {fromCityName ? fromCityName : "Откуда"}
+            </Text>
+          }
           wrapperStyle={openCitys ? styles.openModal : styles.select}
           headerStyle={styles.selectHeader}
           arrowStyle={styles.selectArrowStyle}
           isopenModal={openCitysModal}
+          type={true}
+          expanded={openCitys}
+          childrenStyle={{ height: "100%" }}
         >
           <View style={styles.citysSearch}>
             <DelayInput
@@ -1425,17 +1386,20 @@ function CreatingApplication({
           </View>
           <FlatList
             data={citys}
-            nestedScrollEnabled
+            nestedScrollEnabled={true}
+            scrollEnabled={true}
             keyExtractor={(item) => item.last_id}
-            renderItem={({item}) => {
+            renderItem={({ item }) => {
+              console.log(item);
               return (
                 <TouchableOpacity
                   onPress={() => {
                     setFromCityName(item?.title?.ru || item.title);
                     setFrom_city(item.last_id);
+                    openCitysModal();
                   }}
                 >
-                  <Text style={{marginBottom: 8}}>
+                  <Text style={{ marginBottom: 8 }}>
                     {item.title.ru || item.title}
                   </Text>
                 </TouchableOpacity>
@@ -1446,13 +1410,18 @@ function CreatingApplication({
           />
         </AccordionItem>
         <AccordionItem
-          titleComponent={<Text style={styles.selectText}>
-            {toCityName ? toCityName : "Куда"}
-          </Text>}
+          titleComponent={
+            <Text style={styles.selectText}>
+              {toCityName ? toCityName : "Куда"}
+            </Text>
+          }
           wrapperStyle={openCitysFrom ? styles.openModal : styles.select}
           headerStyle={styles.selectHeader}
           arrowStyle={styles.selectArrowStyle}
           isopenModal={openCytysFromModal}
+          expanded={openCitysFrom}
+          childrenStyle={{ height: "100%" }}
+          type={true}
         >
           <View style={styles.citysSearch}>
             <DelayInput
@@ -1467,19 +1436,19 @@ function CreatingApplication({
 
           <FlatList
             data={citys}
-            scrollEnabled
-            // style={{ zIndex: 10 }}
-            nestedScrollEnabled
+            nestedScrollEnabled={true}
+            scrollEnabled={true}
             keyExtractor={(item) => item.last_id}
-            renderItem={({item}) => {
+            renderItem={({ item }) => {
               return (
                 <TouchableOpacity
                   onPress={() => {
                     setToCityName(item?.title?.ru || item.title);
                     setTo_city(item.last_id);
+                    openCytysFromModal();
                   }}
                 >
-                  <Text style={{marginBottom: 8}}>
+                  <Text style={{ marginBottom: 8 }}>
                     {item.title.ru || item.title}
                   </Text>
                 </TouchableOpacity>
@@ -1501,7 +1470,7 @@ function CreatingApplication({
             dropdownIconPosition="right"
             renderDropdownIcon={() => {
               return (
-                <Entypo name="chevron-small-down" size={32} color={COLOR_1}/>
+                <Entypo name="chevron-small-down" size={32} color={COLOR_1} />
               );
             }}
             defaultButtonText="Выберите тип контейнера"
@@ -1513,13 +1482,10 @@ function CreatingApplication({
             buttonStyle={{
               height: 40,
               width: "100%",
-              borderRadius: 8
+              borderRadius: 8,
             }}
             data={container}
-            onSelect={(
-              selectedItem,
-              index
-            ) => {
+            onSelect={(selectedItem, index) => {
               setTypeContiner(selectedItem);
             }}
             rowStyle={{
@@ -1543,10 +1509,7 @@ function CreatingApplication({
         <DatePicker
           body="Cрок"
           date={date}
-          setDate={(
-            event,
-            date
-          ) => {
+          setDate={(event, date) => {
             setShowDatePicker(false);
             return setDate(date);
           }}
@@ -1568,14 +1531,17 @@ function CreatingApplication({
   };
 
   const filtered = (searchText) => {
-    setCitys(allCitys?.filter((c) => {
-      return c?.title?.ru?.includes(searchText);
-    }));
+    setCitys(
+      allCitys?.filter((c) => {
+        return c?.title?.ru?.includes(searchText);
+      })
+    );
   };
 
   return (
     <Wrapper
       withContainer
+      // scrollEnabled={openCitys || openCitysFrom ? false : true}
       header={{
         currentPage,
         home: false,
@@ -1593,14 +1559,17 @@ function CreatingApplication({
         secondary
       />
       <View style={styles.wrapper}>
-        {activeSecondaryTab === "Поиск КТК" ? searchKTK() : activeSecondaryTab === "Продажа КТК" ? sellKTK()
-                                                                                                 : activeSecondaryTab === "Выдача КТК"
-                                                                                                   ? extraditionKTK()
-                                                                                                   : activeSecondaryTab === "Поездной сервис"
-                                                                                                     ? trainService()
-                                                                                                     : activeSecondaryTab === "Заявка на ТЭО"
-                                                                                                       ? applicationOnTEO()
-                                                                                                       : null}
+        {activeSecondaryTab === "Поиск КТК"
+          ? searchKTK()
+          : activeSecondaryTab === "Продажа КТК"
+          ? sellKTK()
+          : activeSecondaryTab === "Выдача КТК"
+          ? extraditionKTK()
+          : activeSecondaryTab === "Поездной сервис"
+          ? trainService()
+          : activeSecondaryTab === "Заявка на ТЭО"
+          ? applicationOnTEO()
+          : null}
         <BlockWithSwitchButton
           title={"Сохранить как черновик"}
           titleStyle={styles.selectText}
@@ -1614,7 +1583,7 @@ function CreatingApplication({
       {loading && (
         <Modal backdropOpacity={0.75} isVisible={true}>
           <View>
-            <ActivityIndicator size="large"/>
+            <ActivityIndicator size="large" />
           </View>
         </Modal>
       )}
@@ -1635,7 +1604,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
   },
   openModal: {
-    height: 200,
+    height: 250,
     marginBottom: 100,
   },
   commentInput: {
@@ -1648,6 +1617,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLOR_10,
     borderRadius: 10,
     marginBottom: 20,
+    // height: 50,
   },
   selectText: {
     color: COLOR_1,

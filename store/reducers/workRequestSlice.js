@@ -1,14 +1,29 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../../Api";
 
-export const workRequest = createAsyncThunk("work/request", async (data) => {
-  try {
-    const result = await api.post("/work-request-send", data);
-    return result.data;
-  } catch (error) {
-    return error;
+export const workRequest = createAsyncThunk(
+  "work/request",
+  async (form_data) => {
+    console.log(form_data, "formdata");
+
+    var requestOptions = {
+      method: "POST",
+      // headers: myHeaders,
+      body: form_data,
+      redirect: "follow",
+    };
+    try {
+      const response = await fetch(
+        "https://teus.online/api/work-request-send",
+        requestOptions
+      );
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      return error;
+    }
   }
-});
+);
 const workRequestSlice = createSlice({
   name: "work/request",
   initialState: {
