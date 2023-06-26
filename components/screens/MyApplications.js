@@ -70,7 +70,7 @@ function MyApplications() {
 
   useEffect(() => {
     const isFocused = navigation.addListener("focus", () => {
-    console.log(activeTab,73);
+      console.log(activeTab, 73);
 
       dispatch(
         allCatRequest({
@@ -114,21 +114,6 @@ function MyApplications() {
   //     }
   //   });
   // }, [activeTab]);
-
-  // if (loading) {
-  //   return (
-  //     <View
-  //       style={{
-  //         alignItems: "center",
-  //         justifyContent: "center",
-  //         flex: 1,
-  //         backgroundColor: "transparent",
-  //       }}
-  //     >
-  //       <ActivityIndicator color={COLOR_1} size={"large"} />
-  //     </View>
-  //   );
-  // }
 
   const renderItem = ({ item, index }) => {
     return (
@@ -233,16 +218,17 @@ function MyApplications() {
             setPage(1);
             setOffset(0);
             setActiveTab(tab);
-            await AsyncStorage.setItem('activTab',activeTab)
+            await AsyncStorage.setItem("activeTab", tab);
             dispatch(
               allCatRequest({
                 token,
                 tab,
                 offset,
               })
-            ).then((res) => {
+            ).then(async (res) => {
               if (res.payload) {
                 setFilteredData(res.payload?.data?.aplications?.aplications);
+                resetText()
               }
             });
           }}
@@ -453,11 +439,17 @@ function MyApplications() {
                   tab,
                   offset,
                 })
-              ).then((res) => {
-                if (res.payload) {
-                  setFilteredData(res.payload?.data?.aplications?.aplications);
-                }
-              });
+              )
+                .then(async (res) => {
+                  if (res.payload) {
+                    setFilteredData(
+                      res.payload?.data?.aplications?.aplications
+                    );
+                  }
+                })
+                .catch((e) => {
+                  console.log(e, "error");
+                });
             }}
           />
           <View style={styles.blankTextBlock}>

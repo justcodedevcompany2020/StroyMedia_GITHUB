@@ -12,7 +12,7 @@ import { COLOR_1, COLOR_5 } from "../helpers/Variables";
 import { useSelector } from "react-redux";
 import DelayInput from "react-native-debounce-input";
 
-function FilterItem({ title, onSelect, options, top, offers, isCitys }) {
+function FilterItem({ title, onSelect, options, offers, isCitys }) {
   const [expanded, setExpanded] = useState("");
 
   const [searchValue, setSearchValue] = useState("");

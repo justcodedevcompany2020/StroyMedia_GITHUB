@@ -44,15 +44,8 @@ const reestrized = ["Любой исключен", "включен"];
 function CreatingApplication() {
   const navigation = useNavigation();
   const route = useRoute();
-  const { currentPage, activeTab } = route.params;
-  // console.log(activeTab);
-  // let isActiveTab = false;
+  const { currentPage } = route.params;
 
-  // if (activeTab == "Черновик") {
-  //   isActiveTab = true;
-  // } else if (activeTab == "В работе") {
-  //   isActiveTab = false;
-  // }
   const [secondaryTabs, setSecondaryTabs] = useState([
     "Продажа КТК",
     "Поиск КТК",
@@ -70,7 +63,7 @@ function CreatingApplication() {
   const [token, setToken] = useState("");
   const [showDatePicker, setShowDatePicker] = useState("");
   const [currency, setCurrency] = useState("");
-  const [saveAsDraft, setSaveAsDraft] = useState(activeTab);
+  const [saveAsDraft, setSaveAsDraft] = useState(false);
   const [whereToCount, setWhereToCount] = useState(1);
   const [termOfUse, setTermOfUse] = useState(null);
   const [from_city, setFrom_city] = useState("");
@@ -100,35 +93,8 @@ function CreatingApplication() {
   );
   const DropDownRef = useRef({});
   const DrowDownTypeContainerRef = useRef({});
-  //   const getFileSize = async (fileUri) => {
-  //     let fileInfo = await FileSystem.getInfoAsync(fileUri);
-  //     return fileInfo.size;
-  //   };
-  // const deleteSelectImage = (selectImage) => {
-  //   /* @ts-ignore */
-  //   const filteredList = selectedImage?.filter((item) => item !== selectImage);
-  //   setSelectedImage(filteredList);
-  // };
-
-  function getImageFormat(str) {
-    const afterDot = str.substr(str.indexOf(".") + 1);
-    return afterDot;
-  }
 
   const pickImage = async () => {
-    // let result = await ImagePicker.launchImageLibraryAsync( {
-    //   mediaTypes : ImagePicker.MediaTypeOptions.Images,
-    //   allowsEditing : true,
-    //   aspect : [ 1, 1 ],
-    //   quality : 0,
-    // } );
-
-    // if( !result.canceled ) {
-    //   setFileName( result.assets[ 0 ].uri.split( "/" )
-    //     .pop() );
-    //   setSelectedImage( result.assets[ 0 ].uri );
-    // }
-
     let result = await DocumentPicker.getDocumentAsync({
       type: ["image/*"],
     });
@@ -137,9 +103,6 @@ function CreatingApplication() {
 
     if (size < 500000) {
       if (type === "success") {
-        // getImageFormat( uri );
-        // setFileName( uri.split( "/" )
-        //   .pop() );
         setFileName(name);
         setSelectedImage(uri);
         setFileType(mimeType);
@@ -160,7 +123,15 @@ function CreatingApplication() {
         dispatch(authRequest({ secret_token: result }));
       }
     });
-  }, [navigation, dispatch]);
+
+    AsyncStorage.getItem("activeTab").then((result) => {
+      if (result == "Черновик") setSaveAsDraft(true);
+      else if (result == "В работе") setSaveAsDraft(false);
+    });
+    return async () => {
+      await AsyncStorage.removeItem("activeTab");
+    };
+  }, [navigation, dispatch, activeSecondaryTab]);
 
   const openCitysModal = () => {
     setOpenCitys(!openCitys);
@@ -169,33 +140,8 @@ function CreatingApplication() {
   const openCytysFromModal = () => {
     setOpenCitysFrom(!openCitysFrom);
   };
-  // const compareData = {
-  //   from_city,
-  //   to_city,
-  //   typeContainer : typeContainer,
-  //   containerCount : containerCount,
-  //   date,
-  //   price : price,
-  //   currency : currency,
-  // };
-  // const compareDataSales = {
-  //   ...compareData,
-  //   typePay : typePay,
-  //   conditation : conditation,
-  //   comment,
-  //   selectedImage,
-  //   restrict,
-  //   to_city : "10",
-  // };
-  const compareData = {
-    // from_city,
-    // to_city,
-    // typeContainer : typeContainer,
-    // containerCount : containerCount,
-    // date,
-    // price : price,
-    // currency : currency,
 
+  const compareData = {
     activeSecondaryTab,
     typePay,
     conditation,
@@ -215,7 +161,7 @@ function CreatingApplication() {
     restrict,
     to_city: "10",
   };
-  const save = () => {
+  const save = (event) => {
     let changed_tab = "";
     let payType = "";
     let new_or_used = "";
@@ -291,6 +237,12 @@ function CreatingApplication() {
       last_id: user?.last_id,
       selectedImage,
     };
+
+    if (event == "Разместить") {
+      setSaveAsDraft(false);
+    } else {
+      setSaveAsDraft(true);
+    }
 
     setLoading(true);
     if (activeSecondaryTab == "Продажа КТК") {
@@ -428,7 +380,7 @@ function CreatingApplication() {
     setPrice("");
     setShowDatePicker("");
     setCurrency("");
-    setSaveAsDraft(activeTab);
+    setSaveAsDraft(false);
     setWhereToCount(1);
     setTermOfUse(null);
     setWeight("");
@@ -477,7 +429,13 @@ function CreatingApplication() {
               placeholder="Search"
               value={searchValue}
               minLength={1}
-              onChangeText={(text) => setSearchValue(text)}
+              onChangeText={(text) => {
+                if (text.trim().length > 0) {
+                  setSearchValue(text);
+                } else {
+                  setSearchValue("");
+                }
+              }}
               delayTimeout={500}
               style={styles.searchInput}
             />
@@ -502,6 +460,18 @@ function CreatingApplication() {
                 </TouchableOpacity>
               );
             }}
+            ListEmptyComponent={() => (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginTop: 50,
+                }}
+              >
+                <Text>Не найдено</Text>
+              </View>
+            )}
             maxToRenderPerBatch={10}
             updateCellsBatchingPeriod={20}
           />
@@ -525,7 +495,13 @@ function CreatingApplication() {
               placeholder="Search"
               value={searchValue}
               minLength={1}
-              onChangeText={(text) => setSearchValue(text)}
+              onChangeText={(text) => {
+                if (text.trim().length > 0) {
+                  setSearchValue(text);
+                } else {
+                  setSearchValue("");
+                }
+              }}
               delayTimeout={500}
               style={styles.searchInput}
             />
@@ -550,6 +526,18 @@ function CreatingApplication() {
                 </TouchableOpacity>
               );
             }}
+            ListEmptyComponent={() => (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginTop: 50,
+                }}
+              >
+                <Text>Не найдено</Text>
+              </View>
+            )}
             maxToRenderPerBatch={10}
             updateCellsBatchingPeriod={20}
           />
@@ -767,7 +755,13 @@ function CreatingApplication() {
               placeholder="Search"
               value={searchValue}
               minLength={1}
-              onChangeText={(text) => setSearchValue(text)}
+              onChangeText={(text) => {
+                if (text.trim().length > 0) {
+                  setSearchValue(text);
+                } else {
+                  setSearchValue("");
+                }
+              }}
               delayTimeout={500}
               style={styles.searchInput}
             />
@@ -792,6 +786,18 @@ function CreatingApplication() {
                 </TouchableOpacity>
               );
             }}
+            ListEmptyComponent={() => (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginTop: 50,
+                }}
+              >
+                <Text>Не найдено</Text>
+              </View>
+            )}
             maxToRenderPerBatch={10}
             updateCellsBatchingPeriod={20}
           />
@@ -977,7 +983,13 @@ function CreatingApplication() {
               placeholder="Search"
               value={searchValue}
               minLength={1}
-              onChangeText={(text) => setSearchValue(text)}
+              onChangeText={(text) => {
+                if (text.trim().length > 0) {
+                  setSearchValue(text);
+                } else {
+                  setSearchValue("");
+                }
+              }}
               delayTimeout={500}
               style={styles.searchInput}
             />
@@ -1002,6 +1014,18 @@ function CreatingApplication() {
                 </TouchableOpacity>
               );
             }}
+            ListEmptyComponent={() => (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginTop: 50,
+                }}
+              >
+                <Text>Не найдено</Text>
+              </View>
+            )}
             maxToRenderPerBatch={10}
             updateCellsBatchingPeriod={20}
           />
@@ -1025,7 +1049,13 @@ function CreatingApplication() {
               placeholder="Search"
               value={searchValue}
               minLength={1}
-              onChangeText={(text) => setSearchValue(text)}
+              onChangeText={(text) => {
+                if (text.trim().length > 0) {
+                  setSearchValue(text);
+                } else {
+                  setSearchValue("");
+                }
+              }}
               delayTimeout={500}
               style={styles.searchInput}
             />
@@ -1050,6 +1080,18 @@ function CreatingApplication() {
                 </TouchableOpacity>
               );
             }}
+            ListEmptyComponent={() => (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginTop: 50,
+                }}
+              >
+                <Text>Не найдено</Text>
+              </View>
+            )}
             maxToRenderPerBatch={10}
             updateCellsBatchingPeriod={20}
           />
@@ -1178,7 +1220,13 @@ function CreatingApplication() {
               placeholder="Search"
               value={searchValue}
               minLength={1}
-              onChangeText={(text) => setSearchValue(text)}
+              onChangeText={(text) => {
+                if (text.trim().length > 0) {
+                  setSearchValue(text);
+                } else {
+                  setSearchValue("");
+                }
+              }}
               delayTimeout={500}
               style={styles.searchInput}
             />
@@ -1203,6 +1251,18 @@ function CreatingApplication() {
                 </TouchableOpacity>
               );
             }}
+            ListEmptyComponent={() => (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginTop: 50,
+                }}
+              >
+                <Text>Не найдено</Text>
+              </View>
+            )}
             maxToRenderPerBatch={10}
             updateCellsBatchingPeriod={20}
           />
@@ -1226,7 +1286,13 @@ function CreatingApplication() {
               placeholder="Search"
               value={searchValue}
               minLength={1}
-              onChangeText={(text) => setSearchValue(text)}
+              onChangeText={(text) => {
+                if (text.trim().length > 0) {
+                  setSearchValue(text);
+                } else {
+                  setSearchValue("");
+                }
+              }}
               delayTimeout={500}
               style={styles.searchInput}
             />
@@ -1251,6 +1317,18 @@ function CreatingApplication() {
                 </TouchableOpacity>
               );
             }}
+            ListEmptyComponent={() => (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginTop: 50,
+                }}
+              >
+                <Text>Не найдено</Text>
+              </View>
+            )}
             maxToRenderPerBatch={10}
             updateCellsBatchingPeriod={20}
           />
@@ -1379,7 +1457,13 @@ function CreatingApplication() {
               placeholder="Search"
               value={searchValue}
               minLength={1}
-              onChangeText={(text) => setSearchValue(text)}
+              onChangeText={(text) => {
+                if (text.trim().length > 0) {
+                  setSearchValue(text);
+                } else {
+                  setSearchValue("");
+                }
+              }}
               delayTimeout={500}
               style={styles.searchInput}
             />
@@ -1405,6 +1489,18 @@ function CreatingApplication() {
                 </TouchableOpacity>
               );
             }}
+            ListEmptyComponent={() => (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginTop: 50,
+                }}
+              >
+                <Text>Не найдено</Text>
+              </View>
+            )}
             maxToRenderPerBatch={10}
             updateCellsBatchingPeriod={20}
           />
@@ -1428,7 +1524,13 @@ function CreatingApplication() {
               placeholder="Search"
               value={searchValue}
               minLength={1}
-              onChangeText={(text) => setSearchValue(text)}
+              onChangeText={(text) => {
+                if (text.trim().length > 0) {
+                  setSearchValue(text);
+                } else {
+                  setSearchValue("");
+                }
+              }}
               delayTimeout={500}
               style={styles.searchInput}
             />
@@ -1454,6 +1556,18 @@ function CreatingApplication() {
                 </TouchableOpacity>
               );
             }}
+            ListEmptyComponent={() => (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginTop: 50,
+                }}
+              >
+                <Text>Не найдено</Text>
+              </View>
+            )}
             maxToRenderPerBatch={10}
             updateCellsBatchingPeriod={20}
           />
@@ -1576,7 +1690,7 @@ function CreatingApplication() {
           onToggle={(val) => setSaveAsDraft(val)}
           isOn={saveAsDraft}
         />
-        <MyButton onPress={save} style={styles.button}>
+        <MyButton onPress={() => save("Разместить")} style={styles.button}>
           Разместить
         </MyButton>
       </View>
