@@ -5,23 +5,14 @@ import axios from "axios";
 export const allCatRequest = createAsyncThunk(
   "allCat",
   async ({ token, tab, offset }) => {
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-
-    let raw = {
-      secret_token: token,
-      type_request: tab === "В работе" ? "onwork" : "draft",
-      // offset,
-    };
-
-    if (offset > 0) {
-      raw.offset = offset;
-    }
-
-    let requestOptions = {
+    var formdata = new FormData();
+    formdata.append("secret_token", token);
+    formdata.append("type_request", tab);
+    formdata.append("offset", offset);
+    console.log(formdata,5555);
+    var requestOptions = {
       method: "POST",
-      headers: myHeaders,
-      body: JSON.stringify(raw),
+      body: formdata,
       redirect: "follow",
     };
 
@@ -31,15 +22,10 @@ export const allCatRequest = createAsyncThunk(
         requestOptions
       );
       const data = await response.json();
+      // console.log(data.data.aplications.aplications)
       return data;
     } catch (err) {
-      // if (axios.isAxiosError(err)) {
-      //   let error = err;
-      //   if (!error.response) {
-      //     throw err;
-      //   }
-      //   return error.response.data;
-      // }
+      console.log(err);
       throw err;
     }
   }
@@ -59,7 +45,7 @@ const allCatSlice = createSlice({
         state.loading = true;
       })
       .addCase(allCatRequest.fulfilled, (state, action) => {
-        state.data = action.payload?.data?.aplications?.aplications;
+        state.data = action.payload?.aplications?.aplications;
         state.error = false;
         state.loading = false;
       })

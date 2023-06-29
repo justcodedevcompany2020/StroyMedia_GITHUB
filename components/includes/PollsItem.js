@@ -17,7 +17,6 @@ import { getAnswerRequest } from "../../store/reducers/sendAnswerPollsSlice";
 import { checkUserPollRequest } from "../../store/reducers/checkUserPollSlice";
 
 function PollsItem({ optionsList, id, total, vote }) {
-  // console.log(total + " items")
   const [checkedList, setCheckedList] = useState("");
   const [token, setToken] = useState("");
   const [submitted, setSubmitted] = useState();
@@ -26,7 +25,6 @@ function PollsItem({ optionsList, id, total, vote }) {
 
   useEffect(() => {
     setLoading(true);
-    console.log(5558);
     AsyncStorage.getItem("token").then((result) => {
       if (result) {
         setToken(result);
@@ -65,7 +63,6 @@ function PollsItem({ optionsList, id, total, vote }) {
           type: "danger",
         });
   };
-  // console.log(vote)
   return submitted ? (
     <View>
       <Modal visible={loading} transparent>
@@ -109,7 +106,9 @@ function PollsItem({ optionsList, id, total, vote }) {
           );
         }
       })}
-      <Text style={styles.smallText}>{total} голоса</Text>
+      <Text style={styles.smallText}>
+        {vote.length} голоса
+      </Text>
     </View>
   ) : (
     <View>

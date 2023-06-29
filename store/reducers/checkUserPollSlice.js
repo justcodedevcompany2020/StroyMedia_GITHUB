@@ -32,7 +32,6 @@ const checkUserPollSlice = createSlice({
       })
       .addCase(getAnswerRequest.fulfilled, (state, action) => {
         state.data = action.payload.data;
-        console.log(action.payload.data, "action.payload.data");
         state.loading = false;
       })
 

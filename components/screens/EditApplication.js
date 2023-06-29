@@ -126,14 +126,13 @@ function EditApplication() {
     });
 
     const { type, uri, mimeType, size, name } = result;
-    console.log(result);
+
     if (size < 500000) {
       if (type === "success") {
         setSelectedImage(uri);
         setFileName(name);
         setFileType(mimeType);
       }
-      console.log(selectedImage);
     } else {
       showMessage({
         type: "info",

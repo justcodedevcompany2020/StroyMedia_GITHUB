@@ -10,17 +10,14 @@ export const editAplicationsRequest = createAsyncThunk(
       body: formdata,
       redirect: "follow",
     };
-   console.log(formdata);
     try {
       const response = await fetch(
         "https://teus.online/api/cat-serv-edit",
         requestOptions
       );
       const result = await response.json();
-      console.log("📢[editAplicationsSlice.js:20]: result: ", result);
       return result;
     } catch (error) {
-      console.log(error);
       throw error
       return error;
     }

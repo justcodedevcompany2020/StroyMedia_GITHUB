@@ -4,8 +4,6 @@ import { api } from "../../Api";
 export const workRequest = createAsyncThunk(
   "work/request",
   async (form_data) => {
-    console.log(form_data, "formdata");
-
     var requestOptions = {
       method: "POST",
       // headers: myHeaders,

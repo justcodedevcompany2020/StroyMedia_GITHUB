@@ -3,7 +3,6 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 export const sendCatRequest = createAsyncThunk(
   "sendCat",
   async ({ formdata, myHeaders }) => {
-    console.log(formdata);
     try {
       var requestOptions = {
         method: "POST",
@@ -16,12 +15,10 @@ export const sendCatRequest = createAsyncThunk(
         "https://teus.online/api/cat-serv-send",
         requestOptions
       );
-        console.log(response,18)
       const result = await response.json();
 
       return result;
     } catch (error) {
-      // console.log(error);
       return error.response;
     }
   }

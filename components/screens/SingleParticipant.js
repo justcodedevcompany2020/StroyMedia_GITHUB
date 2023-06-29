@@ -37,14 +37,17 @@ function SingleParticipant({ route, navigation }) {
   const totalRate = [];
   const [reviewText, setReviewText] = useState("");
   const { currentPage } = route.params;
-  const [rate, setRate] = useState(0);
+  const [rate, setRate] = useState("");
   const dispatch = useDispatch();
   const data = useSelector((state) => state.membersSingleSlice.data);
-  const reviews = useSelector((state) => state.getAllProjectReviews.data.rows);
-  const [role, setRole] = useState("");
-  const contacts = useSelector(
-    (state) => state.getAllProjectReviews.data.contacts
+  const { rows, contacts } = useSelector(
+    (state) => state.getAllProjectReviews.data
   );
+  // const rows = useSelector((state) => state.getAllProjectReviews.data.rows);
+  // const contacts = useSelector(
+  //   (state) => state.getAllProjectReviews.data.contacts
+  // );
+  const [role, setRole] = useState("");
   const [token, setToken] = useState();
   useEffect(() => {
     setRole({
@@ -61,17 +64,18 @@ function SingleParticipant({ route, navigation }) {
     });
     dispatch(getProjectReviewsRequest({ token, id: route?.params.id }));
   }, [data]);
+
   const leaveReview = () => {
     setShowReviewModal(true);
   };
-
   const reviewSubmit = () => {
-    reviewText && rate > 0
+    reviewText && rate
       ? dispatch(
           projectReviewRequest({
             token,
             id: route?.params?.id,
             rate: rate === 3 ? "netral" : rate > 3 ? "plus" : "minus",
+            // rate: new_rate,
             review: reviewText,
           })
         )
@@ -81,9 +85,10 @@ function SingleParticipant({ route, navigation }) {
               message: "Ваш отзыв успешно сохранён",
               type: "success",
             });
+            dispatch(getProjectReviewsRequest({ token, id: route?.params.id }));
             setShowReviewModal(false);
             setReviewText("");
-            setRate(0);
+            setRate("");
           })
       : rate < 1
       ? showMessage({
@@ -100,13 +105,27 @@ function SingleParticipant({ route, navigation }) {
     setShowMoreReviewsModal(true);
     setToOrFrom(toOrFrom);
   };
-  reviews &&
-    reviews?.map((item) => {
-      totalRate.push(item.user.rate_plus);
+  rows &&
+    rows?.map((item) => {
+      if (item.ball === 2) {
+        totalRate.push(5);
+      }
+      if (item.ball === 1) {
+        totalRate.push(4);
+      }
+      if (item.ball === 0) {
+        totalRate.push(3);
+      }
+      if (item.ball === -1) {
+        totalRate.push(2);
+      }
+      if (item.ball === -2) {
+        totalRate.push(1);
+      }
     });
 
   let totalRateing =
-    reviews && totalRate.length > 0
+    rows && totalRate.length > 0
       ? totalRate.reduce((num, acc) => {
           return (num + acc) / totalRate?.length;
         })
@@ -117,12 +136,13 @@ function SingleParticipant({ route, navigation }) {
       <ReviewItem
         toOrFrom={"на"}
         review={{
-          uri: "https://teus.online" + item.user.avatar,
+          uri:
+            "https://teus.online" + item.from.avatar_person || item.from.avatar,
           name: item.user.name,
           date: moment(date).format("DD.MM.YYYY"),
           id: 3,
           text: item.review,
-          rating: item.user.rate_plus,
+          rating: item.ball,
         }}
       />
     );
@@ -231,10 +251,12 @@ function SingleParticipant({ route, navigation }) {
               <Text style={styles.averageReview}>
                 {Math.ceil(totalRateing)}
               </Text>
-              <Text style={styles.reviewInfo}>(основан на {reviews?.length} отзывах)</Text>
+              <Text style={styles.reviewInfo}>
+                (основан на {rows?.length} отзывах)
+              </Text>
             </View>
           </View>
-          <FlatList data={reviews?.slice(0, 2)} renderItem={renderItem} />
+          <FlatList data={rows?.slice(0, 2)} renderItem={renderItem} />
           <View style={styles.buttonRow}>
             <MyButton
               textStyle={styles.buttonText}
@@ -267,7 +289,7 @@ function SingleParticipant({ route, navigation }) {
         isVisible={showMoreReviewsModal}
         onCancel={() => setShowMoreReviewsModal(false)}
         toOrFrom={toOrFrom}
-        data={reviews}
+        data={rows && rows}
       />
     </Wrapper>
   );

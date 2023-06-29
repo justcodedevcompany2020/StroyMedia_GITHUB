@@ -325,7 +325,6 @@ function Offers({ route, navigation }) {
             style={styles.search}
             // searchText={searchValue}
             onSearchText={(val) => {
-              console.log(val,18)
               val.trim().length === 0 && resetFiltered();
               setSearchValue(val);
               filtered()

@@ -12,8 +12,15 @@ import {
 
 class ReviewItem extends Component {
   countRatingLineWidth = (rating) => {
-    if (rating > 5) rating = 5;
-    if (rating < 0) rating = 0;
+    console.log(rating)
+    // if (rating > 5) rating = 5;
+    // if (rating < 0) rating = 0;
+    if(rating === 2) rating = 5
+    if(rating === 1) rating = 4
+    if(rating === 0) rating = 3
+    if(rating === -1) rating = 2
+    if(rating === -2) rating = 1
+
     const [full, add] = [Math.floor(rating), rating % 1];
     return (
       full * (RATINGS_ACTIVE_IMAGE_WIDTH / 5) +

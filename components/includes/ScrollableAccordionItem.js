@@ -26,7 +26,7 @@ function ScrollableAccordionItem( {
   const [ userLastMessage, setUserLastMessage ] = useState();
   const [ openLastMessage, setOpenLastMessage ] = useState( false );
   const [ token, setToken ] = useState();
-  // console.log(last_messages)
+
   // useEffect(() => {
   //   activeTab === "Чаты" &&
   //     dispatch(chatForumOrderRequest({ token: token, id: item.last_id }))

@@ -6,10 +6,8 @@ export const searchMembersRequest = createAsyncThunk(
   async (data) => {
     try {
       const result = await api.post("/chat-search-contact", data);
-      console.log(result.data)
       return result;
     } catch (error) {
-      console.log(error)
       return error;
     }
   }

@@ -820,7 +820,6 @@ function CreatingApplication() {
                 } else {
                   setSearchValue("");
                 }
-                console.log(searchValue);
               }}
               delayTimeout={500}
               style={styles.searchInput}

@@ -5,21 +5,19 @@ import { COLOR_1, COLOR_5 } from "../helpers/Variables";
 import ReviewItem from "./ReviewItem";
 import moment from "moment";
 
-function MoreReviewsModal(props) {
-  const { onCancel, isVisible, toOrFrom, data } = props;
-
+function MoreReviewsModal({ onCancel, isVisible, toOrFrom, data }) {
   const renderItem = ({ item }) => {
     const date = item.date.$date.$numberLomg;
     return (
       <ReviewItem
         toOrFrom={"на"}
         review={{
-          uri: "https://teus.online" + item.user.avatar,
+          uri: "https://teus.online" + item.from.avatar_person || item.from.avatar,
           name: item.user.name,
           date: moment(date).format("DD.MM.YYYY"),
           id: 3,
           text: item.review,
-          rating: item.user.rate_plus,
+          rating: item.ball,
         }}
       />
     );

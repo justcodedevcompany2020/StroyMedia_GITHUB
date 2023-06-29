@@ -30,7 +30,22 @@ function LeaveReviewModal({
     });
   });
   const ratingFinish = (rate) => {
-    setRate(rate);
+    console.log(rate,8888);
+    if(rate === 5){
+      setRate(2);
+    }
+    else if(rate === 4){
+      setRate(1);
+    }
+    else if(rate === 3){
+      setRate(0);
+    }
+    else if(rate === 2){
+      setRate(-1);
+    }
+    else if(rate === 1){
+      setRate(-2);
+    }
   };
 
   return (

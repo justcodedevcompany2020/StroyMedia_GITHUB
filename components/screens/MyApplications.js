@@ -70,33 +70,42 @@ function MyApplications() {
 
   useEffect(() => {
     const isFocused = navigation.addListener("focus", () => {
-      console.log(activeTab, 73);
-
-      dispatch(
-        allCatRequest({
-          token,
-          tab: activeTab,
-          offset,
-        })
-      ).then((res) => {
-        if (res.payload) {
-          setFilteredData(res.payload?.data?.aplications?.aplications);
-          // setActiveTab(
-          //   res.payload?.data?.aplications?.type == "onwork"
-          //     ? "В работе"
-          //     : "Черновик"
-          // );
-        }
-      });
+      // dispatch(
+      //   allCatRequest({
+      //     token,
+      //     tab: activeTab == "В работе" ? "onwork" : "draft",
+      //     offset,
+      //   })
+      // ).then((res) => {
+      //   if (res.payload) {
+      //     setFilteredData(res.payload?.data?.aplications?.aplications);
+      //     // setActiveTab(
+      //     //   res.payload?.data?.aplications?.type == "onwork"
+      //     //     ? "В работе"
+      //     //     : "Черновик"
+      //     // );
+      //   }
+      // });
     });
 
     return () => {
       isFocused();
     };
   }, [navigation]);
-
+  useEffect(() => {
+    dispatch(
+      allCatRequest({
+        token,
+        tab: activeTab == "В работе" ? "onwork" : "draft",
+        offset,
+      })
+    ).then((res) => {
+      if (res.payload) {
+        setFilteredData(res.payload?.data?.aplications?.aplications);
+      }
+    });
+  }, [activeTab]);
   // useEffect(() => {
-  //   console.log(activeTab,98)
   //   dispatch(
   //     allCatRequest({
   //       token,
@@ -219,18 +228,18 @@ function MyApplications() {
             setOffset(0);
             setActiveTab(tab);
             await AsyncStorage.setItem("activeTab", tab);
-            dispatch(
-              allCatRequest({
-                token,
-                tab,
-                offset,
-              })
-            ).then(async (res) => {
-              if (res.payload) {
-                setFilteredData(res.payload?.data?.aplications?.aplications);
-                resetText()
-              }
-            });
+            // dispatch(
+            //   allCatRequest({
+            //     token,
+            //     tab: activeTab == "В работе" ? "onwork" : "draft",
+            //     offset,
+            //   })
+            // ).then(async (res) => {
+            //   if (res.payload) {
+            //     setFilteredData(res.payload?.data?.aplications?.aplications);
+            //     resetText();
+            //   }
+            // });
           }}
         />
         <View style={styles.searchRow}>
@@ -270,7 +279,7 @@ function MyApplications() {
     dispatch(
       allCatRequest({
         token,
-        tab: activeTab,
+        tab: activeTab == "В работе" ? "onwork" : "draft",
         offset: offset + 5,
         searchText: searchValue ? searchValue : null,
       })
@@ -287,7 +296,7 @@ function MyApplications() {
     dispatch(
       allCatRequest({
         token,
-        tab: activeTab,
+        tab: activeTab == "В работе" ? "onwork" : "draft",
         offset: offset - 5,
         searchText: searchValue ? searchValue : null,
       })
@@ -433,23 +442,23 @@ function MyApplications() {
             activeTab={activeTab}
             onPress={async (tab) => {
               setActiveTab(tab);
-              dispatch(
-                allCatRequest({
-                  token,
-                  tab,
-                  offset,
-                })
-              )
-                .then(async (res) => {
-                  if (res.payload) {
-                    setFilteredData(
-                      res.payload?.data?.aplications?.aplications
-                    );
-                  }
-                })
-                .catch((e) => {
-                  console.log(e, "error");
-                });
+              // dispatch(
+              //   allCatRequest({
+              //     token,
+              //     tab: activeTab == "В работе" ? "onwork" : "draft",
+              //     offset,
+              //   })
+              // )
+              //   .then((res) => {
+              //     if (res.payload) {
+              //       setFilteredData(
+              //         res.payload?.data?.aplications?.aplications
+              //       );
+              //     }
+              //   })
+              //   .catch((e) => {
+              //     console.log(e, "error");
+              //   });
             }}
           />
           <View style={styles.blankTextBlock}>

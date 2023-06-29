@@ -64,7 +64,6 @@ function EventsItem({
             )
               .unwrap()
               .then(async (res) => {
-                console.log(res.data);
                 if (res.data.success) {
                   dispatch(
                     chatOrderRequest({

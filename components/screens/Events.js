@@ -176,7 +176,6 @@ function Events({ route, navigation }) {
                     )
                       .unwrap()
                       .then((res) => {
-                        console.log(res);
                         navigation.navigate("Chat", {
                           currentPage: "Чаты",
                           title: s.event.title,

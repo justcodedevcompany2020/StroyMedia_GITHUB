@@ -60,9 +60,8 @@ function Polls({ route, navigation }) {
               value.includes("vote") &&
               value.length < 15
             ) {
-              if (item[value][0] == null) {
-                vote.push([0]);
-              } else {
+              if (item[value][0] !== null) {
+                
                 vote.push(item[value]);
               }
 
@@ -83,7 +82,6 @@ function Polls({ route, navigation }) {
         {filteredData.map((d, i) => {
           let sended = false;
         
-          console.log(sended, "res.payload.data");
           if (d.value) {
             return (
               <AccordionItem

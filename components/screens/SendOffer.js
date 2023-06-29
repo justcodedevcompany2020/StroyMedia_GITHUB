@@ -246,7 +246,6 @@ function SendOffer(props) {
             dispatch(workRequest(form_data))
               .unwrap()
               .then((res) => {
-                console.log(res, "response");
                 // if (res.success) {
                 //   showMessage({
                 //     message: "Ваши данные успешно сохранены",
@@ -275,7 +274,6 @@ function SendOffer(props) {
                 }
               })
               .catch((e) => {
-                console.log(e, "error");
                 showMessage({
                   type: "danger",
                   message: "Неверные данные",

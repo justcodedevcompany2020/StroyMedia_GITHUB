@@ -6,6 +6,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Modal,
 } from "react-native";
 import Wrapper from "../helpers/Wrapper";
 import { useDispatch, useSelector } from "react-redux";
@@ -27,7 +28,6 @@ import { authRequest } from "../../store/reducers/authUserSlice";
 import { allChatForumRequest } from "../../store/reducers/forumChatAllSlice";
 import { chatForumOrderRequest } from "../../store/reducers/orderForumChatSlice";
 import SearchModal from "../includes/SearchModal";
-import Modal from "react-native-modal";
 import { deleteChatRequest } from "../../store/reducers/deleteChatSlice";
 import { chatOrderRequest } from "../../store/reducers/chatDialogOrderSlice";
 
@@ -44,7 +44,7 @@ function Messages({ route, navigation }) {
   const { data, loading } = useSelector((state) => state.allDialogSlice);
   const forumChats = useSelector((state) => state.forumChatAllSlice.data);
   const { last_messages } = useSelector((state) => state.forumChatAllSlice);
-  const isloading = useSelector((state) => state.forumChatAllSlice.loading);
+  const isLoading = useSelector((state) => state.forumChatAllSlice);
   const [filteredData, setFilteredData] = useState([]);
   const [changed, setChanged] = useState(true);
   const serachResult = useSelector(
@@ -62,12 +62,11 @@ function Messages({ route, navigation }) {
     success && setCompName("");
     success && setUserName("");
   }, [success]);
-  console.log(serachResult,65)
-  useEffect(()=>{
-    if(serachResult){
+  useEffect(() => {
+    if (serachResult) {
       setVisibleModal(false);
     }
-  },[serachResult])
+  }, [serachResult]);
   useEffect(() => {
     AsyncStorage.getItem("token").then((result) => {
       setToken(result);
@@ -86,7 +85,6 @@ function Messages({ route, navigation }) {
   });
 
   const renderItem = ({ item, index }) => {
-    console.log(!deletedId.includes(item.last_id))
     return (
       <>
         {!deletedId.includes(item.last_id) && (
@@ -298,10 +296,17 @@ function Messages({ route, navigation }) {
         <View style={styles.fadeBlock}>
           <Image source={ImageFadePart} style={styles.fade} />
         </View>
-        {loading && !data.length && (
-          <Modal backdropOpacity={0.75} isVisible={true}>
-            <View>
-              <ActivityIndicator size="large" />
+        {!data.length && (
+          <Modal visible={loading || isLoading} transparent>
+            <View
+              style={{
+                backgroundColor: "#00000030",
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <ActivityIndicator size={50} />
             </View>
           </Modal>
         )}

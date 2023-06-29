@@ -10,7 +10,7 @@ export const getProjectReviewsRequest = createAsyncThunk(
         project_id: id,
         service_id: "reviews2",
       });
-      return result;
+      return result.data;
     } catch (error) {
       return error;
     }
@@ -33,7 +33,7 @@ const getAllProjectReviewsSlice = createSlice({
       })
 
       .addCase(getProjectReviewsRequest.fulfilled, (state, action) => {
-        state.data = action.payload.data.data;
+        state.data = action.payload.data;
         state.error = false;
       })
 

@@ -19,7 +19,7 @@ export default AccordionItem = ({
   const [expand, setExpandedNew] = useState(expanded || false);
 
   const setExpanded = (val) => setExpandedNew(val);
-  // console.log(expand,21);
+
   return (
     <View style={[styles.wrapper, wrapperStyle]}>
       <TouchableOpacity

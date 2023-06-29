@@ -36,7 +36,7 @@ const allDialogSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(allDialogRequest.pending, (state) => {
-        // state.loading = true;
+        state.loading = true;
       })
       .addCase(allDialogRequest.fulfilled, (state, action) => {
         state.data = action.payload.data.users;
