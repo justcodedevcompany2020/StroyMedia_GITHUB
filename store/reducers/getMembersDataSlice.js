@@ -46,6 +46,7 @@ const getMembersSlice = createSlice({
     builder
       .addCase(getMembersReques.pending, (state) => {
         state.loading = true;
+        state.favoriteList = [];
       })
       .addCase(getMembersReques.fulfilled, (state, action) => {
         state.data = action.payload.data?.data?.company;

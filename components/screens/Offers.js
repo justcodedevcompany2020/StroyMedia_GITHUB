@@ -282,7 +282,7 @@ function Offers({ route, navigation }) {
           )
             .unwrap()
             .then(() => {
-              setSearchValue("");
+              // setSearchValue("");
               setCitys(allCitys);
               setLoad(false);
             });
@@ -321,11 +321,14 @@ function Offers({ route, navigation }) {
         />
         <View style={styles.searchRow}>
           <Search
-            value={searchName}
+            value={searchValue}
             style={styles.search}
-            searchText={searchValue}
+            // searchText={searchValue}
             onSearchText={(val) => {
+              console.log(val,18)
+              val.trim().length === 0 && resetFiltered();
               setSearchValue(val);
+              filtered()
             }}
             resetText={resetText}
           />

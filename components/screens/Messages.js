@@ -62,7 +62,12 @@ function Messages({ route, navigation }) {
     success && setCompName("");
     success && setUserName("");
   }, [success]);
-
+  console.log(serachResult,65)
+  useEffect(()=>{
+    if(serachResult){
+      setVisibleModal(false);
+    }
+  },[serachResult])
   useEffect(() => {
     AsyncStorage.getItem("token").then((result) => {
       setToken(result);
@@ -81,6 +86,7 @@ function Messages({ route, navigation }) {
   });
 
   const renderItem = ({ item, index }) => {
+    console.log(!deletedId.includes(item.last_id))
     return (
       <>
         {!deletedId.includes(item.last_id) && (

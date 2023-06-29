@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  ActivityIndicator,
+} from "react-native";
 import { COLOR_1, COLOR_3 } from "../helpers/Variables";
 import { useDispatch } from "react-redux";
 import MyCheckbox from "./MyCheckbox";
@@ -7,24 +14,37 @@ import MyButton from "./MyButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { showMessage } from "react-native-flash-message";
 import { getAnswerRequest } from "../../store/reducers/sendAnswerPollsSlice";
+import { checkUserPollRequest } from "../../store/reducers/checkUserPollSlice";
 
-function PollsItem({ optionsList, id, total }) {
+function PollsItem({ optionsList, id, total, vote }) {
+  // console.log(total + " items")
   const [checkedList, setCheckedList] = useState("");
   const [token, setToken] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-
+  const [submitted, setSubmitted] = useState();
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
+    setLoading(true);
+    console.log(5558);
     AsyncStorage.getItem("token").then((result) => {
       if (result) {
         setToken(result);
       }
     });
-  }, []);
-
+    dispatch(checkUserPollRequest({ id }))
+      .then(async (res) => {
+        setSubmitted(res?.payload?.data?.data);
+        setTimeout(() => {
+          setLoading(false);
+        }, 300);
+      })
+      .catch((error) => {
+        setLoading(false);
+      });
+  }, [dispatch]);
   const checked = (item) => {
-    setCheckedList(item?.id);
+    setCheckedList(item);
   };
 
   const submit = () => {
@@ -45,19 +65,46 @@ function PollsItem({ optionsList, id, total }) {
           type: "danger",
         });
   };
-
+  // console.log(vote)
   return submitted ? (
     <View>
+      <Modal visible={loading} transparent>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "#00000055",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <ActivityIndicator size={50} />
+        </View>
+      </Modal>
       {optionsList?.map((option, index) => {
-        console.log(option,51)
-        if (option?.key) {
+        if (option) {
           return (
             <View key={Math.random()}>
               <View style={styles.firstLine}>
-                <Text style={styles.percentage}>{option.vote}%</Text>
-                <Text style={styles.title}>{option.key}</Text>
+                <Text style={styles.percentage}>
+                  {Math.floor((vote[index] / total) * 100)
+                    ? Math.floor((vote[index] / total) * 100)
+                    : 0}
+                  %
+                </Text>
+                <Text style={styles.title}>{option}</Text>
               </View>
-              <View style={[styles.line, { width: `${option.vote}%` }]} />
+              <View
+                style={[
+                  styles.line,
+                  {
+                    width: `${
+                      Math.floor((vote[index] / total) * 100)
+                        ? Math.floor((vote[index] / total) * 100)
+                        : 0
+                    }%`,
+                  },
+                ]}
+              />
             </View>
           );
         }
@@ -67,15 +114,14 @@ function PollsItem({ optionsList, id, total }) {
   ) : (
     <View>
       {optionsList?.map((option, index) => {
-        if (option?.key) {
+        if (option) {
           return (
-            <TouchableOpacity key={option.id} onPress={() => checked(option)}>
+            <TouchableOpacity key={index} onPress={() => checked(option)}>
               <Text>
                 <MyCheckbox
                   option={option}
-                  id={option.id}
+                  id={option}
                   checkedList={checkedList}
-                  key={option.id}
                 />
               </Text>
             </TouchableOpacity>

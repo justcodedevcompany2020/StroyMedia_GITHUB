@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Image, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import Wrapper from "../helpers/Wrapper";
 import {
   ImageCallGreen,
@@ -29,7 +36,7 @@ import { workRequest } from "../../store/reducers/workRequestSlice";
 import Modal from "react-native-modal";
 import { showMessage } from "react-native-flash-message";
 import { chatOrderRequest } from "../../store/reducers/chatDialogOrderSlice";
-
+import * as Linking from "expo-linking";
 const valuta = ["₽", "€", "$"];
 
 function SendOffer(props) {
@@ -148,14 +155,20 @@ function SendOffer(props) {
             <Text style={styles.location}>
               {item?.user?.country?.title?.ru}
             </Text>
-            <View style={styles.contacts}>
+            <TouchableOpacity
+              onPress={() => Linking.openURL("tel:" + item?.user?.phone)}
+              style={styles.contacts}
+            >
               <Text style={styles.contactsText}>{item?.user?.phone}</Text>
               <ImageCallGreen />
-            </View>
-            <View style={styles.contacts}>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => Linking.openURL("mailto:" + item?.user?.email)}
+              style={styles.contacts}
+            >
               <Text style={styles.contactsText}>{item?.user?.email}</Text>
               <ImageEmailGreen />
-            </View>
+            </TouchableOpacity>
           </SingleParticipantBlock>
         </View>
 
@@ -234,17 +247,31 @@ function SendOffer(props) {
               .unwrap()
               .then((res) => {
                 console.log(res, "response");
+                // if (res.success) {
+                //   showMessage({
+                //     message: "Ваши данные успешно сохранены",
+                //     type: "success",
+                //   });
+                //   navigation.goBack();
+                // } else if (!res.success) {
+                //   showMessage({
+                //     type: "danger",
+                //     message: "Неверные данные",
+                //   });
+                // }
                 if (res.success) {
-                  showMessage({
-                    message: "Ваши данные успешно сохранены",
-                    type: "success",
-                  });
-                  navigation.goBack();
-                } else if (!res.success) {
-                  showMessage({
-                    type: "danger",
-                    message: "Неверные данные",
-                  });
+                  dispatch(
+                    chatOrderRequest({ token: token, id: item.user.last_id })
+                  )
+                    .unwrap()
+                    .then(async () => {
+                      // await AsyncStorage.setItem("comment", comment);
+                      navigation.navigate("DialogChat", {
+                        currentPage: "Диалоги",
+                        title: item.user.name,
+                        id: item.user.last_id,
+                      });
+                    });
                 }
               })
               .catch((e) => {

@@ -56,7 +56,7 @@ function Events({ route, navigation }) {
         dispatch(
           getEventsRequest({
             token: result,
-            events_id: 1,
+            events_id: 2,
           })
         );
         // dispatch(getEventsRequest({token: result, events_id: "index"}));
@@ -65,7 +65,7 @@ function Events({ route, navigation }) {
     dispatch(
       getEventsRequest({
         token,
-        events_id: 1,
+        events_id: 2,
       })
     );
     // dispatch(getEventsRequest({token, events_id: "index"}));

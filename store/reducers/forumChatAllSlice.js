@@ -38,8 +38,8 @@ const allChatForumSlice = createSlice( {
 
       if( state.last_messages.length === 0 ) {
         action.payload?.data?.data?.last_messages.forEach( item => {
-          state.last_messages.push( item[ 0 ]?.comment );
-         
+          state.last_messages.unshift( item[ 0 ]?.comment );
+         console.log(item);
         } );
       }
 

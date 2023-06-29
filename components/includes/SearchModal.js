@@ -25,7 +25,6 @@ function SearchModal(props) {
   const state = useSelector((state) => state);
   const [valueError, setValueError] = useState("");
   const [fio, setFio] = useState("");
-
   useEffect(() => {
     AsyncStorage.getItem("token").then((result) => {
       if (result) {
@@ -33,7 +32,6 @@ function SearchModal(props) {
       }
     });
   });
-
   const submith = () => {
     if (!value) {
       setValueError("Заполните эту строку");
@@ -42,12 +40,16 @@ function SearchModal(props) {
       //   return;
       // }
       return;
+    } else {
+      setValueError("");
     }
-    if (!fio) {
+    if (!name) {
       setFio("Заполните эту строку");
       return;
+    } else {
+      setFio("");
     }
-    if (value && fio) {
+    if (value && name) {
       dispatch(
         searchMembersRequest({
           secret_token: token,

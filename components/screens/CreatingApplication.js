@@ -39,7 +39,7 @@ const container = ["40 ST", "20 (30)", "20 (24)", "40 HQ"];
 const valuta = ["₽", "€", "$"];
 const conditations = ["Б/у", "Новый"];
 const typespay = ["Любой вариант", "безналичный расчет", "наличный расчет"];
-const reestrized = ["Любой исключен", "включен"];
+const reestrized = ["исключен", "включен"];
 
 function CreatingApplication() {
   const navigation = useNavigation();
@@ -195,7 +195,7 @@ function CreatingApplication() {
       new_or_used = "2";
     }
 
-    if (restrict == "Любой исключен") {
+    if (restrict == "исключен") {
       restrick = "3";
     } else if (restrict == "включен") {
       restrick = "2";
@@ -308,7 +308,10 @@ function CreatingApplication() {
       user: user?.last_id,
     };
 
-    if (activeSecondaryTab !== "Продажа КТК") {
+    if (
+      activeSecondaryTab !== "Продажа КТК" &&
+      activeSecondaryTab !== "Заявка на ТЭО"
+    ) {
       if (_.every(Object.values(checkValues1))) {
         formdata.append("secret_token", token);
         formdata.append("last_id", changed_tab);
@@ -320,6 +323,62 @@ function CreatingApplication() {
         formdata.append("price", price);
         formdata.append("type_container", typeKTK);
         formdata.append("currency", price_type);
+        formdata.append("responsible", user?.last_id.toString());
+        formdata.append("_type_op", saveAsDraft ? "draft" : "onwork");
+
+        dispatch(
+          sendCatRequest({
+            formdata,
+            myHeaders,
+          })
+        )
+          .unwrap()
+          .then((e) => {
+            setLoading(false);
+            if (e.success)
+              navigation.navigate("MyApplications", {
+                currentPage: "Мои заявки",
+              });
+          })
+          .catch((e) => {
+            setLoading(false);
+            showMessage({
+              message: "Все поля должны быть заполнены",
+              type: "danger",
+            });
+          });
+      } else if (!_.every(Object.values(checkValues1))) {
+        setLoading(false);
+        showMessage({
+          message: "Все поля должны быть заполнены",
+          type: "danger",
+        });
+      }
+    }
+
+    let checkValues2 = {
+      token,
+      changed_tab,
+      from_city,
+      to_city,
+      containerCount,
+      date,
+      weight,
+      comment,
+      typeKTK,
+      user: user?.last_id,
+    };
+    if (activeSecondaryTab === "Заявка на ТЭО") {
+      if (_.every(Object.values(checkValues2))) {
+        formdata.append("secret_token", token);
+        formdata.append("last_id", changed_tab);
+        formdata.append("from_city", from_city.toString());
+        formdata.append("to_city", to_city.toString());
+        formdata.append("count", containerCount);
+        formdata.append("date_shipment", date.toString());
+        formdata.append("cargo", weight);
+        formdata.append("comment", comment);
+        formdata.append("type_container", typeKTK);
         formdata.append("responsible", user?.last_id.toString());
         formdata.append("_type_op", saveAsDraft ? "draft" : "onwork");
 
@@ -404,7 +463,7 @@ function CreatingApplication() {
   }, [dispatch, navigation]);
 
   useEffect(() => {
-    searchValue && filtered(searchValue);
+    filtered(searchValue);
   }, [searchValue]);
 
   const searchKTK = () => {
@@ -761,6 +820,7 @@ function CreatingApplication() {
                 } else {
                   setSearchValue("");
                 }
+                console.log(searchValue);
               }}
               delayTimeout={500}
               style={styles.searchInput}
@@ -856,14 +916,14 @@ function CreatingApplication() {
           </Text>
         </TouchableOpacity>
         {selectedImage ? (
-          <View>
-            <Image source={{ uri: selectedImage }} style={styles.imageStyle} />
+          <View style={styles.imageContainer}>
             <TouchableOpacity
               onPress={() => setSelectedImage("")}
               style={styles.cancelImage}
             >
               <Text style={{ color: "red" }}>X</Text>
             </TouchableOpacity>
+            <Image source={{ uri: selectedImage }} style={styles.imageStyle} />
           </View>
         ) : null}
         <MyInput
@@ -1474,7 +1534,6 @@ function CreatingApplication() {
             scrollEnabled={true}
             keyExtractor={(item) => item.last_id}
             renderItem={({ item }) => {
-              console.log(item);
               return (
                 <TouchableOpacity
                   onPress={() => {
@@ -1525,11 +1584,7 @@ function CreatingApplication() {
               value={searchValue}
               minLength={1}
               onChangeText={(text) => {
-                if (text.trim().length > 0) {
-                  setSearchValue(text);
-                } else {
-                  setSearchValue("");
-                }
+                setSearchValue(text);
               }}
               delayTimeout={500}
               style={styles.searchInput}
@@ -1759,9 +1814,15 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginHorizontal: 5,
   },
+  imageContainer: {
+    position: "relative",
+  },
   cancelImage: {
     color: "red",
     marginLeft: 5,
+    position: "absolute",
+    left: 45,
+    top: -13,
   },
   citysSearch: {
     flexDirection: "row",

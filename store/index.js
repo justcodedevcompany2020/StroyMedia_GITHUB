@@ -88,6 +88,7 @@ const RootReducer = combineReducers( {
   editAplicationsSlice,
   deleteChatSlice,
   forgotPasswordSlice,
+  searchChatMembersSlice
 } );
 
 const configureCustomStore = () => {

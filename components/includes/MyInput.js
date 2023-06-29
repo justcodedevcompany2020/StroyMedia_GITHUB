@@ -27,6 +27,7 @@ function MyInput({
   numberTel,
   isGray,
   placeholder,
+  onFocus,
   secureTextEntry,
   value,
   onChangeText,
@@ -77,6 +78,7 @@ function MyInput({
         />
       ) : (
         <TextInput
+      
           value={value}
           onChangeText={onChangeText}
           // maxLength={numberTel ? 10 : 100000}
@@ -85,7 +87,7 @@ function MyInput({
           secureTextEntry={secureTextEntry}
           editable={editable}
           placeholder={placeholder}
-          onFocus={() => setIsActive(true)}
+          onFocus={() => {setIsActive(true)}}
           onBlur={() => setIsActive(false)}
           multiline={multiline}
           style={[

@@ -28,7 +28,9 @@ function ParticipantItem({
       }
     });
   }, []);
-
+  useEffect(() => {
+    setLiked(likedList)
+  },[likedList])
   return (
     <>
       {favorites === "Избранное" && liked ? (

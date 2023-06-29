@@ -11,9 +11,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 function Polls({ route, navigation }) {
   const { data } = useSelector((state) => state.getAllPolsSlice);
-
+  let filteredData = [];
   const { currentPage } = route.params;
   const dispatch = useDispatch();
+
+  const [sending,setSending] = useState([])
 
   useEffect(() => {
     AsyncStorage.getItem("token").then((result) => {
@@ -34,146 +36,73 @@ function Polls({ route, navigation }) {
     >
       <View style={styles.wrapper}>
         <Text style={styles.title}>Уважаемый пользователь!</Text>
-        {data?.map((d) => {
-          const vote1 = d?.vote1?.length || 0;
-          const vote2 = d?.vote2?.length || 0;
-          const vote3 = d?.vote3?.length || 0;
-          const vote4 = d?.vote4?.length || 0;
-          const vote5 = d?.vote5?.length || 0;
-          const vote6 = d?.vote6?.length || 0;
-          const vote7 = d?.vote7?.length || 0;
-          const vote8 = d?.vote8?.length || 0;
-          const vote9 = d?.vote9?.length || 0;
-          const vote10 = d?.vote10?.length || 0;
-          const vote11 = d?.vote11?.length || 0;
-          const vote12 = d?.vote12?.length || 0;
-          const vote13 = d?.vote13?.length || 0;
-          const vote14 = d?.vote14?.length || 0;
-          const vote15 = d?.vote15?.length || 0;
-          const totalVote =
-            vote1 +
-            vote2 +
-            vote3 +
-            vote4 +
-            vote5 +
-            vote6 +
-            vote7 +
-            vote8 +
-            vote9 +
-            vote10 +
-            vote11 +
-            vote12 +
-            vote13 +
-            vote14 +
-            vote15;
-          const options = [
-            {
-              id: 1,
-              key: d?.title1,
-              value: "1",
-              vote: Math.round((vote1 / totalVote) * 100),
-            },
-            {
-              id: 2,
-              key: d?.title2,
-              value: "2",
-              vote: Math.round((vote2 / totalVote) * 100),
-            },
-            {
-              id: 3,
-              key: d?.title3,
-              value: "3",
-              vote: Math.round((vote3 / totalVote) * 100),
-            },
-            {
-              id: 4,
-              key: d?.title4,
-              value: "4",
-              vote: Math.round((vote4 / totalVote) * 100),
-            },
-            {
-              id: 5,
-              key: d?.title5,
-              value: "6",
-              vote: Math.round((vote5 / totalVote) * 100),
-            },
 
-            {
-              id: 6,
-              key: d?.title6,
-              value: "6",
-              vote: Math.round((vote6 / totalVote) * 100),
-            },
-            {
-              id: 7,
-              key: d?.title7,
-              value: "7",
-              vote: Math.round((vote7 / totalVote) * 100),
-            },
-            {
-              id: 8,
-              key: d?.title8,
-              value: "8",
-              vote: Math.round((vote8 / totalVote) * 100),
-            },
-            {
-              id: 9,
-              key: d?.title9,
-              value: "9",
-              vote: Math.round((vote9 / totalVote) * 100),
-            },
-            {
-              id: 10,
-              key: d?.title10,
-              value: "10",
-              vote: Math.round((vote10 / totalVote) * 100),
-            },
-            {
-              id: 11,
-              key: d?.title11,
-              value: "11",
-              vote: Math.round((vote11 / totalVote) * 100),
-            },
-            {
-              id: 12,
-              key: d?.title12,
-              value: "12",
-              vote: Math.round((vote12 / totalVote) * 100),
-            },
-            {
-              id: 13,
-              key: d?.title13,
-              value: "13",
-              vote: Math.round((vote13 / totalVote) * 100),
-            },
-            {
-              id: 14,
-              key: d?.title14,
-              value: "14",
-              vote: Math.round((vote14 / totalVote) * 100),
-            },
-          ];
+        {data?.map((item) => {
+          let data = [];
+          let title = "";
+          let last_id = "";
+          let vote = [];
+          let total = 0;
+          Object.keys(item)?.map((value, index) => {
+            if (value === "last_id") {
+              last_id = item[value];
+            }
+            if (value === "title") {
+              title = item[value];
+            } else if (
+              value !== "title" &&
+              value.includes("title") &&
+              item[value].trim().length > 0
+            ) {
+              data.push(item[value]);
+            } else if (
+              value !== "vote" &&
+              value.includes("vote") &&
+              value.length < 15
+            ) {
+              if (item[value][0] == null) {
+                vote.push([0]);
+              } else {
+                vote.push(item[value]);
+              }
 
-          return (
-            <AccordionItem
-              key={new Date() + Math.random()}
-              headerStyle={styles.headerStyle}
-              arrowStyle={styles.arrowStyle}
-              titleComponent={<Text style={styles.header}>{d.title}</Text>}
-            >
-              <View style={styles.itemWrapper}>
-                <PollsItem
-                  // vote1={vote1}
-                  // vote2={vote2}
-                  // vote3={vote3}
-                  // vote4={vote4}
-                  total={totalVote}
-                  id={d.last_id}
-                  optionsList={options}
-                />
-              </View>
-            </AccordionItem>
-          );
+              total += +item[value];
+            }
+          });
+          filteredData.push({
+            title: title,
+            value: data,
+            last_id: last_id,
+            total: total,
+            vote: vote,
+          });
+        })}
+
+       
+
+        {filteredData.map((d, i) => {
+          let sended = false;
+        
+          console.log(sended, "res.payload.data");
+          if (d.value) {
+            return (
+              <AccordionItem
+                key={new Date() + Math.random()}
+                headerStyle={styles.headerStyle}
+                arrowStyle={styles.arrowStyle}
+                titleComponent={<Text style={styles.header}>{d.title}</Text>}
+              >
+                <View style={styles.itemWrapper}>
+                  <PollsItem
+                    total={d.total}
+                    vote={d.vote}
+                    id={d.last_id}
+                    optionsList={d.value}
+                  />
+                </View>
+              </AccordionItem>
+            );
+          }
         })}
       </View>
     </Wrapper>

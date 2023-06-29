@@ -9,7 +9,7 @@ function MyCheckbox({ option, id, checkedList }) {
       <View style={styles.checkbox}>
         {checkedList === id && <ImageOk style={styles.image} />}
       </View>
-      <Text style={styles.label}>{option.key}</Text>
+      <Text style={styles.label}>{option}</Text>
     </View>
   );
 }

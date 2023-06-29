@@ -40,7 +40,7 @@ const container = ["40 ST", "20 (30)", "20 (24)", "40 HQ"];
 const valuta = ["₽", "€", "$"];
 const conditations = ["Б/у", "Новый"];
 const typespay = ["Любой вариант", "безналичный расчет", "наличный расчет"];
-const reestrized = ["Любой исключен", "включен"];
+const reestrized = ["исключен", "включен"];
 
 function EditApplication() {
   const dispatch = useDispatch();
@@ -92,7 +92,7 @@ function EditApplication() {
   const [typePay, setTypePay] = useState(paymentType);
 
   const [restrict, setRestrict] = useState(
-    reestrrzhd_ == "исключен" ? "Любой исключен" : "включен"
+    reestrrzhd_ == "исключен" ? "исключен" : "включен"
   );
   const [selectedImage, setSelectedImage] = useState(
     img?.length && "https://teus.online/" + img
@@ -177,7 +177,7 @@ function EditApplication() {
       new_or_used = "2";
     }
 
-    if (restrict == "Любой исключен") {
+    if (restrict == "исключен") {
       restrick = "3";
     } else if (restrict == "включен") {
       restrick = "2";

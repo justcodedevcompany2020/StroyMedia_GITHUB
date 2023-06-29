@@ -200,7 +200,6 @@ function Participants({ route, navigation }) {
         renderItem={({ item, index }) => {
           if (favoriteList[index] == "is_Favorite") {
             liked = true;
-            console.log(liked);
           } else if (favoriteList[index] == "not_Favorite") {
             liked = false;
           }

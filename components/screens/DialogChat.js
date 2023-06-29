@@ -208,6 +208,9 @@ export const DialogChat = ({ route }) => {
           </TouchableOpacity>
           <View style={styles.inputView}>
             <MyInput
+              onFocus={() =>
+                messagesRef?.current?.scrollToEnd({ animated: true })
+              }
               isChat={true}
               value={inputValue}
               onChangeText={(val) => setInputValue(val)}
