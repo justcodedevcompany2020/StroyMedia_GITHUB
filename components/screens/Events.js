@@ -83,6 +83,14 @@ function Events({ route, navigation }) {
     );
   };
 
+  // const tagsStyles = {
+  //   p: {
+  //     color: "blue",
+  //     // width: 100,
+  //     // overflow: "hidden",
+  //   },
+  // };
+
   return (
     <Wrapper
       withContainer
@@ -136,28 +144,105 @@ function Events({ route, navigation }) {
                   navigation={navigation}
                   title={s.moderator_post || s.event.title}
                   text={
-                    Platform.OS === "android"
-                      ? s?.full
-                          ?.replace(regex, "")
-                          .replace(simvolRegexp, "")
-                          .replace(spacesRegex, "")
-                          .trim() ||
-                        s?.event?.full
-                          ?.replace(regex, "")
-                          .replace(spacesRegex, "")
-                          .replace(simvolRegexp, " ")
-                          .trim()
-                      : (
-                          <RenderHtml
-                            contentWidth={width}
-                            source={{ html: s.full }}
-                          />
-                        ) || (
-                          <RenderHtml
-                            contentWidth={width}
-                            source={{ html: s.event.full }}
-                          />
-                        )
+                    // Platform.OS === "android"
+                    //   ? s?.full
+                    //       ?.replace(regex, "")
+                    //       .replace(simvolRegexp, "")
+                    //       .replace(spacesRegex, "")
+                    //       .trim() ||
+                    //     s?.event?.full
+                    //       ?.replace(regex, "")
+                    //       .replace(spacesRegex, "")
+                    //       .replace(simvolRegexp, " ")
+                    //       .trim()
+                    //   : (
+                    //       <RenderHtml
+                    //         contentWidth={width}
+                    //         source={{ html: s.full }}
+                    //         tagsStyles={tagsStyles}
+                    //       />
+                    //     ) || (
+                    //       <RenderHtml
+                    //         contentWidth={width}
+                    //         source={{ html: s.event.full }}
+                    //         tagsStyles={tagsStyles}
+                    //       />
+                    //     )
+
+                    <>
+                      <RenderHtml
+                        contentWidth={width}
+                        source={{ html: s.full }}
+                        tagsStyles={{
+                          body: {
+                            listStyleType: "none",
+                            // backgroundColor: "red",
+                            padding: 0,
+                            fontFamily: "GothamProRegular",
+                            fontSize: 9,
+                            color: COLOR_9,
+                            marginBottom: 15,
+                            lineHeight: 11,
+                            textAlign: "left",
+                          },
+                          p: {
+                            whiteSpace: "normal",
+                            alignSelf: "flex-start",
+                          },
+                          li: {
+                            // listStyleType: "none",
+                            // whiteSpace: "normal",
+                            marginBottom: 2,
+                            textAlign: "left",
+                          },
+                          ul: {
+                            padding: 0,
+                          },
+                        }}
+                        baseStyle={{
+                          alignSelf: "center",
+                          fontSize: 10,
+                          // marginLeft: -20,
+                          padding: 0,
+                        }}
+                      />
+
+                      <RenderHtml
+                        contentWidth={width}
+                        source={{ html: s.event.full }}
+                        tagsStyles={{
+                          body: {
+                            listStyleType: "none",
+                            // backgroundColor: "red",
+                            padding: 0,
+                            fontFamily: "GothamProRegular",
+                            fontSize: 9,
+                            color: COLOR_9,
+                            marginBottom: 15,
+                            lineHeight: 11,
+                            textAlign: "left",
+                          },
+                          p: {
+                            whiteSpace: "normal",
+                          },
+                          li: {
+                            // listStyleType: "none",
+                            // whiteSpace: "normal",
+                            marginBottom: 2,
+                            textAlign: "left",
+                          },
+                          ul: {
+                            padding: 0,
+                          },
+                        }}
+                        baseStyle={{
+                          alignSelf: "center",
+                          fontSize: 10,
+                          // marginLeft: -20,
+                          padding: 0,
+                        }}
+                      />
+                    </>
                   }
                   personName={s.moderator}
                   token={token}
@@ -203,28 +288,99 @@ function Events({ route, navigation }) {
                   navigation={navigation}
                   title={s.moderator_post || s.event.title}
                   text={
-                    Platform.OS === "android"
-                      ? s?.full
-                          ?.replace(regex, "")
-                          .replace(spacesRegex, "")
-                          .replace(simvolRegexp, " ")
-                          .trim() ||
-                        s?.event?.full
-                          ?.replace(regex, "")
-                          .replace(spacesRegex, "")
-                          .replace(simvolRegexp, " ")
-                          .trim()
-                      : (
-                          <RenderHtml
-                            contentWidth={width}
-                            source={{ html: s.full }}
-                          />
-                        ) || (
-                          <RenderHtml
-                            contentWidth={width}
-                            source={{ html: s.event.full }}
-                          />
-                        )
+                    // <Text>
+                    //   {Platform.OS === "android"
+                    //     ? s?.full
+                    //         ?.replace(regex, "")
+                    //         .replace(spacesRegex, "")
+                    //         .replace(simvolRegexp, " ")
+                    //         .trim() ||
+                    //       s?.event?.full
+                    //         ?.replace(regex, "")
+                    //         .replace(spacesRegex, "")
+                    //         .replace(simvolRegexp, " ")
+                    //         .trim()
+                    //     : (
+                    //         <RenderHtml
+                    //           contentWidth={width}
+                    //           source={{ html: s.full }}
+                    //           enableExperimentalMarginCollapsing={true}
+                    //           // tagsStyles={tagsStyles}
+                    //         />
+                    //       ) || (
+                    //         <RenderHtml
+                    //           contentWidth={width}
+                    //           source={{ html: s.event.full }}
+                    //           enableExperimentalMarginCollapsing={true}
+                    //           // tagsStyles={tagsStyles}
+                    //         />
+                    //       )}
+                    // </Text>
+
+                    <>
+                      <RenderHtml
+                        contentWidth={width}
+                        source={{ html: s.full }}
+                        tagsStyles={{
+                          body: {
+                            listStyleType: "none",
+                            padding: 0,
+                            fontFamily: "GothamProRegular",
+                            fontSize: 12,
+                            color: COLOR_9,
+                            textAlign: "left",
+                            alignSelf: "flex-start",
+                          },
+
+                          p: {
+                            textAlign: "left",
+                          },
+                          li: {
+                            marginBottom: 2,
+                            textAlign: "left",
+                          },
+                          ul: {
+                            padding: 0,
+                          },
+                        }}
+                        baseStyle={{
+                          alignSelf: "center",
+                          fontSize: 10,
+                          // marginLeft: -20,
+                          padding: 0,
+                        }}
+                      />
+
+                      <RenderHtml
+                        contentWidth={width}
+                        source={{ html: s.event.full }}
+                        tagsStyles={{
+                          body: {
+                            listStyleType: "none",
+                            // backgroundColor: "red",
+                            padding: 0,
+                            fontFamily: "GothamProRegular",
+                            fontSize: 9,
+                            color: COLOR_9,
+                            textAlign: "left",
+                          },
+                          p: {
+                            whiteSpace: "normal",
+                            backgroundColor: "red",
+                          },
+                          li: {
+                            marginBottom: 2,
+                            textAlign: "left",
+                          },
+                          ul: {
+                            padding: 0,
+                          },
+                        }}
+                        baseStyle={{
+                          padding: 0,
+                        }}
+                      />
+                    </>
                   }
                   personName={s.moderator}
                   token={token}

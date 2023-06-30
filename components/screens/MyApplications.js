@@ -50,11 +50,10 @@ function MyApplications() {
   const [token, setToken] = useState();
   const dispatch = useDispatch();
   const state = useSelector((state1) => state1);
-  const { loading } = state.allCatSlice;
+  const { loading,data } = state.allCatSlice;
   const user = state.authUserSlice?.data?.user;
 
   const [filteredData, setFilteredData] = useState([]);
-  const [isFiltred, setIsFiltred] = useState(false);
   const timeStamnp = +filteredData[0]?.date_create?.$date.$numberLong;
 
   useEffect(() => {
@@ -70,29 +69,23 @@ function MyApplications() {
 
   useEffect(() => {
     const isFocused = navigation.addListener("focus", () => {
-      // dispatch(
-      //   allCatRequest({
-      //     token,
-      //     tab: activeTab == "В работе" ? "onwork" : "draft",
-      //     offset,
-      //   })
-      // ).then((res) => {
-      //   if (res.payload) {
-      //     setFilteredData(res.payload?.data?.aplications?.aplications);
-      //     // setActiveTab(
-      //     //   res.payload?.data?.aplications?.type == "onwork"
-      //     //     ? "В работе"
-      //     //     : "Черновик"
-      //     // );
-      //   }
-      // });
+      AsyncStorage.getItem("token").then((result) => {
+        if (result) {
+          setToken(result);
+          dispatch(authRequest({ secret_token: result })).then((res) => {
+            // setToken(res.payload?.data?.token);
+          });
+        }
+      });
     });
 
     return () => {
       isFocused();
     };
   }, [navigation]);
+
   useEffect(() => {
+    resetText()
     dispatch(
       allCatRequest({
         token,
@@ -104,25 +97,7 @@ function MyApplications() {
         setFilteredData(res.payload?.data?.aplications?.aplications);
       }
     });
-  }, [activeTab]);
-  // useEffect(() => {
-  //   dispatch(
-  //     allCatRequest({
-  //       token,
-  //       tab: activeTab,
-  //       offset,
-  //     })
-  //   ).then((res) => {
-  //     if (res.payload) {
-  //       setFilteredData(res.payload?.data?.aplications?.aplications);
-  //       setActiveTab(
-  //         res.payload?.data?.aplications?.type == "onwork"
-  //           ? "В работе"
-  //           : "Черновик"
-  //       );
-  //     }
-  //   });
-  // }, [activeTab]);
+  }, [activeTab, token]);
 
   const renderItem = ({ item, index }) => {
     return (
@@ -203,7 +178,6 @@ function MyApplications() {
   };
 
   const filtered = (searchText) => {
-    setIsFiltred(true);
     setFilteredData(
       filteredData.filter((m) => {
         return m?.title?.includes(searchText);
@@ -211,9 +185,17 @@ function MyApplications() {
     );
   };
 
+  useEffect(() => {
+    if (searchValue.trim().length < 1) {
+      resetText();
+    }
+  }, [searchValue, activeTab]);
+
   const resetText = () => {
     setSearchValue("");
     filtered("");
+    console.log(data)
+    setFilteredData(data);
   };
 
   const headerComponent = () => {
@@ -223,23 +205,9 @@ function MyApplications() {
           tabs={["В работе", "Черновик", "Архив"]}
           activeTab={activeTab}
           onPress={async (tab) => {
-            setIsFiltred(false);
             setPage(1);
             setOffset(0);
             setActiveTab(tab);
-            await AsyncStorage.setItem("activeTab", tab);
-            // dispatch(
-            //   allCatRequest({
-            //     token,
-            //     tab: activeTab == "В работе" ? "onwork" : "draft",
-            //     offset,
-            //   })
-            // ).then(async (res) => {
-            //   if (res.payload) {
-            //     setFilteredData(res.payload?.data?.aplications?.aplications);
-            //     resetText();
-            //   }
-            // });
           }}
         />
         <View style={styles.searchRow}>
@@ -247,10 +215,11 @@ function MyApplications() {
             <Search
               style={styles.search}
               keyboardType={"web-search"}
-              searchText={searchValue}
+              value={searchValue}
               onSearchText={(val) => {
-                val === "" && resetText();
-                setSearchValue(val);
+                val.trim().length && setSearchValue(val);
+                !val.trim().length && resetText();
+                console.log(val);
               }}
               resetText={resetText}
             />
@@ -442,23 +411,6 @@ function MyApplications() {
             activeTab={activeTab}
             onPress={async (tab) => {
               setActiveTab(tab);
-              // dispatch(
-              //   allCatRequest({
-              //     token,
-              //     tab: activeTab == "В работе" ? "onwork" : "draft",
-              //     offset,
-              //   })
-              // )
-              //   .then((res) => {
-              //     if (res.payload) {
-              //       setFilteredData(
-              //         res.payload?.data?.aplications?.aplications
-              //       );
-              //     }
-              //   })
-              //   .catch((e) => {
-              //     console.log(e, "error");
-              //   });
             }}
           />
           <View style={styles.blankTextBlock}>

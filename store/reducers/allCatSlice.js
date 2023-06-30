@@ -6,10 +6,13 @@ export const allCatRequest = createAsyncThunk(
   "allCat",
   async ({ token, tab, offset }) => {
     var formdata = new FormData();
-    formdata.append("secret_token", token);
+    formdata.append(
+      "secret_token",
+      token || (await AsyncStorage.getItem("token"))
+    );
     formdata.append("type_request", tab);
     formdata.append("offset", offset);
-    console.log(formdata,5555);
+    console.log(formdata, 5555);
     var requestOptions = {
       method: "POST",
       body: formdata,
@@ -45,7 +48,7 @@ const allCatSlice = createSlice({
         state.loading = true;
       })
       .addCase(allCatRequest.fulfilled, (state, action) => {
-        state.data = action.payload?.aplications?.aplications;
+        state.data = action.payload?.data?.aplications?.aplications;
         state.error = false;
         state.loading = false;
       })

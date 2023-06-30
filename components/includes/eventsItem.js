@@ -40,7 +40,7 @@ function EventsItem({
     <View style={styles.section}>
       <View style={styles.sectionContent}>
         <Text style={styles.sectionTitle}>{title}</Text>
-        <Text style={styles.sectionText}>{text}</Text>
+        {text}
         <View style={styles.personBlock}>
           <Text style={styles.personName}>{personName}</Text>
           <Text style={styles.personPosition}>{position}</Text>
@@ -133,14 +133,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginTop: 20,
   },
-  sectionText: {
-    fontFamily: "GothamProRegular",
-    fontSize: 9,
-    color: COLOR_9,
-    marginBottom: 15,
-    lineHeight: 11,
-    textAlign: "left",
-  },
+
   personBlock: {
     marginBottom: 34,
   },
