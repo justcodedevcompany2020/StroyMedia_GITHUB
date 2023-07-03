@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../../Api";
 
-export const getMembersReques = createAsyncThunk(
+export const getMembersRequest = createAsyncThunk(
   "getMember",
   async ({ token, offset = null, city, role, companyName }) => {
     let roleName;
@@ -44,16 +44,16 @@ const getMembersSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(getMembersReques.pending, (state) => {
+      .addCase(getMembersRequest.pending, (state) => {
         state.loading = true;
         state.favoriteList = [];
       })
-      .addCase(getMembersReques.fulfilled, (state, action) => {
+      .addCase(getMembersRequest.fulfilled, (state, action) => {
         state.data = action.payload.data?.data?.company;
         state.favoriteList = action.payload.data?.data?.isLike;
         state.error = false;
       })
-      .addCase(getMembersReques.rejected, (state) => {
+      .addCase(getMembersRequest.rejected, (state) => {
         state.error = true;
         state.loading = false;
       });

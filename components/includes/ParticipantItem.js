@@ -17,10 +17,12 @@ function ParticipantItem({
   id,
   favorites,
   likedList,
+  index,
 }) {
   const [token, setToken] = useState();
   const [liked, setLiked] = useState(likedList);
   const dispatch = useDispatch();
+
   useEffect(() => {
     AsyncStorage.getItem("token").then((result) => {
       if (result) {
@@ -28,12 +30,15 @@ function ParticipantItem({
       }
     });
   }, []);
-  useEffect(() => {
-    setLiked(likedList)
-  },[likedList])
+
+  // useEffect(() => {
+  //   setLiked(likedList);
+  // }, [likedList]);
+  // console.log(likedList);
+
   return (
     <>
-      {favorites === "Избранное" && liked ? (
+      {favorites === "Избранное" && likedList[index] == "is_Favorite" ? (
         <TouchableOpacity
           style={styles.wrapper}
           activeOpacity={0.5}
@@ -60,7 +65,7 @@ function ParticipantItem({
             }}
             styles={styles.favImgBlock}
           >
-            {liked ? <ImageFavoriteGreen /> : <ImageFavorite />}
+            {likedList[index] ? <ImageFavoriteGreen /> : <ImageFavorite />}
           </TouchableOpacity>
         </TouchableOpacity>
       ) : null}
@@ -92,7 +97,11 @@ function ParticipantItem({
             }}
             styles={styles.favImgBlock}
           >
-            {liked ? <ImageFavoriteGreen /> : <ImageFavorite />}
+            {likedList[index] == "is_Favorite" ? (
+              <ImageFavoriteGreen />
+            ) : (
+              <ImageFavorite />
+            )}
           </TouchableOpacity>
         </TouchableOpacity>
       )}

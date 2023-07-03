@@ -12,7 +12,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { allCatRequest } from "../../store/reducers/allCatSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getMembersReques } from "../../store/reducers/getMembersDataSlice";
+import { getMembersRequest } from "../../store/reducers/getMembersDataSlice";
 import { ActivityIndicator } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 
@@ -46,11 +46,11 @@ const HomeMainButtons = () => {
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() => {
-          dispatch(getMembersReques({ token }))
-            .unwrap()
-            .then(() => {
+          // dispatch(getMembersRequest({ token }))
+          //   .unwrap()
+          //   .then(() => {
+          //   });
               navigation.navigate("Participants", { currentPage: "Участники" });
-            });
         }}
         style={[styles.block, styles.bgGreen]}
       >

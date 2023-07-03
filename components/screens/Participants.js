@@ -22,7 +22,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getCitys } from "../../store/reducers/getCitysSlice";
 import { Entypo } from "@expo/vector-icons";
-import { getMembersReques } from "../../store/reducers/getMembersDataSlice";
+import { getMembersRequest } from "../../store/reducers/getMembersDataSlice";
 
 const SearchIcon = require("../../assets/search.png");
 
@@ -59,7 +59,7 @@ function Participants({ route, navigation }) {
   }, [citys]);
 
   // useEffect(() => {
-  //   dispatch(getMembersReques({ token }))
+  //   dispatch(getMembersRequest({ token }))
   //     .unwrap()
   //     .then((res) => {
   //       console.log(res?.data?.data?.isLike, "favoriteList");
@@ -68,6 +68,21 @@ function Participants({ route, navigation }) {
   //   // setLikedList(favoriteList);
   // }, [success]);
 
+  // test Armani hamar
+
+  // const makeFakeRequest = async () => {
+  //   await fetch("https://admin.justcode.am/api/new_request", {
+  //     method: "POST",
+  //   })
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       console.log(data, "data");
+  //     });
+  // };
+  // useEffect(() => {
+  //   makeFakeRequest();
+  // }, []);
+
   const resetText = () => {
     setSearchValue("");
     filtered("");
@@ -75,42 +90,37 @@ function Participants({ route, navigation }) {
 
   const resetFiltered = () => {
     setCityId(null);
-    filtered("");
+    // filtered("");
     setRole("");
     setCityName("");
   };
 
-  const nextPage = () => {
-    setOffset(offset + 5);
-    setPage(page + 1);
+  useEffect(() => {
     dispatch(
-      getMembersReques({
+      getMembersRequest({
         token,
-        offset: offset + 5,
+        offset: offset,
         city: cityId ? cityId : null,
         role: role ? role : null,
       })
     );
+  }, [offset, navigation, token]);
+
+  const nextPage = () => {
+    setOffset(offset + 5);
+    setPage(page + 1);
   };
 
   const previusPage = () => {
     setOffset(offset - 5);
     setPage(page - 1);
-    dispatch(
-      getMembersReques({
-        token,
-        offset: offset - 5,
-        city: cityId ? cityId : null,
-        role: role ? role : null,
-      })
-    );
   };
 
   const filtered = (id, role, companyName = null) => {
     setPage(1);
     setOffset(null);
     dispatch(
-      getMembersReques({ token, offset: null, role, city: id, companyName })
+      getMembersRequest({ token, offset: null, role, city: id, companyName })
     );
   };
 
@@ -127,6 +137,7 @@ function Participants({ route, navigation }) {
         onPress={(tab) => {
           resetFiltered();
           setActiveTab(tab);
+          // setOffset(null);
         }}
         tabs={tabs}
         activeTab={activeTab}
@@ -198,11 +209,11 @@ function Participants({ route, navigation }) {
           return <Text style={styles.empty}>ничего не найдено</Text>;
         }}
         renderItem={({ item, index }) => {
-          if (favoriteList[index] == "is_Favorite") {
-            liked = true;
-          } else if (favoriteList[index] == "not_Favorite") {
-            liked = false;
-          }
+          // if (favoriteList[index] == "is_Favorite") {
+          //   liked = true;
+          // } else if (favoriteList[index] == "not_Favorite") {
+          //   liked = false;
+          // }
           return (
             <View
               style={{
@@ -212,7 +223,7 @@ function Participants({ route, navigation }) {
               }}
             >
               <ParticipantItem
-                likedList={liked}
+                likedList={favoriteList}
                 favorites={activeTab}
                 imageUri={`https://teus.online/${item?.avatar}`}
                 companyName={item?.name || item?.contact_person}
@@ -220,6 +231,7 @@ function Participants({ route, navigation }) {
                 doingProfile={item?.inn}
                 navigation={navigation}
                 id={item?.last_id}
+                index={index}
               />
             </View>
           );
@@ -233,7 +245,7 @@ function Participants({ route, navigation }) {
           marginBottom: 20,
         }}
       >
-        {activeTab !== "Избранное" && data?.length === 5 ? (
+        {activeTab !== "Избранное" && data?.length > 4 ? (
           <>
             <View>
               <TouchableOpacity
