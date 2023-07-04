@@ -15,7 +15,7 @@ function Polls({ route, navigation }) {
   const { currentPage } = route.params;
   const dispatch = useDispatch();
 
-  const [sending,setSending] = useState([])
+  const [sending, setSending] = useState([]);
 
   useEffect(() => {
     AsyncStorage.getItem("token").then((result) => {
@@ -61,7 +61,6 @@ function Polls({ route, navigation }) {
               value.length < 15
             ) {
               if (item[value][0] !== null) {
-                
                 vote.push(item[value]);
               }
 
@@ -77,11 +76,9 @@ function Polls({ route, navigation }) {
           });
         })}
 
-       
-
         {filteredData.map((d, i) => {
           let sended = false;
-        
+
           if (d.value) {
             return (
               <AccordionItem

@@ -259,12 +259,8 @@ function CreatingApplication() {
         formdata.append("currency", price_type);
         formdata.append("responsible", user?.last_id);
         formdata.append("img", selectedImage);
+        formdata.append("count", containerCount);
         formdata.append("_type_op", saveAsDraft ? "draft" : "onwork");
-        // formdata.append("img", {
-        //   uri: selectedImage,
-        //   name: fileName.split(".").shift(),
-        //   type: fileType,
-        // });
 
         dispatch(
           sendCatRequest({

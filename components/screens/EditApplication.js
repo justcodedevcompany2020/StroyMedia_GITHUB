@@ -66,6 +66,8 @@ function EditApplication() {
     condition_,
     to_city_id,
     from_city_id,
+    cargo,
+    comment_,
   } = route.params;
   let activeSecondary = activeSecondaryTab.hasOwnProperty("ru")
     ? activeSecondaryTab.ru
@@ -83,19 +85,22 @@ function EditApplication() {
   const [to_city, setTo_city] = useState(to_city_id);
   const [searchValue, setSearchValue] = useState("");
   const [date, setDate] = useState(new Date());
-  const [comment, setComment] = useState(decription);
+  const [comment, setComment] = useState(decription || comment_);
   const [showDatePicker, setShowDatePicker] = useState("");
   const [currency, setCurrency] = useState(valut);
-  const [weight, setWeight] = useState("");
+  const [weight, setWeight] = useState(cargo);
   const state = useSelector((state1) => state1);
   const [conditation, setConditation] = useState(condition_);
   const [typePay, setTypePay] = useState(paymentType);
-
   const [restrict, setRestrict] = useState(
     reestrrzhd_ == "исключен" ? "исключен" : "включен"
   );
   const [selectedImage, setSelectedImage] = useState(
-    img?.length && "https://teus.online/" + img
+    img === "string"
+      ? "https://teus.online" + img
+      : Array.isArray(img)
+      ? "https://teus.online" + img[0]?.url
+      : selectedImage || null
   );
   const [fileName, setFileName] = useState("");
   const [fileType, setFileType] = useState("");
@@ -214,71 +219,62 @@ function EditApplication() {
       restrick,
       typeKTK,
       price_type,
-      user,
+      user: user.last_id,
       selectedImage,
+      count_,
     };
     setLoading(true);
-    if (
-      activeSecondary == "Продажа КТК" &&
-      _.every(Object.values(checkValues))
-    ) {
-      formdata.append("secret_token", token);
-      formdata.append("last_id", last_id);
-      formdata.append("price", price);
-      formdata.append("dislokaciya", from_city);
-      formdata.append("condition", new_or_used);
-      formdata.append("description", comment);
-      formdata.append("typepay", payType);
-      formdata.append("reestrrzhd", restrick);
-      formdata.append("type_container", typeKTK);
-      formdata.append("currency", price_type);
-      formdata.append("responsible", user);
-      // formdata.append("img", {
-      //   uri: selectedImage,
-      //   name: fileName.split(".").shift(),
-      //   type: fileType,
-      // });
-      formdata.append("img", selectedImage);
-      formdata.append("_type_op", saveAsDraft ? "draft" : "onwork");
-
-      dispatch(
-        editAplicationsRequest({
-          formdata,
-          myHeaders,
-        })
-      )
-        .unwrap()
-        .then((res) => {
-          setLoading(false);
-          if (res?.success) {
-            navigation.navigate("MyApplications", {
-              currentPage: "Мои заявки",
+    if (activeSecondary === "Продажа КТК") {
+      if (_.every(Object.values(checkValues))) {
+        formdata.append("secret_token", token);
+        formdata.append("last_id", last_id);
+        formdata.append("price", price);
+        formdata.append("dislokaciya", from_city);
+        formdata.append("condition", new_or_used);
+        formdata.append("description", comment);
+        formdata.append("typepay", payType);
+        formdata.append("reestrrzhd", restrick);
+        formdata.append("type_container", typeKTK);
+        formdata.append("currency", price_type);
+        formdata.append("responsible", user.last_id.toString());
+        formdata.append("img", selectedImage);
+        formdata.append("count", containerCount);
+        formdata.append("_type_op", saveAsDraft ? "draft" : "onwork");
+        console.log(checkValues);
+        console.log(formdata);
+        dispatch(
+          editAplicationsRequest({
+            formdata,
+            myHeaders,
+          })
+        )
+          .unwrap()
+          .then((res) => {
+            setLoading(false);
+            if (res?.success) {
+              console.log(res);
+              navigation.navigate("MyApplications", {
+                currentPage: "Мои заявки",
+              });
+            }
+          })
+          .catch((e) => {
+            setLoading(false);
+            console.log(e);
+            showMessage({
+              message: "Все поля должны быть заполнены",
+              type: "danger",
             });
-          }
-        })
-        .catch((e) => {
-          setLoading(false);
-          showMessage({
-            message: "Все поля должны быть заполнены",
-            type: "danger",
           });
+      } else {
+        setLoading(false);
+        showMessage({
+          message: "Все поля должны быть заполнены",
+          type: "danger",
         });
-    } else {
-      setLoading(false);
-      showMessage({
-        message: "Все поля должны быть заполнены",
-        type: "danger",
-      });
+      }
     }
-    // activeSecondaryTab === "Продажа КТК" && !_.every( Object.values( compareDataSales ) ) && showMessage( {
-    //   message : "Все поля должны быть заполнены",
-    //   type : "danger",
-    // } );
-    //
-    // activeSecondaryTab !== "Продажа КТК" && !_.every( Object.values( compareData ) ) && showMessage( {
-    //   message : "Все поля должны быть заполнены",
-    //   type : "danger",
-    // } );
+
     let checkValues1 = {
       token,
       last_id,
@@ -294,48 +290,112 @@ function EditApplication() {
     };
     if (
       activeSecondaryTab !== "Продажа КТК" &&
-      !_.every(Object.values(checkValues1))
+      activeSecondaryTab !== "Заявка на ТЭО"
     ) {
-      formdata.append("secret_token", token);
-      formdata.append("last_id", last_id);
-      formdata.append("from_city", from_city);
-      formdata.append("to_city", to_city);
-      formdata.append("count", containerCount);
-      formdata.append("date_shipment", date.toString());
-      formdata.append("period", date.toString());
-      formdata.append("price", price);
-      formdata.append("type_container", typeKTK);
-      formdata.append("currency", price_type);
-      formdata.append("responsible", user);
-      formdata.append("_type_op", saveAsDraft ? "draft" : "onwork");
+      if (_.every(Object.values(checkValues1))) {
+        formdata.append("secret_token", token);
+        formdata.append("last_id", last_id);
+        formdata.append("from_city", from_city);
+        formdata.append("to_city", to_city);
+        formdata.append("count", containerCount);
+        formdata.append("date_shipment", date.toString());
+        formdata.append("period", date.toString());
+        formdata.append("price", price);
+        formdata.append("type_container", typeKTK);
+        formdata.append("currency", price_type);
+        formdata.append("responsible", user.last_id.toString());
+        formdata.append("_type_op", saveAsDraft ? "draft" : "onwork");
 
-      dispatch(
-        editAplicationsRequest({
-          formdata,
-          myHeaders,
-        })
-      )
-        .unwrap()
-        .then((e) => {
-          setLoading(false);
-          if (e.success)
-            navigation.navigate("MyApplications", {
-              currentPage: "Мои заявки",
+        dispatch(
+          editAplicationsRequest({
+            formdata,
+            myHeaders,
+          })
+        )
+          .unwrap()
+          .then((e) => {
+            setLoading(false);
+            if (e.success)
+              navigation.navigate("MyApplications", {
+                currentPage: "Мои заявки",
+              });
+          })
+          .catch((e) => {
+            setLoading(false);
+            showMessage({
+              message: "Все поля должны быть заполнены",
+              type: "danger",
             });
-        })
-        .catch((e) => {
-          setLoading(false);
-          showMessage({
-            message: "Все поля должны быть заполнены",
-            type: "danger",
           });
+      } else {
+        setLoading(false);
+        showMessage({
+          message: "Все поля должны быть заполнены",
+          type: "danger",
         });
-    } else {
-      setLoading(false);
-      showMessage({
-        message: "Все поля должны быть заполнены",
-        type: "danger",
-      });
+      }
+    }
+
+    let checkValues2 = {
+      token,
+      from_city,
+      to_city,
+      containerCount,
+      date,
+      weight,
+      comment,
+      typeKTK,
+      user: user?.last_id,
+    };
+    if (activeSecondaryTab === "Заявка на ТЭО") {
+      if (_.every(Object.values(checkValues2))) {
+        formdata.append("secret_token", token);
+        formdata.append("last_id", last_id);
+        formdata.append("from_city", from_city.toString());
+        formdata.append("to_city", to_city.toString());
+        formdata.append("count", containerCount);
+        formdata.append("date_shipment", date.toString());
+        formdata.append("cargo", weight);
+        formdata.append("comment", comment);
+        formdata.append("type_container", typeKTK);
+        formdata.append("responsible", user?.last_id.toString());
+        formdata.append("_type_op", saveAsDraft ? "draft" : "onwork");
+
+        dispatch(
+          editAplicationsRequest({
+            formdata,
+            myHeaders,
+          })
+        )
+          .unwrap()
+          .then((e) => {
+            setLoading(false);
+            if (e.success) {
+              navigation.navigate("MyApplications", {
+                currentPage: "Мои заявки",
+              });
+            } else {
+              setLoading(false);
+              showMessage({
+                message: "Все поля должны быть заполнены",
+                type: "danger",
+              });
+            }
+          })
+          .catch((e) => {
+            setLoading(false);
+            showMessage({
+              message: "Все поля должны быть заполнены",
+              type: "danger",
+            });
+          });
+      } else if (!_.every(Object.values(checkValues2))) {
+        setLoading(false);
+        showMessage({
+          message: "Все поля должны быть заполнены",
+          type: "danger",
+        });
+      }
     }
   };
 
@@ -537,7 +597,7 @@ function EditApplication() {
               borderRadius: 8,
             }}
             data={valuta}
-            defaultValue={valut}
+            defaultValue={currency}
             onSelect={(selectedItem, index) => {
               setCurrency(selectedItem);
             }}
@@ -1038,6 +1098,7 @@ function EditApplication() {
               borderRadius: 8,
             }}
             data={valuta}
+            defaultValue={currency}
             onSelect={(selectedItem, index) => {
               setCurrency(selectedItem);
             }}

@@ -50,7 +50,7 @@ function MyApplications() {
   const [token, setToken] = useState();
   const dispatch = useDispatch();
   const state = useSelector((state1) => state1);
-  const { loading,data } = state.allCatSlice;
+  const { loading, data } = state.allCatSlice;
   const user = state.authUserSlice?.data?.user;
 
   const [filteredData, setFilteredData] = useState([]);
@@ -85,7 +85,7 @@ function MyApplications() {
   }, [navigation]);
 
   useEffect(() => {
-    resetText()
+    resetText();
     dispatch(
       allCatRequest({
         token,
@@ -97,7 +97,7 @@ function MyApplications() {
         setFilteredData(res.payload?.data?.aplications?.aplications);
       }
     });
-  }, [activeTab, token]);
+  }, [activeTab, token, navigation]);
 
   const renderItem = ({ item, index }) => {
     return (
@@ -108,7 +108,9 @@ function MyApplications() {
               source={{
                 uri:
                   typeof item?.img === "string"
-                    ? "https://teus.online/" + item.img
+                    ? "https://teus.online" + item?.img
+                    : Array.isArray(item?.img)
+                    ? "https://teus.online" + item.img[0]?.url
                     : null,
               }}
               style={{
@@ -149,21 +151,24 @@ function MyApplications() {
             </View>
             <View
               style={{
-                flexDirection: "column",
-                width: "80%",
+                width: "100%",
+                justifyContent: "space-between",
               }}
             >
               <View
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
+                  justifyContent: "space-between",
                 }}
               >
                 <Text style={styles.quantity}>Количество: {item?.count}</Text>
-                <Text style={styles.priceText}>Цена:</Text>
-                <View style={styles.price}>
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Text style={styles.priceText}>Цена:</Text>
                   <Text style={styles.price}>
-                    {item?.price ? item.price + " " + "p" : "по запросу"}
+                    {item?.price
+                      ? item.price + " " + item?.currency?.sign
+                      : "по запросу"}
                   </Text>
                 </View>
               </View>
@@ -194,7 +199,6 @@ function MyApplications() {
   const resetText = () => {
     setSearchValue("");
     filtered("");
-    console.log(data)
     setFilteredData(data);
   };
 
@@ -219,7 +223,6 @@ function MyApplications() {
               onSearchText={(val) => {
                 val.trim().length && setSearchValue(val);
                 !val.trim().length && resetText();
-                console.log(val);
               }}
               resetText={resetText}
             />
@@ -353,7 +356,7 @@ function MyApplications() {
                       currentPage: "Редактирование заявки",
                       activeSecondaryTab: item?.service?.title,
                       typeKTK: item?.type_container?.title,
-                      user: user?.last_id?.toString(),
+                      user: user,
                       token,
                       last_id: item?.last_id?.toString(),
                       price_: item?.price?.toString(),
@@ -380,6 +383,8 @@ function MyApplications() {
                       condition_: item?.condition?.title.hasOwnProperty("ru")
                         ? item?.condition?.title?.ru
                         : item?.condition?.title,
+                      cargo: item?.cargo?.toString(),
+                      comment_: item?.comment?.toString(),
                     });
                   }}
                 >
@@ -474,6 +479,7 @@ const styles = StyleSheet.create({
     borderBottomColor: COLOR_6,
     borderBottomWidth: 1,
     paddingHorizontal: WRAPPER_PADDINGS,
+    maxWidth: "100%",
   },
   row: {
     flexDirection: "row",
@@ -482,7 +488,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   number: {
-    marginRight: 20,
+    // marginRight: 20,
     color: COLOR_5,
     fontSize: 12,
     fontFamily: "GothamProMedium",
@@ -502,7 +508,7 @@ const styles = StyleSheet.create({
     fontFamily: "GothamProRegular",
   },
   leftBlock: {
-    marginRight: 20,
+    // marginRight: 20,
     height: 50,
     justifyContent: "space-between",
     alignItems: "center",
@@ -520,7 +526,9 @@ const styles = StyleSheet.create({
   },
   rightBlock: {
     height: 50,
+    flex: 1,
     justifyContent: "space-between",
+    marginLeft: 10,
   },
   locationInfo: {
     flexDirection: "row",
@@ -549,14 +557,14 @@ const styles = StyleSheet.create({
     color: COLOR_8,
     fontSize: 12,
     fontFamily: "GothamProMedium",
-    marginRight: 8,
+    marginRight: 2,
   },
   price: {
     color: COLOR_5,
     fontSize: 12,
     fontFamily: "GothamProMedium",
-    paddingVertical: 4,
-    paddingHorizontal: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
     backgroundColor: COLOR_2,
     borderRadius: 10,
   },

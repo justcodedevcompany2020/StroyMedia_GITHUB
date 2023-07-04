@@ -327,7 +327,7 @@ function Offers({ route, navigation }) {
             onSearchText={(val) => {
               val.trim().length === 0 && resetFiltered();
               setSearchValue(val);
-              filtered()
+              filtered();
             }}
             resetText={resetText}
           />
