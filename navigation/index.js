@@ -22,7 +22,9 @@ const Navigation = () => {
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
-
+  const state = useSelector((state) => state);
+  const { notification_data } = state.getAllNotificationsSlice;
+  
   useEffect(() => {
     registerForPushNotificationsAsync().then((token) =>
       setExpoPushToken(token)
@@ -30,12 +32,12 @@ const Navigation = () => {
 
     notificationListener.current =
       Notifications.addNotificationReceivedListener((notification) => {
-        setNotification(notification);
+        setNotification(notification, "notification");
       });
 
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log(response);
+        console.log(response, "response");
       });
 
     return () => {

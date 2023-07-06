@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, Image } from "react-native";
 import {
   COLOR_1,
@@ -12,26 +12,67 @@ import {
   ImageNotificationsIcon,
   ImageSave,
 } from "../helpers/images";
-import { getAllnotificationsRequest } from "../../store/reducers/getAllNotificationsSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Modal from "react-native-modal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getAllNotificationsRequest } from "../../store/reducers/getAllNotificationsSlice";
+import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
 
 function Header({ currentPage, home, navigation, onSavePress }) {
-  const data = useSelector((state) =>
-    state.getAllNotificationsSlice?.data?.date_16_08_2022
-      ? state.getAllNotificationsSlice?.data?.date_16_08_2022[0]
-      : null
-  );
+  const state = useSelector((state) => state);
+  const { notification_data } = state.getAllNotificationsSlice;
+  const [expoPushToken, setExpoPushToken] = useState("");
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  const responseListener = useRef();
+
+  useEffect(() => {
+    registerForPushNotificationsAsync().then((token) =>
+      setExpoPushToken(token)
+    );
+
+    notificationListener.current =
+      Notifications.addNotificationReceivedListener((notification) => {
+        setNotification(notification);
+        console.log(notification, "notification");
+      });
+
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log(response, "response");
+      });
+
+    sendNotification();
+    return () => {
+      Notifications.removeNotificationSubscription(
+        notificationListener.current
+      );
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
+  }, []);
+
+  const sendNotification = async () => {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "New Notification",
+        body: "Hello, this is a test notification!",
+        sound: true,
+        vibrate: true,
+      },
+      trigger: null, // Display immediately
+    });
+  };
+
   const [visible, setVisible] = useState(false);
   const dispatch = useDispatch();
   useEffect(() => {
     AsyncStorage.getItem("token").then((result) => {
       if (result) {
-        dispatch(getAllnotificationsRequest({ token: result }));
+        dispatch(getAllNotificationsRequest({ token: result }));
       }
     });
-  }, [dispatch]);
+  }, [dispatch, navigation]);
 
   const isVisible = () => {
     setVisible(true);
@@ -93,30 +134,28 @@ function Header({ currentPage, home, navigation, onSavePress }) {
         <View style={styles.modalWrapper}>
           <Text style={styles.title}>Уведомления</Text>
           <View>
-            {/* {data ? 
-                            <View>
-                                <Image source={{ uri: 'https://teus.online/' + data?.author.avatar }} style={styles.imageStyles} />
-                                <View><Text style={styles.notifyText}>{data?.type}</Text>
-                                    <Text style={styles.notifyText}>{data?.author?.name}</Text> </View>
-                            </View>
-                            :null
-                      
-                        } */}
-            {data && (
-              <View style={styles.notificationWrapper}>
-                <Image
-                  source={{ uri: "https://teus.online/" + data?.author.avatar }}
-                  style={styles.imageStyles}
-                />
-                <View>
-                  <Text style={styles.authorNotification}>
-                    {data?.author.name}
-                  </Text>
-                  <Text style={styles.notifyText}>{data?.type}</Text>
-                </View>
-              </View>
-            )}
-            {!data && (
+            {notification_data ? (
+              notification_data.map((item, index) => {
+                return (
+                  <View style={styles.notificationWrapper} key={index}>
+                    <Image
+                      source={{
+                        uri: "https://teus.online" + item[0]?.author?.avatar,
+                      }}
+                      style={styles.imageStyles}
+                    />
+                    <View>
+                      <Text style={styles.authorNotification}>
+                        {item[0]?.author?.name}
+                      </Text>
+                      <Text style={styles.notifyText}>
+                        {/* {item[0]?.type} */}
+                      </Text>
+                    </View>
+                  </View>
+                );
+              })
+            ) : (
               <Text style={styles.noDataText}>У Вас нет уведомлений</Text>
             )}
           </View>
@@ -228,3 +267,36 @@ const styles = StyleSheet.create({
 });
 
 export default Header;
+
+async function registerForPushNotificationsAsync() {
+  let token;
+
+  if (Platform.OS === "android") {
+    await Notifications.setNotificationChannelAsync("default", {
+      name: "default",
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: "#FF231F7C",
+    });
+  }
+
+  if (Device.isDevice) {
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== "granted") {
+      alert("Failed to get push token for push notification!");
+      return;
+    }
+    token = (await Notifications.getExpoPushTokenAsync()).data;
+    console.log(token);
+  } else {
+    alert("Must use physical device for Push Notifications");
+  }
+
+  return token;
+}
