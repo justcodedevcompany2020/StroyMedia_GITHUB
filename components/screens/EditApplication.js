@@ -240,8 +240,7 @@ function EditApplication() {
         formdata.append("img", selectedImage);
         formdata.append("count", containerCount);
         formdata.append("_type_op", saveAsDraft ? "draft" : "onwork");
-        console.log(checkValues);
-        console.log(formdata);
+   
         dispatch(
           editAplicationsRequest({
             formdata,
@@ -252,7 +251,6 @@ function EditApplication() {
           .then((res) => {
             setLoading(false);
             if (res?.success) {
-              console.log(res);
               navigation.navigate("MyApplications", {
                 currentPage: "Мои заявки",
               });
@@ -260,7 +258,6 @@ function EditApplication() {
           })
           .catch((e) => {
             setLoading(false);
-            console.log(e);
             showMessage({
               message: "Все поля должны быть заполнены",
               type: "danger",

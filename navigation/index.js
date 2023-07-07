@@ -10,8 +10,8 @@ import * as Notifications from "expo-notifications";
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
   }),
 });
 
@@ -24,7 +24,28 @@ const Navigation = () => {
   const responseListener = useRef();
   const state = useSelector((state) => state);
   const { notification_data } = state.getAllNotificationsSlice;
-  
+
+  const sendNotification = async () => {
+    // console.log(notification_data[0][0]);
+    // console.log(`https://teus.online${notification_data[0][0].author.avatar}`);
+
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "You've got mail! 📬",
+        sound: true, // Provide ONLY the base filename
+        body: "namak es stacel",
+        subtitle: "You ve got mail",
+        vibrate: true,
+        launchImageName: `https://teus.online${notification_data[0][0].author.avatar}`,
+        badge: 1,
+      },
+      trigger: {
+        seconds: 2,
+        channelId: "new-emails",
+      },
+    });
+  };
+
   useEffect(() => {
     registerForPushNotificationsAsync().then((token) =>
       setExpoPushToken(token)
@@ -39,6 +60,8 @@ const Navigation = () => {
       Notifications.addNotificationResponseReceivedListener((response) => {
         console.log(response, "response");
       });
+
+    sendNotification();
 
     return () => {
       Notifications.removeNotificationSubscription(
@@ -83,6 +106,10 @@ async function registerForPushNotificationsAsync() {
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
       lightColor: "#FF231F7C",
+      sound: true,
+      enableVibrate: true,
+      showBadge: true,
+      audioAttributes: true,
     });
   }
 

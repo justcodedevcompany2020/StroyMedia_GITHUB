@@ -53,7 +53,7 @@ function Offers({ route, navigation }) {
   const [activeSecondaryTab, setActiveSecondaryTab] = useState("Поиск КТК");
   const [searchValue, setSearchValue] = useState("");
   const [load, setLoad] = useState(false);
-  const [id, setId] = useState();
+  const [id, setId] = useState("0");
   const [token, setToken] = useState();
 
   const { currentPage } = route.params;
@@ -61,9 +61,8 @@ function Offers({ route, navigation }) {
   const [searchName, setSearchName] = useState("");
   const [cityFromName, setFromCityName] = useState("");
   const [cityToName, setToCityName] = useState("");
-  const [offset, setOffset] = useState(5);
+  const [offset, setOffset] = useState(0);
   const [page, setPage] = useState(1);
-  const [likedList, setLikedList] = useState([]);
   const timeStamnp = +data[0]?.date_create?.$date.$numberLong;
   let allCitys = useSelector(
     (state) => state.getCitysSlice?.data?.data?.data?.citys
@@ -74,19 +73,19 @@ function Offers({ route, navigation }) {
 
   const dispatch = useDispatch();
   let liked = false;
-  useEffect(() => {
-    setId(
-      activeSecondaryTab === "Поиск КТК"
-        ? "2"
-        : activeSecondaryTab === "Продажа КТК"
-        ? "5"
-        : activeSecondaryTab === "Выдача КТК"
-        ? "3"
-        : activeSecondaryTab === "Контейнерный сервис"
-        ? "6"
-        : "7"
-    );
-  }, [activeSecondaryTab]);
+  // useEffect(() => {
+  //   setId(
+  //     activeSecondaryTab === "Поиск КТК"
+  //       ? "2"
+  //       : activeSecondaryTab === "Продажа КТК"
+  //       ? "5"
+  //       : activeSecondaryTab === "Выдача КТК"
+  //       ? "3"
+  //       : activeSecondaryTab === "Контейнерный сервис"
+  //       ? "6"
+  //       : "7"
+  //   );
+  // }, [activeSecondaryTab]);
 
   useEffect(() => {
     AsyncStorage.getItem("token").then((result) => {
@@ -117,7 +116,7 @@ function Offers({ route, navigation }) {
     dispatch(
       allSuggestionRequest({
         token,
-        id: activeSecondaryTab,
+        id,
         offset: 5,
         searchText: searchValue ? searchValue : null,
         to_city: cityToName ? cityToName.last_id : null,
@@ -163,8 +162,8 @@ function Offers({ route, navigation }) {
     dispatch(
       allSuggestionRequest({
         token,
-        id: activeSecondaryTab,
-        offset: 5,
+        id,
+        offset: 0,
         searchText: searchValue ? searchValue : null,
         to_city: cityToName ? cityToName.last_id : null,
         from_city: data,
@@ -188,8 +187,8 @@ function Offers({ route, navigation }) {
     dispatch(
       allSuggestionRequest({
         token,
-        id: activeSecondaryTab,
-        offset: 5,
+        id,
+        offset: 0,
         searchText: searchValue ? searchValue : null,
         to_city: data,
         from_city: cityFromName ? cityFromName : null,
@@ -213,8 +212,8 @@ function Offers({ route, navigation }) {
     dispatch(
       allSuggestionRequest({
         token,
-        id: activeSecondaryTab,
-        offset: 5,
+        id: id,
+        offset: 0,
         searchText: searchValue ? searchValue : null,
         to_city: cityToName ? cityToName.last_id : null,
         from_city: cityFromName ? cityFromName.last_id : null,
@@ -250,9 +249,7 @@ function Offers({ route, navigation }) {
     setTypeContainer(null);
     setFromCityName(null);
     setToCityName(null);
-    dispatch(
-      allSuggestionRequest({ token, id: activeSecondaryTab, offset: 5 })
-    );
+    dispatch(allSuggestionRequest({ token, id: id, offset: 0 }));
   };
 
   const renderCitys = ({ item }) => {
@@ -265,11 +262,11 @@ function Offers({ route, navigation }) {
           dispatch(
             allSuggestionRequest({
               token,
-              id: activeSecondaryTab,
-              offset: 5,
+              id: id,
+              offset: 0,
               searchText: [item.last_id, item.last_id],
               to_city: cityToName ? cityToName.last_id : null,
-              from_city: cityFromName ? cityFromName : null,
+              from_city: cityFromName ? cityFromName.last_id : null,
               type_container:
                 containerType === "40 ST" || containerType === "20 (30)"
                   ? 4
@@ -309,13 +306,24 @@ function Offers({ route, navigation }) {
             setCitys(allCitys);
             setSearchValue("");
             setPage(1);
-            setOffset(5);
+            setOffset(0);
             setPage(1);
             setTypeContainer(null);
             setFromCityName(null);
             setToCityName(null);
-            dispatch(allSuggestionRequest({ token, id: tab, offset: 5 }));
+            // dispatch(allSuggestionRequest({ token, id: tab, offset: 5 }));
             setActiveSecondaryTab(tab);
+            setId(
+              tab === "Поиск КТК"
+                ? "2"
+                : tab === "Продажа КТК"
+                ? "5"
+                : tab === "Выдача КТК"
+                ? "3"
+                : tab === "Контейнерный сервис"
+                ? "6"
+                : "7"
+            );
           }}
           secondary
         />
@@ -385,59 +393,78 @@ function Offers({ route, navigation }) {
   const nextPage = () => {
     setOffset(offset + 5);
     setPage(page + 1);
-    dispatch(
-      allSuggestionRequest({
-        token,
-        id: activeSecondaryTab,
-        offset: offset + 5,
-        searchText: searchValue ? searchValue : null,
-        to_city: cityToName ? cityToName.last_id : null,
-        from_city: cityFromName ? cityFromName.last_id : null,
-        type_container:
-          containerType === "40 ST" || containerType === "20 (30)"
-            ? 4
-            : containerType === "20 (24)"
-            ? 2
-            : containerType === "40 HQ"
-            ? 3
-            : null,
-      })
-    ).unwrap();
-    // .then((res) => setLikedList(res?.data.data.isLike));
-  };
-
-  const previusPage = () => {
-    setOffset(offset - 5);
-    setPage(page - 1);
-    dispatch(
-      allSuggestionRequest({
-        token,
-        id: activeSecondaryTab,
-        offset: offset - 5,
-        searchText: searchValue ? searchValue : null,
-        to_city: cityToName ? cityToName.last_id : null,
-        from_city: cityFromName ? cityFromName.last_id : null,
-        type_container:
-          containerType === "40 ST" || containerType === "20 (30)"
-            ? 4
-            : containerType === "20 (24)"
-            ? 2
-            : containerType === "40 HQ"
-            ? 3
-            : null,
-      })
-    ).unwrap();
+    // dispatch(
+    //   allSuggestionRequest({
+    //     token,
+    //     id: activeSecondaryTab,
+    //     offset: offset + 5,
+    //     searchText: searchValue ? searchValue : null,
+    //     to_city: cityToName ? cityToName.last_id : null,
+    //     from_city: cityFromName ? cityFromName.last_id : null,
+    //     type_container:
+    //       containerType === "40 ST" || containerType === "20 (30)"
+    //         ? 4
+    //         : containerType === "20 (24)"
+    //         ? 2
+    //         : containerType === "40 HQ"
+    //         ? 3
+    //         : null,
+    //   })
+    // ).unwrap();
     // .then((res) => setLikedList(res?.data.data.isLike));
   };
 
   useEffect(() => {
-    dispatch(allSuggestionRequest({ token, id: "Поиск КТК", offset }))
-      .unwrap()
-      .then((res) => {
-        // console.log(res?.data.data.isLike,'res?.data.data.isLike');
-        // setLikedList(res?.data.data.isLike);
-      });
-  }, [token]);
+    dispatch(
+      allSuggestionRequest({
+        token,
+        id,
+        offset,
+        searchText: searchValue ? searchValue : null,
+        to_city: cityToName ? cityToName.last_id : null,
+        from_city: cityFromName ? cityFromName.last_id : null,
+        type_container:
+          containerType === "40 ST" || containerType === "20 (30)"
+            ? 4
+            : containerType === "20 (24)"
+            ? 2
+            : containerType === "40 HQ"
+            ? 3
+            : null,
+      })
+    );
+  }, [offset, token, activeSecondaryTab]);
+
+  const previusPage = () => {
+    setOffset(offset - 5);
+    setPage(page - 1);
+    // dispatch(
+    //   allSuggestionRequest({
+    //     token,
+    //     id: activeSecondaryTab,
+    //     offset: offset - 5,
+    //     searchText: searchValue ? searchValue : null,
+    //     to_city: cityToName ? cityToName.last_id : null,
+    //     from_city: cityFromName ? cityFromName.last_id : null,
+    //     type_container:
+    //       containerType === "40 ST" || containerType === "20 (30)"
+    //         ? 4
+    //         : containerType === "20 (24)"
+    //         ? 2
+    //         : containerType === "40 HQ"
+    //         ? 3
+    //         : null,
+    //   })
+    // ).unwrap();
+    //  .then((res) => setLikedList(res?.data.data.isLike));
+  };
+
+  // useEffect(() => {
+  //   dispatch(allSuggestionRequest({ token, id: "Поиск КТК", offset }))
+  //     .unwrap()
+  //     .then((res) => {
+  //     });
+  // }, [token]);
 
   return (
     <>
@@ -607,18 +634,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  fromCity: {
-    marginRight: 10,
-    color: COLOR_8,
-    fontSize: 12,
-    fontFamily: "GothamProMedium",
-  },
-  toCity: {
-    marginLeft: 10,
-    color: COLOR_8,
-    fontSize: 12,
-    fontFamily: "GothamProMedium",
-  },
+  // fromCity: {
+  //   marginRight: 10,
+  //   color: COLOR_8,
+  //   fontSize: 12,
+  //   fontFamily: "GothamProMedium",
+  // },
+  // toCity: {
+  //   marginLeft: 10,
+  //   color: COLOR_8,
+  //   fontSize: 12,
+  //   fontFamily: "GothamProMedium",
+  // },
   price: {
     color: COLOR_5,
     fontSize: 12,

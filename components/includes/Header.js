@@ -22,47 +22,6 @@ import * as Notifications from "expo-notifications";
 function Header({ currentPage, home, navigation, onSavePress }) {
   const state = useSelector((state) => state);
   const { notification_data } = state.getAllNotificationsSlice;
-  const [expoPushToken, setExpoPushToken] = useState("");
-  const [notification, setNotification] = useState(false);
-  const notificationListener = useRef();
-  const responseListener = useRef();
-
-  useEffect(() => {
-    registerForPushNotificationsAsync().then((token) =>
-      setExpoPushToken(token)
-    );
-
-    notificationListener.current =
-      Notifications.addNotificationReceivedListener((notification) => {
-        setNotification(notification);
-        console.log(notification, "notification");
-      });
-
-    responseListener.current =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log(response, "response");
-      });
-
-    sendNotification();
-    return () => {
-      Notifications.removeNotificationSubscription(
-        notificationListener.current
-      );
-      Notifications.removeNotificationSubscription(responseListener.current);
-    };
-  }, []);
-
-  const sendNotification = async () => {
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "New Notification",
-        body: "Hello, this is a test notification!",
-        sound: true,
-        vibrate: true,
-      },
-      trigger: null, // Display immediately
-    });
-  };
 
   const [visible, setVisible] = useState(false);
   const dispatch = useDispatch();

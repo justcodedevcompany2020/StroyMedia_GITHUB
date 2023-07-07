@@ -30,7 +30,6 @@ function LeaveReviewModal({
     });
   });
   const ratingFinish = (rate) => {
-    console.log(rate,8888);
     if(rate === 5){
       setRate(2);
     }

@@ -13,22 +13,32 @@ export const allSuggestionRequest = createAsyncThunk(
     from_city,
     type_container,
   }) => {
-    let activeOffer;
-    if (id === "Поиск КТК") {
-      activeOffer = 2;
-    } else if (id === "Продажа КТК") {
-      activeOffer = 5;
-    } else if (id === "Выдача КТК") {
-      activeOffer = 3;
-    } else if (id === "Контейнерный сервис") {
-      activeOffer = 6;
-    } else if (id === "Заявка на ТЭО") {
-      activeOffer = 7;
-    }
+    // let activeOffer;
+    // if (id === "Поиск КТК") {
+    //   activeOffer = 2;
+    // } else if (id === "Продажа КТК") {
+    //   activeOffer = 5;
+    // } else if (id === "Выдача КТК") {
+    //   activeOffer = 3;
+    // } else if (id === "Контейнерный сервис") {
+    //   activeOffer = 6;
+    // } else if (id === "Заявка на ТЭО") {
+    //   activeOffer = 7;
+    // }
+    // console.log(
+    //   "📢 [getAllSuggestionsSlice.js:28]",
+    //   token,
+    //   id,
+    //   offset,
+    //   searchText,
+    //   to_city,
+    //   from_city,
+    //   type_container
+    // );
     try {
       const result = await api.post("/get-request-work-all", {
         secret_token: token,
-        last_id: activeOffer,
+        last_id: id,
         offset,
         searchText,
         type_container,
@@ -71,6 +81,7 @@ const allSuggestionsSlice = createSlice({
         state.favoriteList = action.payload?.data?.data?.isLike;
         state.error = false;
         state.loading = false;
+        // console.log(action.payload.data?.data.rows);
       })
 
       .addCase(allSuggestionRequest.rejected, (state) => {

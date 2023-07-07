@@ -12,7 +12,6 @@ export const allCatRequest = createAsyncThunk(
     );
     formdata.append("type_request", tab);
     formdata.append("offset", offset);
-    console.log(formdata, 5555);
     var requestOptions = {
       method: "POST",
       body: formdata,

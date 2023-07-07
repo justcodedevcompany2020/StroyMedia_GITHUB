@@ -38,6 +38,7 @@ import { showMessage } from "react-native-flash-message";
 import { chatOrderRequest } from "../../store/reducers/chatDialogOrderSlice";
 import * as Linking from "expo-linking";
 const valuta = ["₽", "€", "$"];
+import * as Notifications from "expo-notifications";
 
 function SendOffer(props) {
   const [price, setPrice] = useState(null);
@@ -58,6 +59,18 @@ function SendOffer(props) {
       }
     });
   }, [token]);
+
+  const sendNotification = async () => {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "New Notification",
+        body: "Hello, this is a test notification!",
+        sound: true,
+        vibrate: true,
+      },
+      trigger: null, // Display immediately
+    });
+  };
 
   return (
     <Wrapper
@@ -259,6 +272,7 @@ function SendOffer(props) {
                 //   });
                 // }
                 if (res.success) {
+                  sendNotification();
                   dispatch(
                     chatOrderRequest({ token: token, id: item.user.last_id })
                   )

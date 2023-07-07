@@ -12,7 +12,6 @@ import {
 
 class ReviewItem extends Component {
   countRatingLineWidth = (rating) => {
-    console.log(rating)
     // if (rating > 5) rating = 5;
     // if (rating < 0) rating = 0;
     if(rating === 2) rating = 5
