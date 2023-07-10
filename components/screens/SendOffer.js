@@ -93,8 +93,12 @@ function SendOffer(props) {
                 {item?.to_city?.title?.ru?.replace("(RU)", "")}
               </Text>
             </View>
+
             <Text style={styles.price}>
-              {item.price > 0 ? item.price + " p" : item.price}
+              {console.log(item.currency)}
+              {item.price > 0 && item.currency != null
+                ? item.price.toString() + item.currency?.sign.toString()
+                : "по запросу"}
             </Text>
           </View>
           <View style={styles.row}>

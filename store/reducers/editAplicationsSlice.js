@@ -16,10 +16,11 @@ export const editAplicationsRequest = createAsyncThunk(
         requestOptions
       );
       const result = await response.json();
+      console.log(result);
       return result;
     } catch (error) {
-      throw error
-      return error;
+      console.log(error);
+      throw error;
     }
   }
 );

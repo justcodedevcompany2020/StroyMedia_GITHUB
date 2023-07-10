@@ -29,6 +29,7 @@ import moment from "moment";
 import { chatOrderRequest } from "../../store/reducers/chatDialogOrderSlice";
 import { projectReviewRequest } from "../../store/reducers/projectReview";
 import * as Linking from "expo-linking";
+import _ from "lodash";
 
 function SingleParticipant({ route, navigation }) {
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -130,6 +131,41 @@ function SingleParticipant({ route, navigation }) {
           return (num + acc) / totalRate?.length;
         })
       : null;
+  let total_rate = 0;
+  let rate_check = rows?.rate_minus
+    ? rows?.rate_minus
+    : 0 + rows?.rate_plus
+    ? rows?.rate_plus
+    : 0 + rows?.rate_good
+    ? rows?.rate_good
+    : 0 + rows?.rate_netral
+    ? rows?.rate_netral
+    : 0 + rows?.rate_negativ
+    ? rows?.rate_negativ
+    : 0;
+
+  if (
+    !_.isEmpty(rows?.rate_minus) ||
+    !_.isEmpty(rows?.rate_plus) ||
+    !_.isEmpty(rows?.rate_good) ||
+    !_.isEmpty(rows?.rate_netral) ||
+    !_.isEmpty(rows?.rate_negativ)
+  ) {
+    total_rate = rows?.rate_minus
+      ? rows?.rate_minus * 2
+      : 0 + rows?.rate_plus
+      ? rows?.rate_plus * 5
+      : 0 + rows?.rate_good
+      ? rows?.rate_good * 4
+      : 0 + rows?.rate_netral
+      ? rows?.rate_netral * 3
+      : 0 + rows?.rate_negativ
+      ? rows?.rate_negativ * 1
+      : 0;
+  }
+
+  console.log(total_rate, 152);
+
   const renderItem = ({ item }) => {
     const date = item.date.$date.$numberLomg;
     return (
@@ -248,9 +284,7 @@ function SingleParticipant({ route, navigation }) {
           <View style={styles.reviewLine}>
             <ImageRating />
             <View style={styles.reviewDescription}>
-              <Text style={styles.averageReview}>
-                {Math.ceil(totalRateing)}
-              </Text>
+              <Text style={styles.averageReview}>{Math.round(total_rate)}</Text>
               <Text style={styles.reviewInfo}>
                 (основан на {rows?.length} отзывах)
               </Text>

@@ -125,11 +125,11 @@ export function OfferItem({
             })
           }
         >
-          {console.log(item?.dislokaciya?.title?.ru)}
           <View style={styles.row}>
             <View style={styles.locationInfo}>
               <Text style={styles.fromCity}>
-                {item?.from_city?.title?.ru?.replace(" (RU)", "") || item?.dislokaciya?.title.ru}
+                {item?.from_city?.title?.ru?.replace(" (RU)", "") ||
+                  item?.dislokaciya?.title.ru}
               </Text>
               {item?.to_city && <ImageOffersArrow />}
               <Text style={styles.toCity}>
@@ -137,8 +137,10 @@ export function OfferItem({
               </Text>
             </View>
 
-            <Text style={(item.price || item.price === 0) && styles.price}>
-              {item.price > 0 ? item.price + item?.currency?.sign : item.price}
+            <Text style={styles.price}>
+              {item.price > 0 && item.currency != null
+                ? item.price.toString() + item.currency?.sign.toString()
+                : "по запросу"}
             </Text>
           </View>
           <View style={styles.row}>

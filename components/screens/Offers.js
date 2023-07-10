@@ -52,7 +52,7 @@ function Offers({ route, navigation }) {
   ];
   const [activeSecondaryTab, setActiveSecondaryTab] = useState("Поиск КТК");
   const [searchValue, setSearchValue] = useState("");
-  const [load, setLoad] = useState(false);
+
   const [id, setId] = useState("0");
   const [token, setToken] = useState();
 
@@ -111,29 +111,29 @@ function Offers({ route, navigation }) {
     );
   };
 
-  const filteretData = () => {
-    setLoad(true);
-    dispatch(
-      allSuggestionRequest({
-        token,
-        id,
-        offset: 5,
-        searchText: searchValue ? searchValue : null,
-        to_city: cityToName ? cityToName.last_id : null,
-        from_city: cityFromName ? cityFromName.last_id : null,
-        type_container:
-          containerType === "40 ST" || containerType === "20 (30)"
-            ? 4
-            : containerType === "20 (24)"
-            ? 2
-            : containerType === "40 HQ"
-            ? 3
-            : null,
-      })
-    )
-      .unwrap()
-      .then(() => setLoad(false));
-  };
+  // const filteretData = () => {
+  //   setLoad(true);
+  //   dispatch(
+  //     allSuggestionRequest({
+  //       token,
+  //       id,
+  //       offset: 5,
+  //       searchText: searchValue ? searchValue : null,
+  //       to_city: cityToName ? cityToName.last_id : null,
+  //       from_city: cityFromName ? cityFromName.last_id : null,
+  //       type_container:
+  //         containerType === "40 ST" || containerType === "20 (30)"
+  //           ? 4
+  //           : containerType === "20 (24)"
+  //           ? 2
+  //           : containerType === "40 HQ"
+  //           ? 3
+  //           : null,
+  //     })
+  //   )
+  //     .unwrap()
+  //     .then(() => setLoad(false));
+  // };
 
   const renderItem = ({ item, index }) => {
     if (favoriteList[index] == "is_Favorite") {
@@ -156,84 +156,84 @@ function Offers({ route, navigation }) {
     );
   };
 
-  const filterFromCitys = (data) => {
-    setPage(1);
-    setLoad(true);
-    dispatch(
-      allSuggestionRequest({
-        token,
-        id,
-        offset: 0,
-        searchText: searchValue ? searchValue : null,
-        to_city: cityToName ? cityToName.last_id : null,
-        from_city: data,
-        type_container:
-          containerType === "40 ST" || containerType === "20 (30)"
-            ? 4
-            : containerType === "20 (24)"
-            ? 2
-            : containerType === "40 HQ"
-            ? 3
-            : null,
-      })
-    )
-      .unwrap()
-      .then(() => setLoad(false));
-  };
+  // const filterFromCitys = (data) => {
+  //   setPage(1);
+  //   setLoad(true);
+  //   dispatch(
+  //     allSuggestionRequest({
+  //       token,
+  //       id,
+  //       offset: 0,
+  //       searchText: searchValue ? searchValue : null,
+  //       to_city: cityToName ? cityToName.last_id : null,
+  //       from_city: data,
+  //       type_container:
+  //         containerType === "40 ST" || containerType === "20 (30)"
+  //           ? 4
+  //           : containerType === "20 (24)"
+  //           ? 2
+  //           : containerType === "40 HQ"
+  //           ? 3
+  //           : null,
+  //     })
+  //   )
+  //     .unwrap()
+  //     .then(() => setLoad(false));
+  // };
 
-  const filterToCitys = (data) => {
-    setLoad(true);
-    setPage(1);
-    dispatch(
-      allSuggestionRequest({
-        token,
-        id,
-        offset: 0,
-        searchText: searchValue ? searchValue : null,
-        to_city: data,
-        from_city: cityFromName ? cityFromName : null,
-        type_container:
-          containerType === "40 ST" || containerType === "20 (30)"
-            ? 4
-            : containerType === "20 (24)"
-            ? 2
-            : containerType === "40 HQ"
-            ? 3
-            : null,
-      })
-    )
-      .unwrap()
-      .then(() => setLoad(false));
-  };
+  // const filterToCitys = (data) => {
+  //   setLoad(true);
+  //   setPage(1);
+  //   dispatch(
+  //     allSuggestionRequest({
+  //       token,
+  //       id,
+  //       offset: 0,
+  //       searchText: searchValue ? searchValue : null,
+  //       to_city: data,
+  //       from_city: cityFromName ? cityFromName : null,
+  //       type_container:
+  //         containerType === "40 ST" || containerType === "20 (30)"
+  //           ? 4
+  //           : containerType === "20 (24)"
+  //           ? 2
+  //           : containerType === "40 HQ"
+  //           ? 3
+  //           : null,
+  //     })
+  //   )
+  //     .unwrap()
+  //     .then(() => setLoad(false));
+  // };
 
-  const filterTypeContainer = (data) => {
-    setLoad(true);
-    setPage(1);
-    dispatch(
-      allSuggestionRequest({
-        token,
-        id: id,
-        offset: 0,
-        searchText: searchValue ? searchValue : null,
-        to_city: cityToName ? cityToName.last_id : null,
-        from_city: cityFromName ? cityFromName.last_id : null,
-        type_container:
-          data === "40 ST" || data === "20 (30)"
-            ? 4
-            : data === "20 (24)"
-            ? 2
-            : data === "40 HQ"
-            ? 3
-            : null,
-      })
-    )
-      .unwrap()
-      .then(() => setLoad(false));
-  };
+  // const filterTypeContainer = (data) => {
+  //   setLoad(true);
+  //   setPage(1);
+  //   dispatch(
+  //     allSuggestionRequest({
+  //       token,
+  //       id: id,
+  //       offset: 0,
+  //       searchText: searchValue ? searchValue : null,
+  //       to_city: cityToName ? cityToName.last_id : null,
+  //       from_city: cityFromName ? cityFromName.last_id : null,
+  //       type_container:
+  //         data === "40 ST" || data === "20 (30)"
+  //           ? 4
+  //           : data === "20 (24)"
+  //           ? 2
+  //           : data === "40 HQ"
+  //           ? 3
+  //           : null,
+  //     })
+  //   )
+  //     .unwrap()
+  //     .then(() => setLoad(false));
+  // };
 
-  useEffect(() => {
-    cityToName && filteretData();
-  }, [containerType, cityToName, cityToName]);
+  // useEffect(() => {
+  //   cityToName && filteretData();
+  // }, [containerType, cityToName, cityToName]);
 
   const resetText = () => {
     setCitys(allCitys);
@@ -257,32 +257,33 @@ function Offers({ route, navigation }) {
       <TouchableOpacity
         onPress={() => {
           setPage(1);
-          setLoad(true);
+          // setLoad(true);
+          setSearchValue(item.title.ru || item.title);
           setSearchName(item.title.ru || item.title);
-          dispatch(
-            allSuggestionRequest({
-              token,
-              id: id,
-              offset: 0,
-              searchText: [item.last_id, item.last_id],
-              to_city: cityToName ? cityToName.last_id : null,
-              from_city: cityFromName ? cityFromName.last_id : null,
-              type_container:
-                containerType === "40 ST" || containerType === "20 (30)"
-                  ? 4
-                  : containerType === "20 (24)"
-                  ? 2
-                  : containerType === "40 HQ"
-                  ? 3
-                  : null,
-            })
-          )
-            .unwrap()
-            .then(() => {
-              // setSearchValue("");
-              setCitys(allCitys);
-              setLoad(false);
-            });
+          // dispatch(
+          //   allSuggestionRequest({
+          //     token,
+          //     id: id,
+          //     offset: 0,
+          //     searchText: [item.last_id, item.last_id],
+          //     to_city: cityToName ? cityToName.last_id : null,
+          //     from_city: cityFromName ? cityFromName.last_id : null,
+          //     type_container:
+          //       containerType === "40 ST" || containerType === "20 (30)"
+          //         ? 4
+          //         : containerType === "20 (24)"
+          //         ? 2
+          //         : containerType === "40 HQ"
+          //         ? 3
+          //         : null,
+          //   })
+          // )
+          //   .unwrap()
+          //   .then(() => {
+          //     // setSearchValue("");
+          //     setCitys(allCitys);
+          //     setLoad(false);
+          //   });
         }}
       >
         <Text style={{ marginBottom: 8 }}>{item.title.ru || item.title}</Text>
@@ -347,12 +348,13 @@ function Offers({ route, navigation }) {
           <FilterItem
             isCitys
             offers
-            title={cityFromName ? cityFromName : "Откуда"}
+            title={cityFromName ? cityFromName.title : "Откуда"}
             options={citys}
             top={274}
             onSelect={(option) => {
-              setFromCityName(option.title);
-              filterFromCitys(option.last_id);
+              setFromCityName(option);
+              console.log("📢[Offers.js:356]: option: ", option);
+              // filterFromCitys(option.last_id);
             }}
           />
 
@@ -363,7 +365,8 @@ function Offers({ route, navigation }) {
             options={typeContainer}
             onSelect={(option) => {
               setTypeContainer(option.title);
-              filterTypeContainer(option.title);
+              // console.log(option.title);
+              // filterTypeContainer(option.title);
             }}
             top={274}
           />
@@ -372,16 +375,16 @@ function Offers({ route, navigation }) {
             isCitys
             offers
             onSelect={(option) => {
-              setToCityName(option.title);
-              filterToCitys(option.last_id);
+              setToCityName(option);
+              // filterToCitys(option.last_id);
             }}
-            title={cityToName ? cityToName : "Куда"}
+            title={cityToName ? cityToName.title : "Куда"}
             options={citys}
             top={274}
           />
         </View>
 
-        {containerType || cityFromName || cityToName || searchName ? (
+        {containerType || cityFromName?.title || cityToName?.title || searchName ? (
           <TouchableOpacity onPress={resetFiltered} style={styles.resetButton}>
             <Text style={styles.resetText}>Сброс x</Text>
           </TouchableOpacity>
@@ -420,7 +423,7 @@ function Offers({ route, navigation }) {
         token,
         id,
         offset,
-        searchText: searchValue ? searchValue : null,
+        searchText: searchName ? searchName : null,
         to_city: cityToName ? cityToName.last_id : null,
         from_city: cityFromName ? cityFromName.last_id : null,
         type_container:
@@ -433,7 +436,15 @@ function Offers({ route, navigation }) {
             : null,
       })
     );
-  }, [offset, token, activeSecondaryTab]);
+  }, [
+    offset,
+    token,
+    activeSecondaryTab,
+    containerType,
+    cityToName,
+    cityFromName,
+    searchName,
+  ]);
 
   const previusPage = () => {
     setOffset(offset - 5);

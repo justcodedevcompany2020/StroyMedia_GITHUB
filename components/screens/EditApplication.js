@@ -208,6 +208,7 @@ function EditApplication() {
     let myHeaders = new Headers();
     let formdata = new FormData();
     myHeaders.append("Content-Type", "multipart/form-data");
+
     let checkValues = {
       token,
       last_id,
@@ -237,10 +238,15 @@ function EditApplication() {
         formdata.append("type_container", typeKTK);
         formdata.append("currency", price_type);
         formdata.append("responsible", user.last_id.toString());
-        formdata.append("img", selectedImage);
+        formdata.append("img[]", {
+          uri: selectedImage,
+          name: "photo.png",
+          filename: "imageName.png",
+          type: "image/png",
+        });
         formdata.append("count", containerCount);
         formdata.append("_type_op", saveAsDraft ? "draft" : "onwork");
-   
+        console.log(formdata);
         dispatch(
           editAplicationsRequest({
             formdata,
@@ -257,13 +263,14 @@ function EditApplication() {
             }
           })
           .catch((e) => {
+            console.log(e);
             setLoading(false);
             showMessage({
               message: "Все поля должны быть заполнены",
               type: "danger",
             });
           });
-      } else {
+      } else if (!_.every(Object.values(checkValues))) {
         setLoading(false);
         showMessage({
           message: "Все поля должны быть заполнены",
@@ -324,7 +331,7 @@ function EditApplication() {
               type: "danger",
             });
           });
-      } else {
+      } else if (_.every(Object.values(checkValues1))) {
         setLoading(false);
         showMessage({
           message: "Все поля должны быть заполнены",
