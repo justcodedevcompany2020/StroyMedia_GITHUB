@@ -224,12 +224,14 @@ const MyProfile = ({ route, navigation }) => {
             data.append("role[]", c);
           }
         });
+
     dispatch(editUserDataRequest(data))
       .unwrap()
       .then((res) => {
+        console.log(res);
         if (res?.message == "Successfully data updated") {
           showMessage({
-            message: "Ваш данные успешно сохранён",
+            message: "Ваши изменения успешно созранены",
             type: "success",
           });
         } else if (res?.message == "Incorrect Details. Please try again") {
@@ -815,15 +817,35 @@ const MyProfile = ({ route, navigation }) => {
               titleStyle={styles.smallSwitchTitle}
               style={styles.switchBlock}
               isOn={dmEmail === "1" ? true : false}
-              onToggle={(val) => {
+              onToggle={async (val) => {
                 setDmEmail(val);
                 changPersonlMessage();
-                return dispatch(
+                await dispatch(
                   personalMessageRequest({
                     token: token,
                     name: val ? "1" : "0",
                   })
-                );
+                )
+                  .then((res) => {
+                    console.log(
+                      "📢[MyProfile.js:926]: res: ",
+                      res.payload.data
+                    );
+                    if (res.payload.data.message == "Successfully done") {
+                      showMessage({
+                        message: "Ваши изменения успешно созранены",
+                        type: "success",
+                      });
+                    } else {
+                      showMessage({
+                        message: "Вы не внесли изменений",
+                        type: "danger",
+                      });
+                    }
+                  })
+                  .catch((e) => {
+                    console.log(e);
+                  });
               }}
             />
             <BlockWithSwitchButton
@@ -831,15 +853,31 @@ const MyProfile = ({ route, navigation }) => {
               titleStyle={styles.smallSwitchTitle}
               style={styles.switchBlock}
               isOn={dmPush === "1" ? true : false}
-              onToggle={(val) => {
+              onToggle={async (val) => {
                 setDmPush(val);
                 changPersonlNotify();
-                return dispatch(
+                await dispatch(
                   personalNotificationRequest({
                     token: token,
                     name: val ? "1" : "0",
                   })
-                );
+                )
+                  .then((res) => {
+                    if (res.payload.data.message == "Successfully done") {
+                      showMessage({
+                        message: "Ваши изменения успешно созранены",
+                        type: "success",
+                      });
+                    } else {
+                      showMessage({
+                        message: "Вы не внесли изменений",
+                        type: "danger",
+                      });
+                    }
+                  })
+                  .catch((e) => {
+                    console.log(e);
+                  });
               }}
             />
           </View>
@@ -858,12 +896,28 @@ const MyProfile = ({ route, navigation }) => {
               titleStyle={styles.smallSwitchTitle}
               style={styles.switchBlock}
               isOn={groupMessagesEmail === "1" ? true : false}
-              onToggle={(val) => {
+              onToggle={async (val) => {
                 changGlobalMessage();
                 setGroupMessagesEmail(val);
-                return dispatch(
+                await dispatch(
                   globallMessageRequest({ token: token, name: val ? "1" : "0" })
-                );
+                )
+                  .then((res) => {
+                    if (res.payload.data.message == "Successfully done") {
+                      showMessage({
+                        message: "Ваши изменения успешно созранены",
+                        type: "success",
+                      });
+                    } else {
+                      showMessage({
+                        message: "Вы не внесли изменений",
+                        type: "danger",
+                      });
+                    }
+                  })
+                  .catch((e) => {
+                    console.log(e);
+                  });
               }}
             />
             <BlockWithSwitchButton
@@ -871,15 +925,31 @@ const MyProfile = ({ route, navigation }) => {
               titleStyle={styles.smallSwitchTitle}
               style={styles.switchBlock}
               isOn={groupMessagesPush === "1" ? true : false}
-              onToggle={(val) => {
+              onToggle={async (val) => {
                 changGlobalNotifuy();
                 setGroupMessagesPush(val);
-                return dispatch(
+                await dispatch(
                   globallNotificationRequest({
                     token: token,
                     name: val ? "1" : "0",
                   })
-                );
+                )
+                  .then((res) => {
+                    if (res.payload.data.message == "Successfully done") {
+                      showMessage({
+                        message: "Ваши изменения успешно созранены",
+                        type: "success",
+                      });
+                    } else {
+                      showMessage({
+                        message: "Вы не внесли изменений",
+                        type: "danger",
+                      });
+                    }
+                  })
+                  .catch((e) => {
+                    console.log(e);
+                  });
               }}
             />
           </View>
@@ -898,12 +968,28 @@ const MyProfile = ({ route, navigation }) => {
               titleStyle={styles.smallSwitchTitle}
               style={styles.switchBlock}
               isOn={newMessagesEmail === "0" ? true : false}
-              onToggle={(val) => {
+              onToggle={async (val) => {
                 changOfferMessage();
                 setNewMessagesEmail(val ? !val : val);
-                return dispatch(
+                await dispatch(
                   offerMessageRequest({ token: token, name: val ? "1" : "0" })
-                );
+                )
+                  .then((res) => {
+                    if (res.payload.data.message == "Successfully done") {
+                      showMessage({
+                        message: "Ваши изменения успешно созранены",
+                        type: "success",
+                      });
+                    } else {
+                      showMessage({
+                        message: "Вы не внесли изменений",
+                        type: "danger",
+                      });
+                    }
+                  })
+                  .catch((e) => {
+                    console.log(e);
+                  });
               }}
             />
             <BlockWithSwitchButton
@@ -911,15 +997,31 @@ const MyProfile = ({ route, navigation }) => {
               titleStyle={styles.smallSwitchTitle}
               style={styles.switchBlock}
               isOn={newMessagesPush === "1" ? true : false}
-              onToggle={(val) => {
+              onToggle={async (val) => {
                 changOfferNotify();
                 setNewMessagesPush(val);
-                return dispatch(
+                await dispatch(
                   offerlNotificationRequest({
                     token: token,
                     name: val ? "1" : "0",
                   })
-                );
+                )
+                  .then((res) => {
+                    if (res.payload.data.message == "Successfully done") {
+                      showMessage({
+                        message: "Ваши изменения успешно созранены",
+                        type: "success",
+                      });
+                    } else {
+                      showMessage({
+                        message: "Вы не внесли изменений",
+                        type: "danger",
+                      });
+                    }
+                  })
+                  .catch((e) => {
+                    console.log(e);
+                  });
               }}
             />
           </View>
@@ -940,12 +1042,28 @@ const MyProfile = ({ route, navigation }) => {
               "Другие участники не видят вашу персональную информацию, но видят информацию о вашей компании"
             }
             isOn={hideProfile === "1" ? true : false}
-            onToggle={(val) => {
+            onToggle={async (val) => {
               setHideProfile(val);
               changeHide();
-              return dispatch(
+              await dispatch(
                 hideUserRequest({ token: token, hideNumber: val ? 1 : 0 })
-              );
+              )
+                .then((res) => {
+                  if (res.payload.data.message == "Successfully data hid") {
+                    showMessage({
+                      message: "Ваши изменения успешно созранены",
+                      type: "success",
+                    });
+                  } else {
+                    showMessage({
+                      message: "Вы не внесли изменений",
+                      type: "danger",
+                    });
+                  }
+                })
+                .catch((e) => {
+                  console.log(e);
+                });
             }}
           />
           <BlockWithSwitchButton

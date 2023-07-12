@@ -4,17 +4,19 @@ import { api } from "../../Api";
 export const personalMessageRequest = createAsyncThunk(
   "personalMessage",
   async ({ token, name }) => {
-    api
-      .post("/notification-control/personal-message-email", {
-        secret_token: token,
-        personal_message_email: name,
-      })
-      .then((res) => {
-        return res;
-      })
-      .catch((error) => {
-        return error;
-      });
+    try {
+      const response = await api.post(
+        "/notification-control/personal-message-email",
+        {
+          secret_token: token,
+          personal_message_email: name,
+        }
+      );
+
+      return response;
+    } catch (error) {
+      return error;
+    }
   }
 );
 

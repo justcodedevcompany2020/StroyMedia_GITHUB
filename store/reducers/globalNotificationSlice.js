@@ -4,17 +4,18 @@ import { api } from "../../Api";
 export const globallNotificationRequest = createAsyncThunk(
   "globallNotification",
   async ({ token, name }) => {
-    api
-      .post("/notification-control/global-push-notification", {
-        secret_token: token,
-        global_push_nothify: name,
-      })
-      .then((res) => {
-        return res;
-      })
-      .catch((error) => {
-        return error;
-      });
+    try {
+      const response = api.post(
+        "/notification-control/global-push-notification",
+        {
+          secret_token: token,
+          global_push_nothify: name,
+        }
+      );
+      return response;
+    } catch (error) {
+      return error;
+    }
   }
 );
 

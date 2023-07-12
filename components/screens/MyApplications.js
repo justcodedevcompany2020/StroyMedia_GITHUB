@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Image,
   StyleSheet,
@@ -7,6 +7,7 @@ import {
   View,
   ActivityIndicator,
   Modal,
+  Dimensions,
 } from "react-native";
 import Wrapper from "../helpers/Wrapper";
 import { useDispatch, useSelector } from "react-redux";
@@ -120,7 +121,12 @@ function MyApplications() {
               }}
             />
           </View>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
             <View style={styles.number}>
               <Text style={styles.numbertext}>N:{item.last_id}</Text>
             </View>
@@ -142,22 +148,34 @@ function MyApplications() {
             </Text>
           </View>
           <View style={styles.rightBlock}>
-            <View style={styles.locationInfo}>
+            <View
+              style={[
+                styles.locationInfo,
+                {
+                  flexWrap: "wrap",
+                  justifyContent: "flex-start",
+                  columnGap: 5,
+                },
+              ]}
+            >
               <Text style={styles.fromCity}>
                 {item?.from_city?.title?.ru || item?.dislokaciya?.title.ru}
               </Text>
               <ImageOffersArrow />
               <Text style={styles.toCity}>{item?.to_city?.title?.ru}</Text>
             </View>
-            <View
+            {/* <View
               style={{
                 width: "100%",
                 justifyContent: "space-between",
+                alignContent: "center",
+                backgroundColor: 'yellow'
               }}
-            >
+            > */}
               <View
                 style={{
                   flexDirection: "row",
+                  flexWrap: "wrap",
                   alignItems: "center",
                   justifyContent: "space-between",
                 }}
@@ -172,7 +190,7 @@ function MyApplications() {
                   </Text>
                 </View>
               </View>
-            </View>
+            {/* </View> */}
           </View>
         </View>
         <View style={styles.commentBlock}>
@@ -301,6 +319,7 @@ function MyApplications() {
           <ActivityIndicator color={COLOR_1} size={50} />
         </View>
       </Modal>
+      {headerComponent()}
       {filteredData.length && activeTab !== "Архив" ? (
         <View style={styles.wrapper}>
           <SwipeListView
@@ -346,7 +365,7 @@ function MyApplications() {
               ) : null;
             }}
             renderItem={renderItem}
-            ListHeaderComponent={headerComponent()}
+            // ListHeaderComponent={headerComponent()}
             renderHiddenItem={({ item }) => (
               <View style={styles.hiddenWrapper}>
                 <TouchableOpacity
@@ -403,7 +422,7 @@ function MyApplications() {
             keyExtractor={(item) => item.last_id.toString()}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ flexShrink: 0 }}
-            stickyHeaderIndices={[0]}
+            // stickyHeaderIndices={[0]}
           />
           <View style={styles.fadeBlock}>
             <Image source={ImageFadePart} style={styles.fade} />
@@ -411,13 +430,13 @@ function MyApplications() {
         </View>
       ) : (
         <View style={styles.wrapper}>
-          <NavBar
+          {/* <NavBar
             tabs={["В работе", "Черновик", "Архив"]}
             activeTab={activeTab}
             onPress={async (tab) => {
               setActiveTab(tab);
             }}
-          />
+          /> */}
           <View style={styles.blankTextBlock}>
             <Text style={styles.blankText}>Здесь будут ваши заявки.</Text>
             <Text style={styles.blankText}>Нажмите на «+» чтобы</Text>
@@ -442,7 +461,7 @@ function MyApplications() {
 
 const styles = StyleSheet.create({
   wrapper: {
-    height: "100%",
+    height: "82.9%",
   },
   empty: {
     fontSize: 22,
@@ -536,13 +555,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   fromCity: {
-    marginRight: 10,
+    // marginRight: 10,
     color: COLOR_8,
     fontSize: 12,
     fontFamily: "GothamProMedium",
   },
   toCity: {
-    marginLeft: 10,
+    // marginLeft: 10,
     color: COLOR_8,
     fontSize: 12,
     fontFamily: "GothamProMedium",

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   Image,
   StyleSheet,
@@ -17,12 +18,14 @@ import {
   COLOR_1,
   COLOR_10,
   COLOR_3,
+  COLOR_5,
   WRAPPER_PADDINGS,
 } from "../helpers/Variables";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getCitys } from "../../store/reducers/getCitysSlice";
 import { Entypo } from "@expo/vector-icons";
 import { getMembersRequest } from "../../store/reducers/getMembersDataSlice";
+import { Modal } from "react-native";
 
 const SearchIcon = require("../../assets/search.png");
 
@@ -39,7 +42,7 @@ function Participants({ route, navigation }) {
   const [cityName, setCityName] = useState("");
   // const [liked, setLiked] = useState(false);
   const state = useSelector((state) => state);
-  const { data, favoriteList } = state.getMembersSlice;
+  const { data, favoriteList, loading } = state.getMembersSlice;
   const { currentPage } = route.params;
   const dispatch = useDispatch();
   let liked = false;
@@ -56,7 +59,7 @@ function Participants({ route, navigation }) {
       .then((result) => {
         setCitys(result.data.data.citys);
       });
-  }, [citys]);
+  }, [navigation]);
 
   // useEffect(() => {
   //   dispatch(getMembersRequest({ token }))
@@ -99,12 +102,12 @@ function Participants({ route, navigation }) {
     dispatch(
       getMembersRequest({
         token,
-        offset: offset,
+        offset,
         city: cityId ? cityId : null,
         role: role ? role : null,
       })
     );
-  }, [offset, navigation, token]);
+  }, [offset, token, activeTab, role]);
 
   const nextPage = () => {
     setOffset(offset + 5);
@@ -143,6 +146,19 @@ function Participants({ route, navigation }) {
         activeTab={activeTab}
       />
       <View style={styles.wrapper}>
+      {console.log(loading)}
+        <Modal visible={loading} transparent>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "#00000055",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <ActivityIndicator size={50} color={COLOR_5} />
+          </View>
+        </Modal>
         <View style={styles.searchRow}>
           <Search
             style={styles.search}

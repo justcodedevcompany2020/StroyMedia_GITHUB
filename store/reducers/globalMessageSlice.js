@@ -4,17 +4,16 @@ import { api } from "../../Api";
 export const globallMessageRequest = createAsyncThunk(
   "globalMessage",
   async ({ name, token }) => {
-    api
-      .post("/notification-control/global-message-email", {
+    try {
+      const response = api.post("/notification-control/global-message-email", {
         global_message_email: name,
         secret_token: token,
-      })
-      .then((res) => {
-        return res;
-      })
-      .catch((error) => {
-        return error;
       });
+
+      return response;
+    } catch (error) {
+      return error;
+    }
   }
 );
 

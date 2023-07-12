@@ -4,17 +4,18 @@ import { api } from "../../Api";
 export const offerlNotificationRequest = createAsyncThunk(
   "offerlNotification",
   async ({ token, name }) => {
-    api
-      .post("/notification-control/offers-push-notification", {
-        secret_token: token,
-        offer_push_nothify: name,
-      })
-      .then((res) => {
-        return res;
-      })
-      .catch((error) => {
-        return error;
-      });
+    try {
+      const response = await api.post(
+        "/notification-control/offers-push-notification",
+        {
+          secret_token: token,
+          offer_push_nothify: name,
+        }
+      );
+      return response;
+    } catch (error) {
+      return error;
+    }
   }
 );
 

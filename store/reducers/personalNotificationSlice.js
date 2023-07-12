@@ -6,17 +6,19 @@ export const personalNotificationRequest = createAsyncThunk(
   "personalNotification",
   async ({ token, name }) => {
     await AsyncStorage.setItem("personal_notify", name);
-    api
-      .post("/notification-control/personal-push-notification", {
-        secret_token: token,
-        personal_push_nothify: name,
-      })
-      .then((res) => {
-        return res;
-      })
-      .catch((error) => {
-        return error;
-      });
+    try {
+      const response = await api.post(
+        "/notification-control/personal-push-notification",
+        {
+          secret_token: token,
+          personal_push_nothify: name,
+        }
+      );
+
+      return response;
+    } catch (error) {
+      return error;
+    }
   }
 );
 

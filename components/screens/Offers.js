@@ -53,7 +53,7 @@ function Offers({ route, navigation }) {
   const [activeSecondaryTab, setActiveSecondaryTab] = useState("Поиск КТК");
   const [searchValue, setSearchValue] = useState("");
 
-  const [id, setId] = useState("0");
+  const [id, setId] = useState("2");
   const [token, setToken] = useState();
 
   const { currentPage } = route.params;
@@ -384,7 +384,7 @@ function Offers({ route, navigation }) {
           />
         </View>
 
-        {containerType || cityFromName?.title || cityToName?.title || searchName ? (
+        {containerType || cityFromName || cityToName || searchName ? (
           <TouchableOpacity onPress={resetFiltered} style={styles.resetButton}>
             <Text style={styles.resetText}>Сброс x</Text>
           </TouchableOpacity>

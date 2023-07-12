@@ -6,14 +6,15 @@ export const hideUserRequest = createAsyncThunk(
   "hideuser",
   async ({ token, hideNumber }) => {
     await AsyncStorage.setItem("hide_person", "" + hideNumber);
-    api
-      .post("/hide-user-data", { secret_token: token, hide_person: hideNumber })
-      .then((res) => {
-        return res;
-      })
-      .catch((error) => {
-        return error.message;
+    try {
+      const response = await api.post("/hide-user-data", {
+        secret_token: token,
+        hide_person: hideNumber,
       });
+      return response;
+    } catch (e) {
+      return error.message;
+    }
   }
 );
 
@@ -30,8 +31,9 @@ const hideUserSlice = createSlice({
       .addCase(hideUserRequest.pending, (state) => {
         state.loading = true;
       })
-      .addCase(hideUserRequest.fulfilled, (state) => {
+      .addCase(hideUserRequest.fulfilled, (state, action) => {
         state.error = false;
+        // state.hide = action.meta.arg.hideNumber;
       })
       .addCase(hideUserRequest.rejected, (state) => {
         state.error = true;

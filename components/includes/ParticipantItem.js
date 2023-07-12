@@ -31,14 +31,14 @@ function ParticipantItem({
     });
   }, []);
 
-  // useEffect(() => {
-  //   setLiked(likedList);
-  // }, [likedList]);
-  // console.log(likedList);
+  useEffect(() => {
+    setLiked(likedList);
+  }, [likedList]);
+  console.log(likedList);
 
   return (
     <>
-      {favorites === "Избранное" && likedList[index] == "is_Favorite" ? (
+      {favorites === "Избранное" && liked[index] == "is_Favorite" ? (
         <TouchableOpacity
           style={styles.wrapper}
           activeOpacity={0.5}
@@ -61,11 +61,25 @@ function ParticipantItem({
           <TouchableOpacity
             onPress={() => {
               dispatch(addFavoriteRequest({ token: token, id: id }));
-              setLiked(!liked);
+
+              setLiked((prevState) => {
+                return prevState.map((like) => {
+                  if (like === "is_Favorite") {
+                    return "not_Favorite";
+                  } else {
+                    return "is_Favorite";
+                  }
+                });
+              });
+              console.log(liked, "liked");
             }}
             styles={styles.favImgBlock}
           >
-            {likedList[index] ? <ImageFavoriteGreen /> : <ImageFavorite />}
+            {liked[index] == "is_Favorite" ? (
+              <ImageFavoriteGreen />
+            ) : (
+              <ImageFavorite />
+            )}
           </TouchableOpacity>
         </TouchableOpacity>
       ) : null}
@@ -93,11 +107,20 @@ function ParticipantItem({
           <TouchableOpacity
             onPress={() => {
               dispatch(addFavoriteRequest({ token: token, id: id }));
-              setLiked(!liked);
+
+              setLiked((prevState) => {
+                return prevState.map((like) => {
+                  if (like === "is_Favorite") {
+                    return "not_Favorite";
+                  } else {
+                    return "is_Favorite";
+                  }
+                });
+              });
             }}
             styles={styles.favImgBlock}
           >
-            {likedList[index] == "is_Favorite" ? (
+            {liked[index] == "is_Favorite" ? (
               <ImageFavoriteGreen />
             ) : (
               <ImageFavorite />

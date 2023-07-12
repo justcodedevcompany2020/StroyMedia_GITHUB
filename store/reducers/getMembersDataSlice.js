@@ -52,6 +52,7 @@ const getMembersSlice = createSlice({
         state.data = action.payload.data?.data?.company;
         state.favoriteList = action.payload.data?.data?.isLike;
         state.error = false;
+        state.loading = false;
       })
       .addCase(getMembersRequest.rejected, (state) => {
         state.error = true;
