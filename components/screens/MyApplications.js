@@ -85,12 +85,20 @@ function MyApplications() {
     };
   }, [navigation]);
 
-  useEffect(() => {
-    resetText();
+  const getData = () => {
+    let type = "";
+    if (activeTab == "В работе") {
+      type = "onwork";
+    } else if (activeTab == "Черновик") {
+      type = "draft";
+    } else if (activeTab == "Архив") {
+      type = "closed";
+    }
+    // activeTab == "В работе" ? "onwork" : "draft"
     dispatch(
       allCatRequest({
         token,
-        tab: activeTab == "В работе" ? "onwork" : "draft",
+        tab: type,
         offset,
       })
     ).then((res) => {
@@ -98,6 +106,18 @@ function MyApplications() {
         setFilteredData(res.payload?.data?.aplications?.aplications);
       }
     });
+  };
+
+  useEffect(() => {
+    resetText();
+    getData();
+
+    const onFocus = navigation.addListener("focus", () => {
+      getData();
+    });
+    return () => {
+      onFocus();
+    };
   }, [activeTab, token, navigation]);
 
   const renderItem = ({ item, index }) => {
@@ -172,24 +192,24 @@ function MyApplications() {
                 backgroundColor: 'yellow'
               }}
             > */}
-              <View
-                style={{
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Text style={styles.quantity}>Количество: {item?.count}</Text>
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Text style={styles.priceText}>Цена:</Text>
-                  <Text style={styles.price}>
-                    {item?.price
-                      ? item.price + " " + item?.currency?.sign
-                      : "по запросу"}
-                  </Text>
-                </View>
+            <View
+              style={{
+                flexDirection: "row",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Text style={styles.quantity}>Количество: {item?.count}</Text>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Text style={styles.priceText}>Цена:</Text>
+                <Text style={styles.price}>
+                  {item?.price
+                    ? item.price + " " + item?.currency?.sign
+                    : "по запросу"}
+                </Text>
               </View>
+            </View>
             {/* </View> */}
           </View>
         </View>
@@ -239,8 +259,8 @@ function MyApplications() {
               keyboardType={"web-search"}
               value={searchValue}
               onSearchText={(val) => {
-                val.trim().length && setSearchValue(val);
-                !val.trim().length && resetText();
+                setSearchValue(val);
+                // !val.trim().length && resetText();
               }}
               resetText={resetText}
             />
@@ -320,12 +340,14 @@ function MyApplications() {
         </View>
       </Modal>
       {headerComponent()}
-      {filteredData.length && activeTab !== "Архив" ? (
+      {/* && activeTab !== "Архив" */}
+      {filteredData.length ? (
         <View style={styles.wrapper}>
           <SwipeListView
             data={filteredData}
             nestedScrollEnabled
             scrollEnabled
+            disableLeftSwipe={activeTab === "Архив"}
             ListEmptyComponent={() => {
               return <Text style={styles.empty}>ничего не найдено</Text>;
             }}

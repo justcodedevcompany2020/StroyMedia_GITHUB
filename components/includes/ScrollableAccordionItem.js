@@ -53,7 +53,7 @@ function ScrollableAccordionItem( {
   const date = +item?.date_create?.$date?.$numberLong;
   useEffect( () => {
     AsyncStorage.getItem( "token" ).then( ( result ) => {
-      dispatch( allDialogRequest( { token : result } ) );
+      // dispatch( allDialogRequest( { token : result } ) );
       dispatch( authRequest( { secret_token : result } ) );
       setToken( result );
     } );

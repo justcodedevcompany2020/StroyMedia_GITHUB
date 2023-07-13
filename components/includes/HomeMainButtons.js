@@ -50,7 +50,7 @@ const HomeMainButtons = () => {
           //   .unwrap()
           //   .then(() => {
           //   });
-              navigation.navigate("Participants", { currentPage: "Участники" });
+          navigation.navigate("Participants", { currentPage: "Участники" });
         }}
         style={[styles.block, styles.bgGreen]}
       >
@@ -87,7 +87,7 @@ const HomeMainButtons = () => {
               flex: 1,
             }}
           >
-            <ActivityIndicator color={COLOR_1} size={"large"} />
+            <ActivityIndicator size={50} color={COLOR_5} />
           </View>
         )}
       </TouchableOpacity>

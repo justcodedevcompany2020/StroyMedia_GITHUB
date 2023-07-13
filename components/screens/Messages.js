@@ -41,10 +41,11 @@ function Messages({ route, navigation }) {
   const [token, setToken] = useState();
   const [visibleModal, setVisibleModal] = useState(false);
   const dispatch = useDispatch();
-  const { data, loading } = useSelector((state) => state.allDialogSlice);
-  const forumChats = useSelector((state) => state.forumChatAllSlice.data);
-  const { last_messages } = useSelector((state) => state.forumChatAllSlice);
-  const isLoading = useSelector((state) => state.forumChatAllSlice);
+  const { loading } = useSelector((state) => state.allDialogSlice);
+  // const forumChats = useSelector((state) => state.forumChatAllSlice.data);
+  const { last_messages, isLoading } = useSelector(
+    (state) => state.forumChatAllSlice
+  );
   const [filteredData, setFilteredData] = useState([]);
   const [changed, setChanged] = useState(true);
   const serachResult = useSelector(
@@ -71,17 +72,26 @@ function Messages({ route, navigation }) {
     AsyncStorage.getItem("token").then((result) => {
       setToken(result);
       dispatch(authRequest({ secret_token: result }));
-      dispatch(allDialogRequest({ token: result }));
-      dispatch(allChatForumRequest({ token: result }));
     });
-  }, []);
+  }, [navigation]);
 
-  const convertedArray = Object.keys(data).map(function (key) {
-    return data[key];
+  useEffect(() => {
+    activeTab == "Диалоги"
+      ? dispatch(allDialogRequest({ token: token })).then((res) => {
+          setFilteredData(res.payload.data.users);
+        })
+      : dispatch(allChatForumRequest({ token: token })).then((res) => {
+          console.log(res.payload);
+          setFilteredData(res.payload.data.data.contacts);
+        });
+  }, [token, activeTab]);
+
+  const convertedArray = Object.keys(filteredData).map(function (key) {
+    return filteredData[key];
   });
 
-  const convertForumChatToArray = Object.keys(forumChats).map(function (key) {
-    return forumChats[key];
+  const convertForumChatToArray = Object.keys(filteredData).map(function (key) {
+    return filteredData[key];
   });
 
   const renderItem = ({ item, index }) => {
@@ -142,17 +152,18 @@ function Messages({ route, navigation }) {
         ? convertForumChatToArray
         : searchMessages?.length
         ? searchMessages
-        : Object.keys(data).map((key) => {
-            return data[key];
+        : Object.keys(filteredData).map((key) => {
+            return filteredData[key];
           })
     );
-  }, [data.length, activeTab, searchMessages]);
+  }, [filteredData.length, activeTab, searchMessages]);
 
   const filteredMessages = (searchText) => {
     activeTab === "Диалоги" &&
       !serachResult.length &&
       setFilteredData(
         convertedArray.filter((m) => {
+          alert();
           return m?.name?.includes(searchText);
         })
       );
@@ -236,7 +247,7 @@ function Messages({ route, navigation }) {
     );
     setFilteredData(
       filteredData.filter((data) => {
-        data;
+        console.log(data);
         return data.last_id !== id;
       })
     );
@@ -296,20 +307,20 @@ function Messages({ route, navigation }) {
         <View style={styles.fadeBlock}>
           <Image source={ImageFadePart} style={styles.fade} />
         </View>
-        {!data.length && (
-          <Modal visible={loading || isLoading} transparent>
-            <View
-              style={{
-                backgroundColor: "#00000030",
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <ActivityIndicator size={50} />
-            </View>
-          </Modal>
-        )}
+
+        <Modal visible={loading || isLoading} transparent>
+          <View
+            style={{
+              backgroundColor: "#00000030",
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <ActivityIndicator size={50} />
+          </View>
+        </Modal>
+
         {activeTab === "Диалоги" && (
           <AddNew onPress={() => setVisibleModal(true)} />
         )}

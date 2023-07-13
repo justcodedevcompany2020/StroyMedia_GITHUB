@@ -118,7 +118,7 @@ function SearchModal(props) {
         />
         <MyButton
           onPress={() => {
-            return submith();
+            submith();
           }}
           style={styles.button}
         >

@@ -12,6 +12,7 @@ export const allCatRequest = createAsyncThunk(
     );
     formdata.append("type_request", tab);
     formdata.append("offset", offset);
+
     var requestOptions = {
       method: "POST",
       body: formdata,
@@ -24,6 +25,9 @@ export const allCatRequest = createAsyncThunk(
         requestOptions
       );
       const data = await response.json();
+      // if (tab == "closed") {
+      //   console.log(data);
+      // }
       // console.log(data.data.aplications.aplications)
       return data;
     } catch (err) {

@@ -30,6 +30,7 @@ const getAllPollsSlice = createSlice({
       .addCase(getAllPollsRequest.fulfilled, (state, action) => {
         state.data = action.payload.data?.data.rows;
         state.error = false;
+        state.loading = false;
       })
 
       .addCase(getAllPollsRequest.rejected, (state) => {

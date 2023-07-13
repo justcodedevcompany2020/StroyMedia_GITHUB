@@ -7,7 +7,7 @@ import {
   Modal,
   ActivityIndicator,
 } from "react-native";
-import { COLOR_1, COLOR_3 } from "../helpers/Variables";
+import { COLOR_1, COLOR_3, COLOR_5 } from "../helpers/Variables";
 import { useDispatch } from "react-redux";
 import MyCheckbox from "./MyCheckbox";
 import MyButton from "./MyButton";
@@ -74,7 +74,7 @@ function PollsItem({ optionsList, id, total, vote }) {
             alignItems: "center",
           }}
         >
-          <ActivityIndicator size={50} />
+          <ActivityIndicator size={50} color={COLOR_5} />
         </View>
       </Modal>
       {optionsList?.map((option, index) => {
@@ -106,9 +106,7 @@ function PollsItem({ optionsList, id, total, vote }) {
           );
         }
       })}
-      <Text style={styles.smallText}>
-        {vote.length} голоса
-      </Text>
+      <Text style={styles.smallText}>{vote.length} голоса</Text>
     </View>
   ) : (
     <View>

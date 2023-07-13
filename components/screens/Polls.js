@@ -2,15 +2,24 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, FlatList } from "react-native";
 import Wrapper from "../helpers/Wrapper";
 import { useDispatch } from "react-redux";
-import { COLOR_1, COLOR_6, WRAPPER_PADDINGS } from "../helpers/Variables";
+import {
+  COLOR_1,
+  COLOR_5,
+  COLOR_6,
+  WRAPPER_PADDINGS,
+} from "../helpers/Variables";
 import AccordionItem from "../includes/AccordionItem";
 import PollsItem from "../includes/PollsItem";
 import { useSelector } from "react-redux";
 import { getAllPollsRequest } from "../../store/reducers/getAllPolsSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Modal } from "react-native";
+import { ActivityIndicator } from "react-native";
 
 function Polls({ route, navigation }) {
-  const { data } = useSelector((state) => state.getAllPolsSlice);
+  const { loading } = useSelector((state) => state.getAllPolsSlice);
+  const [data, setData] = useState([]);
+  console.log(data);
   let filteredData = [];
   const { currentPage } = route.params;
   const dispatch = useDispatch();
@@ -20,7 +29,10 @@ function Polls({ route, navigation }) {
   useEffect(() => {
     AsyncStorage.getItem("token").then((result) => {
       if (result) {
-        dispatch(getAllPollsRequest({ token: result }));
+        dispatch(getAllPollsRequest({ token: result })).then((res) => {
+          console.log(res.payload.data?.data.rows);
+          setData(res.payload.data?.data.rows);
+        });
       }
     });
   }, []);
@@ -34,6 +46,19 @@ function Polls({ route, navigation }) {
         navigation,
       }}
     >
+      <Modal visible={loading} transparent>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "#00000055",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <ActivityIndicator size={50} color={COLOR_5} />
+        </View>
+      </Modal>
+      
       <View style={styles.wrapper}>
         <Text style={styles.title}>Уважаемый пользователь!</Text>
 

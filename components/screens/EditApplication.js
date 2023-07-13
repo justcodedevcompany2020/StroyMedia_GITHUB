@@ -35,6 +35,7 @@ import { Entypo } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import _ from "lodash";
+import { addArchiveApplicationRequest } from "../../store/reducers/addArchiveApplicationSlice";
 
 const container = ["40 ST", "20 (30)", "20 (24)", "40 HQ"];
 const valuta = ["₽", "€", "$"];
@@ -108,6 +109,7 @@ function EditApplication() {
   const DropDownRef = useRef({});
   const DrowDownTypeContainerRef = useRef({});
   const [typeContainer, setTypeContiner] = useState(typeKTK);
+  const [saveAsArchive, setSaveAsArchive] = useState(false);
 
   let allCitys = useSelector(
     (state) => state.getCitysSlice?.data?.data?.data?.citys
@@ -1492,115 +1494,7 @@ function EditApplication() {
         onSavePress: save,
       }}
     >
-      <View style={styles.wrapper}>
-        {/* <AccordionItem
-          titleComponent={
-            <Text style={styles.selectText}>
-              {fromCityName
-                ? fromCityName
-                : item?.from_city?.title?.ru || "Откуда"}
-            </Text>
-          }
-          wrapperStyle={openCitys ? styles.openModal : styles.select}
-          headerStyle={styles.selectHeader}
-          arrowStyle={styles.selectArrowStyle}
-          isopenModal={openCitysModal}
-        >
-          <View style={styles.citysSearch}>
-            <DelayInput
-              placeholder="Search"
-              value={searchValue}
-              minLength={1}
-              onChangeText={(text) => setSearchValue(text)}
-              delayTimeout={500}
-              style={styles.searchInput}
-            />
-          </View>
-          <FlatList
-            data={citys}
-            keyExtractor={(item) => item?.last_id}
-            renderItem={({ item }) => {
-              return (
-                <TouchableOpacity
-                  onPress={() => {
-                    setFromCityName(item?.title?.ru || item.title);
-                    setFrom_city(item?.last_id);
-                  }}
-                >
-                  <Text style={{ marginBottom: 8 }}>
-                    {item.title.ru || item.title}
-                  </Text>
-                </TouchableOpacity>
-              );
-            }}
-            maxToRenderPerBatch={10}
-            updateCellsBatchingPeriod={20}
-          />
-        </AccordionItem>
-        <AccordionItem
-          titleComponent={
-            <Text style={styles.selectText}>
-              {toCityName ? toCityName : item?.to_city?.title?.ru || "Куда"}
-            </Text>
-          }
-          wrapperStyle={openCitysFrom ? styles.openModal : styles.select}
-          headerStyle={styles.selectHeader}
-          arrowStyle={styles.selectArrowStyle}
-          isopenModal={openCytysFromModal}
-        >
-          <View style={styles.citysSearch}>
-            <DelayInput
-              placeholder="Search"
-              value={searchValue}
-              minLength={1}
-              onChangeText={(text) => setSearchValue(text)}
-              delayTimeout={500}
-              style={styles.searchInput}
-            />
-          </View>
-          <FlatList
-            data={citys}
-            keyExtractor={(item) => item?.last_id}
-            renderItem={({ item }) => {
-              return (
-                <TouchableOpacity
-                  onPress={() => {
-                    setToCityName(item?.title?.ru || item.title);
-                    setTo_city(item?.last_id);
-                  }}
-                >
-                  <Text style={{ marginBottom: 8 }}>
-                    {item.title.ru || item.title}
-                  </Text>
-                </TouchableOpacity>
-              );
-            }}
-            maxToRenderPerBatch={10}
-            updateCellsBatchingPeriod={20}
-          />
-        </AccordionItem>
-        <MyInput
-          label={"Количество контейнеров"}
-          value={containerCount}
-          placeholder={item?.count.toString()}
-          onChangeText={(val) => setContainerCount(val)}
-          keyboardType={"numeric"}
-        />
-        <MyInput
-          label={"Ставка"}
-          value={price}
-          placeholder={item?.price.toString()}
-          onChangeText={(val) => setPrice(val)}
-          keyboardType={"numeric"}
-        />
-        <BlockWithSwitchButton
-          title={"Сохранить как черновик"}
-          titleStyle={styles.selectText}
-          onToggle={(val) => setSaveAsDraft(val)}
-          isOn={saveAsDraft}
-        />
-         */}
-      </View>
+      <View style={styles.wrapper}></View>
       <View style={styles.wrapper}>
         {activeSecondary === "Поиск КТК"
           ? searchKTK()
@@ -1619,6 +1513,34 @@ function EditApplication() {
           onToggle={(val) => setSaveAsDraft(val)}
           isOn={saveAsDraft}
         />
+
+        <BlockWithSwitchButton
+          title={"Запрос закрыт"}
+          titleStyle={styles.selectText}
+          onToggle={(val) => {
+            dispatch(addArchiveApplicationRequest({ token, last_id })).then(
+              (res) => {
+                console.log(res.payload);
+                // console.log(last_id);
+                if (res?.payload?.success) {
+                  setSaveAsArchive(val);
+                  showMessage({
+                    message: "Ваша заявка успешно добавлена в архив",
+                    type: "success",
+                  });
+                } else {
+                  showMessage({
+                    message: "Ваша заявка успешно добавлена в архив",
+                    type: "success",
+                  });
+                }
+              }
+            );
+          }}
+          isOn={saveAsArchive}
+          style={{ marginTop: 10 }}
+        />
+
         <MyButton onPress={save} style={styles.button}>
           Разместить
         </MyButton>

@@ -38,9 +38,7 @@ const SearchIcon = require("../../assets/search.png");
 function Offers({ route, navigation }) {
   const [tabs, setTabs] = useState(["Все предложения", "Избранное"]);
   const [activeTab, setActiveTab] = useState("Все предложения");
-  const { data, loading } = useSelector(
-    (state) => state.getAllSuggestionsSlice
-  );
+  const { loading } = useSelector((state) => state.getAllSuggestionsSlice);
   const [citys, setCitys] = useState([]);
   const typeContainer = ["40 ST", "20 (30)", "20 (24)", "40 HQ"];
   const secondaryTabs = [
@@ -63,7 +61,8 @@ function Offers({ route, navigation }) {
   const [cityToName, setToCityName] = useState("");
   const [offset, setOffset] = useState(0);
   const [page, setPage] = useState(1);
-  const timeStamnp = +data[0]?.date_create?.$date.$numberLong;
+  const [filteredData, setFilteredData] = useState([]);
+  const timeStamnp = +filteredData[0]?.date_create?.$date.$numberLong;
   let allCitys = useSelector(
     (state) => state.getCitysSlice?.data?.data?.data?.citys
   );
@@ -73,19 +72,6 @@ function Offers({ route, navigation }) {
 
   const dispatch = useDispatch();
   let liked = false;
-  // useEffect(() => {
-  //   setId(
-  //     activeSecondaryTab === "Поиск КТК"
-  //       ? "2"
-  //       : activeSecondaryTab === "Продажа КТК"
-  //       ? "5"
-  //       : activeSecondaryTab === "Выдача КТК"
-  //       ? "3"
-  //       : activeSecondaryTab === "Контейнерный сервис"
-  //       ? "6"
-  //       : "7"
-  //   );
-  // }, [activeSecondaryTab]);
 
   useEffect(() => {
     AsyncStorage.getItem("token").then((result) => {
@@ -104,36 +90,12 @@ function Offers({ route, navigation }) {
   }, []);
 
   const filtered = () => {
-    setCitys(
-      allCitys?.filter((c) => {
-        return c?.title?.ru?.includes(searchValue);
+    setFilteredData(
+      filteredData?.filter((c) => {
+        return c?.title?.includes(searchValue);
       })
     );
   };
-
-  // const filteretData = () => {
-  //   setLoad(true);
-  //   dispatch(
-  //     allSuggestionRequest({
-  //       token,
-  //       id,
-  //       offset: 5,
-  //       searchText: searchValue ? searchValue : null,
-  //       to_city: cityToName ? cityToName.last_id : null,
-  //       from_city: cityFromName ? cityFromName.last_id : null,
-  //       type_container:
-  //         containerType === "40 ST" || containerType === "20 (30)"
-  //           ? 4
-  //           : containerType === "20 (24)"
-  //           ? 2
-  //           : containerType === "40 HQ"
-  //           ? 3
-  //           : null,
-  //     })
-  //   )
-  //     .unwrap()
-  //     .then(() => setLoad(false));
-  // };
 
   const renderItem = ({ item, index }) => {
     if (favoriteList[index] == "is_Favorite") {
@@ -156,85 +118,6 @@ function Offers({ route, navigation }) {
     );
   };
 
-  // const filterFromCitys = (data) => {
-  //   setPage(1);
-  //   setLoad(true);
-  //   dispatch(
-  //     allSuggestionRequest({
-  //       token,
-  //       id,
-  //       offset: 0,
-  //       searchText: searchValue ? searchValue : null,
-  //       to_city: cityToName ? cityToName.last_id : null,
-  //       from_city: data,
-  //       type_container:
-  //         containerType === "40 ST" || containerType === "20 (30)"
-  //           ? 4
-  //           : containerType === "20 (24)"
-  //           ? 2
-  //           : containerType === "40 HQ"
-  //           ? 3
-  //           : null,
-  //     })
-  //   )
-  //     .unwrap()
-  //     .then(() => setLoad(false));
-  // };
-
-  // const filterToCitys = (data) => {
-  //   setLoad(true);
-  //   setPage(1);
-  //   dispatch(
-  //     allSuggestionRequest({
-  //       token,
-  //       id,
-  //       offset: 0,
-  //       searchText: searchValue ? searchValue : null,
-  //       to_city: data,
-  //       from_city: cityFromName ? cityFromName : null,
-  //       type_container:
-  //         containerType === "40 ST" || containerType === "20 (30)"
-  //           ? 4
-  //           : containerType === "20 (24)"
-  //           ? 2
-  //           : containerType === "40 HQ"
-  //           ? 3
-  //           : null,
-  //     })
-  //   )
-  //     .unwrap()
-  //     .then(() => setLoad(false));
-  // };
-
-  // const filterTypeContainer = (data) => {
-  //   setLoad(true);
-  //   setPage(1);
-  //   dispatch(
-  //     allSuggestionRequest({
-  //       token,
-  //       id: id,
-  //       offset: 0,
-  //       searchText: searchValue ? searchValue : null,
-  //       to_city: cityToName ? cityToName.last_id : null,
-  //       from_city: cityFromName ? cityFromName.last_id : null,
-  //       type_container:
-  //         data === "40 ST" || data === "20 (30)"
-  //           ? 4
-  //           : data === "20 (24)"
-  //           ? 2
-  //           : data === "40 HQ"
-  //           ? 3
-  //           : null,
-  //     })
-  //   )
-  //     .unwrap()
-  //     .then(() => setLoad(false));
-  // };
-
-  // useEffect(() => {
-  //   cityToName && filteretData();
-  // }, [containerType, cityToName, cityToName]);
-
   const resetText = () => {
     setCitys(allCitys);
     setSearchValue("");
@@ -245,51 +128,31 @@ function Offers({ route, navigation }) {
 
   const resetFiltered = () => {
     setPage(1);
+    setOffset('0')
     setSearchName("");
     setTypeContainer(null);
     setFromCityName(null);
     setToCityName(null);
-    dispatch(allSuggestionRequest({ token, id: id, offset: 0 }));
+    dispatch(allSuggestionRequest({ token, id: id, offset: 0 })).then((res) => {
+      console.log(res.payload.data?.data.rows);
+      setFilteredData(res.payload.data?.data.rows);
+    });
   };
 
-  const renderCitys = ({ item }) => {
-    return (
-      <TouchableOpacity
-        onPress={() => {
-          setPage(1);
-          // setLoad(true);
-          setSearchValue(item.title.ru || item.title);
-          setSearchName(item.title.ru || item.title);
-          // dispatch(
-          //   allSuggestionRequest({
-          //     token,
-          //     id: id,
-          //     offset: 0,
-          //     searchText: [item.last_id, item.last_id],
-          //     to_city: cityToName ? cityToName.last_id : null,
-          //     from_city: cityFromName ? cityFromName.last_id : null,
-          //     type_container:
-          //       containerType === "40 ST" || containerType === "20 (30)"
-          //         ? 4
-          //         : containerType === "20 (24)"
-          //         ? 2
-          //         : containerType === "40 HQ"
-          //         ? 3
-          //         : null,
-          //   })
-          // )
-          //   .unwrap()
-          //   .then(() => {
-          //     // setSearchValue("");
-          //     setCitys(allCitys);
-          //     setLoad(false);
-          //   });
-        }}
-      >
-        <Text style={{ marginBottom: 8 }}>{item.title.ru || item.title}</Text>
-      </TouchableOpacity>
-    );
-  };
+  // const renderCitys = ({ item }) => {
+  //   return (
+  //     <TouchableOpacity
+  //       onPress={() => {
+  //         setPage(1);
+  //         // setLoad(true);
+  //         setSearchValue(item.title.ru || item.title);
+  //         setSearchName(item.title.ru || item.title);
+  //       }}
+  //     >
+  //       <Text style={{ marginBottom: 8 }}>{item.title.ru || item.title}</Text>
+  //     </TouchableOpacity>
+  //   );
+  // };
   const headerComponent = () => {
     return (
       <View style={styles.header}>
@@ -312,7 +175,6 @@ function Offers({ route, navigation }) {
             setTypeContainer(null);
             setFromCityName(null);
             setToCityName(null);
-            // dispatch(allSuggestionRequest({ token, id: tab, offset: 5 }));
             setActiveSecondaryTab(tab);
             setId(
               tab === "Поиск КТК"
@@ -336,7 +198,6 @@ function Offers({ route, navigation }) {
             onSearchText={(val) => {
               val.trim().length === 0 && resetFiltered();
               setSearchValue(val);
-              filtered();
             }}
             resetText={resetText}
           />
@@ -396,25 +257,6 @@ function Offers({ route, navigation }) {
   const nextPage = () => {
     setOffset(offset + 5);
     setPage(page + 1);
-    // dispatch(
-    //   allSuggestionRequest({
-    //     token,
-    //     id: activeSecondaryTab,
-    //     offset: offset + 5,
-    //     searchText: searchValue ? searchValue : null,
-    //     to_city: cityToName ? cityToName.last_id : null,
-    //     from_city: cityFromName ? cityFromName.last_id : null,
-    //     type_container:
-    //       containerType === "40 ST" || containerType === "20 (30)"
-    //         ? 4
-    //         : containerType === "20 (24)"
-    //         ? 2
-    //         : containerType === "40 HQ"
-    //         ? 3
-    //         : null,
-    //   })
-    // ).unwrap();
-    // .then((res) => setLikedList(res?.data.data.isLike));
   };
 
   useEffect(() => {
@@ -435,7 +277,10 @@ function Offers({ route, navigation }) {
             ? 3
             : null,
       })
-    );
+    ).then((res) => {
+      console.log(res.payload.data?.data.rows);
+      setFilteredData(res.payload.data?.data.rows);
+    });
   }, [
     offset,
     token,
@@ -449,33 +294,7 @@ function Offers({ route, navigation }) {
   const previusPage = () => {
     setOffset(offset - 5);
     setPage(page - 1);
-    // dispatch(
-    //   allSuggestionRequest({
-    //     token,
-    //     id: activeSecondaryTab,
-    //     offset: offset - 5,
-    //     searchText: searchValue ? searchValue : null,
-    //     to_city: cityToName ? cityToName.last_id : null,
-    //     from_city: cityFromName ? cityFromName.last_id : null,
-    //     type_container:
-    //       containerType === "40 ST" || containerType === "20 (30)"
-    //         ? 4
-    //         : containerType === "20 (24)"
-    //         ? 2
-    //         : containerType === "40 HQ"
-    //         ? 3
-    //         : null,
-    //   })
-    // ).unwrap();
-    //  .then((res) => setLikedList(res?.data.data.isLike));
   };
-
-  // useEffect(() => {
-  //   dispatch(allSuggestionRequest({ token, id: "Поиск КТК", offset }))
-  //     .unwrap()
-  //     .then((res) => {
-  //     });
-  // }, [token]);
 
   return (
     <>
@@ -495,7 +314,7 @@ function Offers({ route, navigation }) {
           navigation,
         }}
       >
-        {searchValue ? (
+        {/* {searchValue ? (
           <View style={styles.searchModal}>
             <FlatList
               data={citys}
@@ -505,13 +324,13 @@ function Offers({ route, navigation }) {
               updateCellsBatchingPeriod={20}
             />
           </View>
-        ) : null}
+        ) : null} */}
         <SwipeListView
-          data={data}
+          data={filteredData}
           renderItem={renderItem}
           ListHeaderComponent={headerComponent()}
           ListFooterComponent={() => {
-            return data.length === 5 && activeTab !== "Избранное" ? (
+            return filteredData.length === 5 && activeTab !== "Избранное" ? (
               <View
                 style={{
                   flex: 1,
@@ -537,7 +356,7 @@ function Offers({ route, navigation }) {
                 </View>
                 <View>
                   <TouchableOpacity
-                    disabled={data.length === 5 ? false : true}
+                    disabled={filteredData.length === 5 ? false : true}
                     onPress={nextPage}
                   >
                     <Entypo name="chevron-right" size={28} color={"gray"} />
