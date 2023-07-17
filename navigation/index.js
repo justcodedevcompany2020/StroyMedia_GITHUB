@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
-import { NavigationContainer } from "@react-navigation/native";
+import React, {useEffect, useRef, useState} from "react";
+import {NavigationContainer} from "@react-navigation/native";
 import LogOutNavigation from "./LogOutNavigation";
 import MainNavigation from "./MainNavigation";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useSelector } from "react-redux";
+import {useSelector} from "react-redux";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 
@@ -23,32 +23,31 @@ const Navigation = () => {
   const notificationListener = useRef();
   const responseListener = useRef();
   const state = useSelector((state) => state);
-  const { notification_data } = state.getAllNotificationsSlice;
+  const {notification_data} = state.getAllNotificationsSlice;
 
-  const sendNotification = async () => {
-    // console.log(notification_data[0][0]);
-    // console.log(`https://teus.online${notification_data[0][0].author.avatar}`);
-
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "You've got mail! 📬",
-        sound: true, // Provide ONLY the base filename
-        body: "namak es stacel",
-        subtitle: "You ve got mail",
-        vibrate: true,
-        // launchImageName: `https://teus.online${notification_data[0][0].author.avatar}`,
-        badge: 1,
-      },
-      trigger: {
-        seconds: 2,
-        channelId: "new-emails",
-      },
-    });
-  };
-
+  // const sendNotification = async () => {
+  //   // console.log(notification_data[0][0]);
+  //   // console.log(`https://teus.online${notification_data[0][0].author.avatar}`);
+  //
+  //   await Notifications.scheduleNotificationAsync({
+  //     content: {
+  //       title: "You've got mail! 📬",
+  //       sound: true, // Provide ONLY the base filename
+  //       body: "namak es stacel",
+  //       subtitle: "You ve got mail",
+  //       vibrate: true,
+  //       // launchImageName: `https://teus.online${notification_data[0][0].author.avatar}`,
+  //       badge: 1,
+  //     },
+  //     trigger: {
+  //       seconds: 2,
+  //       channelId: "new-emails",
+  //     },
   useEffect(() => {
-    registerForPushNotificationsAsync().then((token) =>
-      setExpoPushToken(token)
+    registerForPushNotificationsAsync().then((token) => {
+        setExpoPushToken(token)
+        console.log(token)
+      }
     );
 
     notificationListener.current =
@@ -61,7 +60,6 @@ const Navigation = () => {
         console.log(response, "response");
       });
 
-    sendNotification();
 
     return () => {
       Notifications.removeNotificationSubscription(
@@ -70,6 +68,9 @@ const Navigation = () => {
       Notifications.removeNotificationSubscription(responseListener.current);
     };
   }, []);
+  //   });
+
+  // };
 
   useEffect(() => {
     const getToken = async () => {
@@ -90,7 +91,7 @@ const Navigation = () => {
 
   return (
     <NavigationContainer>
-      {accesToken || token ? <MainNavigation /> : <LogOutNavigation />}
+      {accesToken || token ? <MainNavigation/> : <LogOutNavigation/>}
     </NavigationContainer>
   );
 };
@@ -114,22 +115,22 @@ async function registerForPushNotificationsAsync() {
   }
 
   if (Device.isDevice) {
-    const { status: existingStatus } =
-      await Notifications.getPermissionsAsync();
+    const {status: existingStatus} = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
     if (existingStatus !== "granted") {
-      const { status } = await Notifications.requestPermissionsAsync();
+      const {status} = await Notifications.requestPermissionsAsync();
       finalStatus = status;
     }
-    if (finalStatus !== "granted") {
-      alert("Failed to get push token for push notification!");
-      return;
-    }
+    // alert(finalStatus)
+    // if (finalStatus === "granted") {
+    //   alert("Failed to get push token for push notification!");
+    //   // return;
+    // }
     token = (await Notifications.getExpoPushTokenAsync()).data;
-    console.log(token);
+    alert(token, 'token');
   } else {
     alert("Must use physical device for Push Notifications");
   }
-
+  console.log(token)
   return token;
 }

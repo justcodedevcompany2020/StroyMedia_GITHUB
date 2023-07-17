@@ -1,44 +1,23 @@
-import React, { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import React, {useEffect, useState} from "react";
+import {ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View,} from "react-native";
 import Wrapper from "../helpers/Wrapper";
-import {
-  ImageCallGreen,
-  ImageEmailGreen,
-  ImageOffersArrow,
-  ImageRatingSmall,
-} from "../helpers/images";
-import {
-  COLOR_1,
-  COLOR_10,
-  COLOR_2,
-  COLOR_5,
-  COLOR_6,
-  COLOR_8,
-  COLOR_9,
-  WRAPPER_PADDINGS,
-} from "../helpers/Variables";
+import {ImageCallGreen, ImageEmailGreen, ImageOffersArrow, ImageRatingSmall,} from "../helpers/images";
+import {COLOR_1, COLOR_10, COLOR_2, COLOR_5, COLOR_6, COLOR_8, COLOR_9, WRAPPER_PADDINGS,} from "../helpers/Variables";
 import SingleParticipantBlock from "../includes/SingleParticipantBlock";
 import MyInput from "../includes/MyInput";
 import MyButton from "../includes/MyButton";
 import moment from "moment";
-import { Entypo } from "@expo/vector-icons";
+import {Entypo} from "@expo/vector-icons";
 import SelectDropdown from "react-native-select-dropdown";
-import { useDispatch, useSelector } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { workRequest } from "../../store/reducers/workRequestSlice";
+import {workRequest} from "../../store/reducers/workRequestSlice";
 import Modal from "react-native-modal";
-import { showMessage } from "react-native-flash-message";
-import { chatOrderRequest } from "../../store/reducers/chatDialogOrderSlice";
+import {showMessage} from "react-native-flash-message";
+import {chatOrderRequest} from "../../store/reducers/chatDialogOrderSlice";
 import * as Linking from "expo-linking";
+
 const valuta = ["₽", "€", "$"];
-import * as Notifications from "expo-notifications";
 
 function SendOffer(props) {
   const [price, setPrice] = useState(null);
@@ -46,10 +25,10 @@ function SendOffer(props) {
   const [comment, setComment] = useState("");
   const [currency, setCurrency] = useState("");
   const [token, setToken] = useState("");
-  const { route, navigation } = props;
-  const { currentPage, item, id } = route.params;
+  const {route, navigation} = props;
+  const {currentPage, item, id} = route.params;
   const date = moment(+item?.date_create?.$date.$numberLong).format("DD MMMM");
-  const { loading, error } = useSelector((state) => state.workRequestSlice);
+  const {loading, error} = useSelector((state) => state.workRequestSlice);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -60,17 +39,6 @@ function SendOffer(props) {
     });
   }, [token]);
 
-  const sendNotification = async () => {
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "New Notification",
-        body: "Hello, this is a test notification!",
-        sound: true,
-        vibrate: true,
-      },
-      trigger: null, // Display immediately
-    });
-  };
 
   return (
     <Wrapper
@@ -88,7 +56,7 @@ function SendOffer(props) {
               <Text style={styles.fromCity}>
                 {item?.from_city?.title?.ru?.replace("(RU)", "")}
               </Text>
-              <ImageOffersArrow />
+              <ImageOffersArrow/>
               <Text style={styles.toCity}>
                 {item?.to_city?.title?.ru?.replace("(RU)", "")}
               </Text>
@@ -97,8 +65,8 @@ function SendOffer(props) {
             <Text style={styles.price}>
               {console.log(item.currency)}
               {item.price > 0 && item.currency != null
-                ? item.price.toString() + item.currency?.sign.toString()
-                : "по запросу"}
+               ? item.price.toString() + item.currency?.sign.toString()
+               : "по запросу"}
             </Text>
           </View>
           <View style={styles.row}>
@@ -119,8 +87,8 @@ function SendOffer(props) {
             style={styles.companyPhoto}
             source={{
               uri: item?.user?.avatar_person
-                ? "https://teus.online/" + item?.user?.avatar
-                : "https://vyshnevyi-partners.com/wp-content/uploads/2016/12/no-avatar.png",
+                   ? "https://teus.online/" + item?.user?.avatar
+                   : "https://vyshnevyi-partners.com/wp-content/uploads/2016/12/no-avatar.png",
             }}
           />
           <View style={styles.companyInfo}>
@@ -134,7 +102,7 @@ function SendOffer(props) {
               {item?.user?.post !== "undefined" && item?.user?.post}
             </Text>
             <View style={styles.companyRating}>
-              <ImageRatingSmall />
+              <ImageRatingSmall/>
               <Text style={styles.companyRatingText}>
                 {item.user.rate_plus}
               </Text>
@@ -147,14 +115,14 @@ function SendOffer(props) {
             key={item.last_id}
             uri={
               item?.user?.avatar_person
-                ? "https://teus.online/" + item?.user?.avatar_person
-                : "https://vyshnevyi-partners.com/wp-content/uploads/2016/12/no-avatar.png"
+              ? "https://teus.online/" + item?.user?.avatar_person
+              : "https://vyshnevyi-partners.com/wp-content/uploads/2016/12/no-avatar.png"
             }
             button={{
               label: "Написать",
               onPress: () => {
                 dispatch(
-                  chatOrderRequest({ token: token, id: item.user.last_id })
+                  chatOrderRequest({token: token, id: item.user.last_id})
                 )
                   .unwrap()
                   .then(() => {
@@ -177,14 +145,14 @@ function SendOffer(props) {
               style={styles.contacts}
             >
               <Text style={styles.contactsText}>{item?.user?.phone}</Text>
-              <ImageCallGreen />
+              <ImageCallGreen/>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => Linking.openURL("mailto:" + item?.user?.email)}
               style={styles.contacts}
             >
               <Text style={styles.contactsText}>{item?.user?.email}</Text>
-              <ImageEmailGreen />
+              <ImageEmailGreen/>
             </TouchableOpacity>
           </SingleParticipantBlock>
         </View>
@@ -216,7 +184,7 @@ function SendOffer(props) {
             dropdownIconPosition="right"
             renderDropdownIcon={() => {
               return (
-                <Entypo name="chevron-small-down" size={32} color={COLOR_1} />
+                <Entypo name="chevron-small-down" size={32} color={COLOR_1}/>
               );
             }}
             buttonTextStyle={{
@@ -224,7 +192,7 @@ function SendOffer(props) {
               fontSize: 14,
               textAlign: "left",
             }}
-            buttonStyle={{ height: 40, width: "100%", borderRadius: 8 }}
+            buttonStyle={{height: 40, width: "100%", borderRadius: 8}}
             data={valuta}
             rowStyle={{
               flex: 1,
@@ -249,12 +217,12 @@ function SendOffer(props) {
             form_data.append(
               "currency",
               currency == "₽"
-                ? "1"
-                : currency == "€"
+              ? "1"
+              : currency == "€"
                 ? "2"
                 : currency == "$"
-                ? "3"
-                : ""
+                  ? "3"
+                  : ""
             );
             form_data.append("comment", comment);
             form_data.append("days", periodOfUsing);
@@ -276,9 +244,8 @@ function SendOffer(props) {
                 //   });
                 // }
                 if (res.success) {
-                  sendNotification();
                   dispatch(
-                    chatOrderRequest({ token: token, id: item.user.last_id })
+                    chatOrderRequest({token: token, id: item.user.last_id})
                   )
                     .unwrap()
                     .then(async () => {
@@ -305,7 +272,7 @@ function SendOffer(props) {
       {loading && (
         <Modal backdropOpacity={0.75} color="red" isVisible={true}>
           <View>
-            <ActivityIndicator size="large" />
+            <ActivityIndicator size="large"/>
           </View>
         </Modal>
       )}
