@@ -36,7 +36,7 @@ const Navigation = () => {
         body: "namak es stacel",
         subtitle: "You ve got mail",
         vibrate: true,
-        launchImageName: `https://teus.online${notification_data[0][0].author.avatar}`,
+        // launchImageName: `https://teus.online${notification_data[0][0].author.avatar}`,
         badge: 1,
       },
       trigger: {
