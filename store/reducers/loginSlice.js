@@ -1,6 +1,6 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { api } from "../../Api";
+import {api} from "../../Api";
 
 export const loginRequest = createAsyncThunk("login", async (data) => {
   const result = await api
@@ -50,5 +50,5 @@ const loginSlice = createSlice({
   },
 });
 
-export const { logout } = loginSlice.actions;
+export const {logout} = loginSlice.actions;
 export default loginSlice.reducer;

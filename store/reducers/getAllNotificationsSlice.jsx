@@ -1,9 +1,9 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { api } from "../../Api";
+import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import {api} from "../../Api";
 
 export const getAllNotificationsRequest = createAsyncThunk(
   "get/polls",
-  async ({ token }) => {
+  async ({token}) => {
     try {
       const result = await api.post("/get-notify-all", {
         secret_token: token,
@@ -37,6 +37,7 @@ const getAllNotificationsSlice = createSlice({
             return row;
           }
         );
+        console.log(data)
         state.notification_data = data;
         // state.notification_data = action.payload.data?.data.rows;
         state.error = false;

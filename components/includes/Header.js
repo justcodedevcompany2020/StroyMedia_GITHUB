@@ -1,34 +1,23 @@
-import React, { useState, useEffect, useRef } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, Image } from "react-native";
-import {
-  COLOR_1,
-  COLOR_5,
-  WRAPPER_PADDINGS,
-  COLOR_2,
-} from "../helpers/Variables";
-import {
-  ImageBackArrow,
-  ImageHomeIcon,
-  ImageNotificationsIcon,
-  ImageSave,
-} from "../helpers/images";
-import { useDispatch, useSelector } from "react-redux";
+import React, {useEffect, useState} from "react";
+import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {COLOR_1, COLOR_2, COLOR_5, WRAPPER_PADDINGS,} from "../helpers/Variables";
+import {ImageBackArrow, ImageHomeIcon, ImageNotificationsIcon, ImageSave,} from "../helpers/images";
+import {useDispatch, useSelector} from "react-redux";
 import Modal from "react-native-modal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getAllNotificationsRequest } from "../../store/reducers/getAllNotificationsSlice";
-import * as Device from "expo-device";
-import * as Notifications from "expo-notifications";
+import {getAllNotificationsRequest} from "../../store/reducers/getAllNotificationsSlice";
 
-function Header({ currentPage, home, navigation, onSavePress }) {
+
+function Header({currentPage, home, navigation, onSavePress}) {
   const state = useSelector((state) => state);
-  const { notification_data } = state.getAllNotificationsSlice;
+  const {notification_data} = state.getAllNotificationsSlice;
 
   const [visible, setVisible] = useState(false);
   const dispatch = useDispatch();
   useEffect(() => {
     AsyncStorage.getItem("token").then((result) => {
       if (result) {
-        dispatch(getAllNotificationsRequest({ token: result }));
+        dispatch(getAllNotificationsRequest({token: result}));
       }
     });
   }, [dispatch, navigation]);
@@ -49,7 +38,7 @@ function Header({ currentPage, home, navigation, onSavePress }) {
               onPress={navigation.goBack}
               style={styles.imageView}
             >
-              <ImageBackArrow style={styles.image} />
+              <ImageBackArrow style={styles.image}/>
             </TouchableOpacity>
             <Text style={styles.currentPage}>{currentPage}</Text>
           </>
@@ -62,20 +51,20 @@ function Header({ currentPage, home, navigation, onSavePress }) {
               onPress={() => navigation.navigate("Home")}
               style={styles.homeImageView}
             >
-              <ImageHomeIcon style={styles.homeImage} />
+              <ImageHomeIcon style={styles.homeImage}/>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={isVisible}
               style={styles.notificationImageView}
             >
-              <ImageNotificationsIcon style={styles.notificationImage} />
+              <ImageNotificationsIcon style={styles.notificationImage}/>
             </TouchableOpacity>
           </>
         ) : (
-          <TouchableOpacity style={styles.saveIconView} onPress={onSavePress}>
-            <ImageSave style={styles.saveIcon} />
-          </TouchableOpacity>
-        )}
+           <TouchableOpacity style={styles.saveIconView} onPress={onSavePress}>
+             <ImageSave style={styles.saveIcon}/>
+           </TouchableOpacity>
+         )}
       </View>
       <Modal
         style={styles.modal}
@@ -95,11 +84,12 @@ function Header({ currentPage, home, navigation, onSavePress }) {
           <View>
             {notification_data ? (
               notification_data.map((item, index) => {
+                console.log(item[0]?.user?.avatar)
                 return (
-                  <View style={styles.notificationWrapper} key={index}>
+                  <TouchableOpacity style={styles.notificationWrapper} key={index}>
                     <Image
                       source={{
-                        uri: "https://teus.online" + item[0]?.author?.avatar,
+                        uri: "https://teus.online" + item[0]?.user?.avatar,
                       }}
                       style={styles.imageStyles}
                     />
@@ -111,12 +101,12 @@ function Header({ currentPage, home, navigation, onSavePress }) {
                         {/* {item[0]?.type} */}
                       </Text>
                     </View>
-                  </View>
+                  </TouchableOpacity>
                 );
               })
             ) : (
-              <Text style={styles.noDataText}>У Вас нет уведомлений</Text>
-            )}
+               <Text style={styles.noDataText}>У Вас нет уведомлений</Text>
+             )}
           </View>
         </View>
       </Modal>
@@ -227,35 +217,3 @@ const styles = StyleSheet.create({
 
 export default Header;
 
-async function registerForPushNotificationsAsync() {
-  let token;
-
-  if (Platform.OS === "android") {
-    await Notifications.setNotificationChannelAsync("default", {
-      name: "default",
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: "#FF231F7C",
-    });
-  }
-
-  if (Device.isDevice) {
-    const { status: existingStatus } =
-      await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-    if (existingStatus !== "granted") {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-    if (finalStatus !== "granted") {
-      alert("Failed to get push token for push notification!");
-      return;
-    }
-    token = (await Notifications.getExpoPushTokenAsync()).data;
-    console.log(token);
-  } else {
-    alert("Must use physical device for Push Notifications");
-  }
-
-  return token;
-}

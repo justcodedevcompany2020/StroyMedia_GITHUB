@@ -1,26 +1,17 @@
-import React, { useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Dimensions,
-  ActivityIndicator,
-} from "react-native";
+import React, {useState} from "react";
+import {ActivityIndicator, Dimensions, StyleSheet, Text, TouchableOpacity, View,} from "react-native";
 import Wrapper from "../helpers/Wrapper";
-import { COLOR_1, COLOR_2, LOGIN_PAGE_PADDINGS } from "../helpers/Variables";
+import {COLOR_1, COLOR_2, LOGIN_PAGE_PADDINGS} from "../helpers/Variables";
 import MyInput from "../includes/MyInput";
 import MyButton from "../includes/MyButton";
 import RegistrationModal from "../includes/RegistrationModal";
-import { ImageLogo } from "../helpers/images";
+import {ImageLogo} from "../helpers/images";
 import ForgotPasswordModal from "../includes/ForgotPasswordModal";
-import { useDispatch, useSelector } from "react-redux";
-import { loginRequest } from "../../store/reducers/loginSlice";
-import {
-  changeAnswerForgotPassword,
-  forgotPasswordRequest,
-} from "./../../store/reducers/forgotPasswordSlice";
+import {useDispatch, useSelector} from "react-redux";
+import {loginRequest} from "../../store/reducers/loginSlice";
+import {changeAnswerForgotPassword, forgotPasswordRequest,} from "./../../store/reducers/forgotPasswordSlice";
 import AnswerForgotPasswordModal from "../includes/AnswerForgotPasswordModal";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Login = () => {
   const [login, setLogin] = useState("");
@@ -34,10 +25,10 @@ const Login = () => {
   const [errors, setError] = useState("");
   const state = useSelector((state) => state);
   const dispatch = useDispatch();
-  const { error, loading } = state.loginSlice;
-  const { success } = state.forgotPasswordSlice;
+  const {error, loading} = state.loginSlice;
+  const {success} = state.forgotPasswordSlice;
 
-  const onLoginPress = () => {
+  const onLoginPress = async () => {
     if (!login) {
       setLoginError("Заполните эту строку");
       if (!password) {
@@ -51,7 +42,12 @@ const Login = () => {
       return;
     }
     if (password && login) {
-      dispatch(loginRequest({ login: login, password: password, auth: "api" }));
+      dispatch(loginRequest({
+        login: login,
+        password: password,
+        auth: "api",
+        device_id: await AsyncStorage.getItem('pushToken')
+      }));
     }
   };
 
@@ -69,7 +65,7 @@ const Login = () => {
     if (!emailForNewPassword.includes("@gmail.com")) {
       setError("Неверный Эл. адрес");
     } else {
-      dispatch(forgotPasswordRequest({ email: emailForNewPassword }));
+      dispatch(forgotPasswordRequest({email: emailForNewPassword}));
       setShowForgotPasswordModal(false);
       setEmailForNewPassword("");
       setError("");
@@ -80,7 +76,7 @@ const Login = () => {
     <Wrapper withImage withPaddings>
       <View style={styles.block}>
         <View style={styles.logoView}>
-          <ImageLogo style={styles.logo} />
+          <ImageLogo style={styles.logo}/>
         </View>
         <MyInput
           label={"Логин"}
@@ -104,7 +100,7 @@ const Login = () => {
         {error && <Text style={styles.error}>{error}</Text>}
         <View style={styles.buttonsView}>
           <MyButton onPress={onLoginPress} style={styles.loginButton}>
-            {loading ? <ActivityIndicator color={COLOR_1} /> : "Войти"}
+            {loading ? <ActivityIndicator color={COLOR_1}/> : "Войти"}
           </MyButton>
           <TouchableOpacity onPress={() => setShowForgotPasswordModal(true)}>
             <Text style={styles.smallButton}>Забыли пароль?</Text>
@@ -126,7 +122,7 @@ const Login = () => {
               setShowForgotPasswordModal(false);
               setEmailForNewPassword("");
               setError("");
-              return;
+
             }}
           />
           <AnswerForgotPasswordModal
