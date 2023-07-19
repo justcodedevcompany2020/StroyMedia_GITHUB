@@ -1,23 +1,35 @@
-import React, {useEffect, useState} from "react";
-import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {COLOR_1, COLOR_2, COLOR_5, WRAPPER_PADDINGS,} from "../helpers/Variables";
-import {ImageBackArrow, ImageHomeIcon, ImageNotificationsIcon, ImageSave,} from "../helpers/images";
-import {useDispatch, useSelector} from "react-redux";
+import React, { useEffect, useState } from "react";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  COLOR_1,
+  COLOR_2,
+  COLOR_5,
+  WRAPPER_PADDINGS,
+} from "../helpers/Variables";
+import {
+  ImageBackArrow,
+  ImageHomeIcon,
+  ImageNotificationsIcon,
+  ImageSave,
+} from "../helpers/images";
+import { useDispatch, useSelector } from "react-redux";
 import Modal from "react-native-modal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {getAllNotificationsRequest} from "../../store/reducers/getAllNotificationsSlice";
+import { getAllNotificationsRequest } from "../../store/reducers/getAllNotificationsSlice";
+import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
+import { workRequestGetDataRequest } from "../../store/reducers/workRequestGetDataSlice";
 
-
-function Header({currentPage, home, navigation, onSavePress}) {
+function Header({ currentPage, home, navigation, onSavePress }) {
   const state = useSelector((state) => state);
-  const {notification_data} = state.getAllNotificationsSlice;
-
+  const { notification_data } = state.getAllNotificationsSlice;
+  const [token, setToken] = useState(null);
   const [visible, setVisible] = useState(false);
   const dispatch = useDispatch();
   useEffect(() => {
     AsyncStorage.getItem("token").then((result) => {
       if (result) {
-        dispatch(getAllNotificationsRequest({token: result}));
+        dispatch(getAllNotificationsRequest({ token: result }));
+        setToken(result);
       }
     });
   }, [dispatch, navigation]);
@@ -38,7 +50,7 @@ function Header({currentPage, home, navigation, onSavePress}) {
               onPress={navigation.goBack}
               style={styles.imageView}
             >
-              <ImageBackArrow style={styles.image}/>
+              <ImageBackArrow style={styles.image} />
             </TouchableOpacity>
             <Text style={styles.currentPage}>{currentPage}</Text>
           </>
@@ -51,20 +63,20 @@ function Header({currentPage, home, navigation, onSavePress}) {
               onPress={() => navigation.navigate("Home")}
               style={styles.homeImageView}
             >
-              <ImageHomeIcon style={styles.homeImage}/>
+              <ImageHomeIcon style={styles.homeImage} />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={isVisible}
               style={styles.notificationImageView}
             >
-              <ImageNotificationsIcon style={styles.notificationImage}/>
+              <ImageNotificationsIcon style={styles.notificationImage} />
             </TouchableOpacity>
           </>
         ) : (
-           <TouchableOpacity style={styles.saveIconView} onPress={onSavePress}>
-             <ImageSave style={styles.saveIcon}/>
-           </TouchableOpacity>
-         )}
+          <TouchableOpacity style={styles.saveIconView} onPress={onSavePress}>
+            <ImageSave style={styles.saveIcon} />
+          </TouchableOpacity>
+        )}
       </View>
       <Modal
         style={styles.modal}
@@ -84,29 +96,53 @@ function Header({currentPage, home, navigation, onSavePress}) {
           <View>
             {notification_data ? (
               notification_data.map((item, index) => {
-                console.log(item[0]?.user?.avatar)
                 return (
-                  <TouchableOpacity style={styles.notificationWrapper} key={index}>
+                  <TouchableOpacity
+                    style={styles.notificationWrapper}
+                    key={index}
+                    onPress={() => {
+                      console.log(item[0]?.object?.request,)
+                      if (item[0].type == "request_service_comment") {
+                        dispatch(
+                          workRequestGetDataRequest({
+                            secret_token: token,
+                            last_id: item[0]?.object?.request.last_id,
+                          })
+                        );
+                      }
+                    }}
+                  >
                     <Image
                       source={{
-                        uri: "https://teus.online" + item[0]?.user?.avatar,
+                        uri: "https://teus.online" + item[0]?.author?.avatar,
                       }}
                       style={styles.imageStyles}
                     />
-                    <View>
+                    <View
+                      style={{
+                        alignItems: "flex-end",
+                      }}
+                    >
                       <Text style={styles.authorNotification}>
                         {item[0]?.author?.name}
                       </Text>
-                      <Text style={styles.notifyText}>
-                        {/* {item[0]?.type} */}
-                      </Text>
+                      <Text style={styles.notifyText}>{item[0].comment}</Text>
                     </View>
+                    {item[0].read == 1 ? (
+                      <FontAwesome5 name="envelope" size={20} color="black" />
+                    ) : (
+                      <FontAwesome
+                        name="envelope-open-o"
+                        size={20}
+                        color="black"
+                      />
+                    )}
                   </TouchableOpacity>
                 );
               })
             ) : (
-               <Text style={styles.noDataText}>У Вас нет уведомлений</Text>
-             )}
+              <Text style={styles.noDataText}>У Вас нет уведомлений</Text>
+            )}
           </View>
         </View>
       </Modal>
@@ -131,8 +167,6 @@ const styles = StyleSheet.create({
     color: COLOR_2,
     fontFamily: "GothamProRegular",
     fontSize: 15,
-    alignItems: "center",
-    alignSelf: "center",
   },
   notificationWrapper: {
     flexDirection: "row",
@@ -202,8 +236,6 @@ const styles = StyleSheet.create({
     color: COLOR_1,
     fontFamily: "GothamProRegular",
     fontSize: 12,
-    alignItems: "center",
-    alignSelf: "center",
     marginTop: 5,
   },
   noDataText: {
@@ -216,4 +248,3 @@ const styles = StyleSheet.create({
 });
 
 export default Header;
-

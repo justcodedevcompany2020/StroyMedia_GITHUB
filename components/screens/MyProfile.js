@@ -228,7 +228,6 @@ const MyProfile = ({ route, navigation }) => {
     dispatch(editUserDataRequest(data))
       .unwrap()
       .then((res) => {
-        console.log(res);
         if (res?.message == "Successfully data updated") {
           showMessage({
             message: "Ваши изменения успешно созранены",

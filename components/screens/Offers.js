@@ -128,13 +128,12 @@ function Offers({ route, navigation }) {
 
   const resetFiltered = () => {
     setPage(1);
-    setOffset('0')
+    setOffset("0");
     setSearchName("");
     setTypeContainer(null);
     setFromCityName(null);
     setToCityName(null);
     dispatch(allSuggestionRequest({ token, id: id, offset: 0 })).then((res) => {
-      console.log(res.payload.data?.data.rows);
       setFilteredData(res.payload.data?.data.rows);
     });
   };
@@ -214,7 +213,6 @@ function Offers({ route, navigation }) {
             top={274}
             onSelect={(option) => {
               setFromCityName(option);
-              console.log("📢[Offers.js:356]: option: ", option);
               // filterFromCitys(option.last_id);
             }}
           />

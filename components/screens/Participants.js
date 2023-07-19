@@ -146,7 +146,6 @@ function Participants({ route, navigation }) {
         activeTab={activeTab}
       />
       <View style={styles.wrapper}>
-      {console.log(loading)}
         <Modal visible={loading} transparent>
           <View
             style={{

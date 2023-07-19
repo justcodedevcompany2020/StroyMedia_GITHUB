@@ -81,7 +81,6 @@ function Messages({ route, navigation }) {
           setFilteredData(res.payload.data.users);
         })
       : dispatch(allChatForumRequest({ token: token })).then((res) => {
-          console.log(res.payload);
           setFilteredData(res.payload.data.data.contacts);
         });
   }, [token, activeTab]);
@@ -247,7 +246,6 @@ function Messages({ route, navigation }) {
     );
     setFilteredData(
       filteredData.filter((data) => {
-        console.log(data);
         return data.last_id !== id;
       })
     );

@@ -97,20 +97,6 @@ const HomeMainButtons = () => {
           navigation.navigate("MyApplications", {
             currentPage: "Мои заявки",
           });
-          // dispatch(
-          //   allCatRequest({
-          //     token,
-          //     tab: "В работе",
-          //     // offset,
-          //   })
-          // )
-          //   .unwrap()
-          //   .then((res) => {
-          //     console.log("📢[HomeMainButtons.js:108]: res: ", res);
-          //   })
-          //   .catch((err) => {
-          //     console.log("📢[HomeMainButtons.js:113]: err: ", err);
-          //   });
         }}
         style={[styles.block, styles.bgBlue]}
       >

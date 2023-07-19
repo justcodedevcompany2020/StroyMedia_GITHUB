@@ -34,7 +34,7 @@ function ParticipantItem({
   useEffect(() => {
     setLiked(likedList);
   }, [likedList]);
-  console.log(likedList);
+
 
   return (
     <>
@@ -71,7 +71,7 @@ function ParticipantItem({
                   }
                 });
               });
-              console.log(liked, "liked");
+
             }}
             styles={styles.favImgBlock}
           >

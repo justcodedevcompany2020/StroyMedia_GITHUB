@@ -248,7 +248,7 @@ function EditApplication() {
         });
         formdata.append("count", containerCount);
         formdata.append("_type_op", saveAsDraft ? "draft" : "onwork");
-        console.log(formdata);
+
         dispatch(
           editAplicationsRequest({
             formdata,
@@ -265,7 +265,6 @@ function EditApplication() {
             }
           })
           .catch((e) => {
-            console.log(e);
             setLoading(false);
             showMessage({
               message: "Все поля должны быть заполнены",
@@ -1520,8 +1519,6 @@ function EditApplication() {
           onToggle={(val) => {
             dispatch(addArchiveApplicationRequest({ token, last_id })).then(
               (res) => {
-                console.log(res.payload);
-                // console.log(last_id);
                 if (res?.payload?.success) {
                   setSaveAsArchive(val);
                   showMessage({
