@@ -276,7 +276,6 @@ function Offers({ route, navigation }) {
             : null,
       })
     ).then((res) => {
-      console.log(res.payload.data?.data.rows);
       setFilteredData(res.payload.data?.data.rows);
     });
   }, [

@@ -42,6 +42,9 @@ import workRequestSlice from "./reducers/workRequestSlice";
 import editAplicationsSlice from "./reducers/editAplicationsSlice";
 import deleteChatSlice from "./reducers/deleteChatSlice";
 import forgotPasswordSlice from "./reducers/forgotPasswordSlice";
+import workRequestGetDataSlice from "./reducers/workRequestGetDataSlice";
+
+
 
 const RootReducer = combineReducers({
   loginSlice,
@@ -89,6 +92,7 @@ const RootReducer = combineReducers({
   forgotPasswordSlice,
   searchChatMembersSlice,
   getAllNotificationsSlice,
+  workRequestGetDataSlice,
 });
 
 const configureCustomStore = () => {

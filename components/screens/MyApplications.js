@@ -37,6 +37,7 @@ import moment from "moment";
 import { authRequest } from "../../store/reducers/authUserSlice";
 import { Entypo } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { workRequestAcceptRequest } from "../../store/reducers/workRequestAcceptSlice";
 
 const SearchIcon = require("../../assets/search.png");
 
@@ -47,15 +48,17 @@ function MyApplications() {
   const [searchValue, setSearchValue] = useState("");
   const [page, setPage] = useState(1);
   const [offset, setOffset] = useState(0);
-  const { currentPage } = route.params;
+  const { currentPage, request_service } = route.params;
   const [token, setToken] = useState();
   const dispatch = useDispatch();
   const state = useSelector((state1) => state1);
   const { loading, data } = state.allCatSlice;
   const user = state.authUserSlice?.data?.user;
-
+  const { work_request_data } = state.workRequestGetDataSlice;
   const [filteredData, setFilteredData] = useState([]);
   const timeStamnp = +filteredData[0]?.date_create?.$date.$numberLong;
+  const [modalRequest, setModalRequest] = useState(false);
+  console.log("work_request_data", work_request_data, "work_request_data");
 
   useEffect(() => {
     AsyncStorage.getItem("token").then((result) => {
@@ -119,6 +122,14 @@ function MyApplications() {
       onFocus();
     };
   }, [activeTab, token, navigation]);
+
+  useEffect(() => {
+    if (request_service == "request_service_comment") {
+      setModalRequest(true);
+    } else {
+      setModalRequest(false);
+    }
+  }, []);
 
   const renderItem = ({ item, index }) => {
     return (
@@ -184,14 +195,7 @@ function MyApplications() {
               <ImageOffersArrow />
               <Text style={styles.toCity}>{item?.to_city?.title?.ru}</Text>
             </View>
-            {/* <View
-              style={{
-                width: "100%",
-                justifyContent: "space-between",
-                alignContent: "center",
-                backgroundColor: 'yellow'
-              }}
-            > */}
+
             <View
               style={{
                 flexDirection: "row",
@@ -210,7 +214,6 @@ function MyApplications() {
                 </Text>
               </View>
             </View>
-            {/* </View> */}
           </View>
         </View>
         <View style={styles.commentBlock}>
@@ -260,7 +263,6 @@ function MyApplications() {
               value={searchValue}
               onSearchText={(val) => {
                 setSearchValue(val);
-                // !val.trim().length && resetText();
               }}
               resetText={resetText}
             />
@@ -327,6 +329,192 @@ function MyApplications() {
         navigation,
       }}
     >
+      <Modal visible={modalRequest} transparent statusBarTranslucent>
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => setModalRequest(false)}
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "#00000055",
+          }}
+        >
+          <View
+            style={{
+              width: "80%",
+              height: "50%",
+              backgroundColor: "white",
+              shadowRadius: 10,
+              shadowOffset: { width: 0, height: 0 },
+              shadowColor: "black",
+              elevation: 5,
+              borderRadius: 20,
+              justifyContent: "center",
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: COLOR_5,
+                paddingVertical: 20,
+                borderBottomColor: COLOR_6,
+                borderBottomWidth: 1,
+                paddingHorizontal: 10,
+                maxWidth: "100%",
+              }}
+            >
+              <View style={styles.row}>
+                <View style={styles.img}>
+                  <Image
+                    source={{
+                      uri:
+                        typeof work_request_data.request?.img === "string"
+                          ? "https://teus.online" + work_request_data?.img
+                          : Array.isArray(work_request_data?.img)
+                          ? "https://teus.online" +
+                            work_request_data?.request.img[0]?.url
+                          : null,
+                    }}
+                    style={{
+                      height: 50,
+                      width: 50,
+                      borderRadius: 5,
+                    }}
+                  />
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
+                  <View style={styles.number}>
+                    <Text style={styles.numbertext}>
+                      N:{work_request_data?.request?.last_id}
+                    </Text>
+                  </View>
+                  <Text style={styles.date}>
+                    {" "}
+                    {moment(timeStamnp).format("YYYY-MM-DD")}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.leftBlock}>
+                  <Text style={styles.type}>
+                    {typeof work_request_data.request?.service?.title ===
+                    "string"
+                      ? work_request_data?.request?.service?.title
+                      : work_request_data?.request?.service?.title?.ru}
+                  </Text>
+                  <Text style={styles.type2}>
+                    Тип КТК: {work_request_data?.request?.type_container?.title}{" "}
+                  </Text>
+                </View>
+                <View style={styles.rightBlock}>
+                  <View
+                    style={[
+                      styles.locationInfo,
+                      {
+                        flexWrap: "wrap",
+                        justifyContent: "flex-start",
+                        columnGap: 5,
+                      },
+                    ]}
+                  >
+                    <Text style={styles.fromCity}>
+                      {work_request_data?.request?.from_city?.title?.ru ||
+                        work_request_data?.request?.dislokaciya?.title.ru}
+                    </Text>
+                    <ImageOffersArrow />
+                    <Text style={styles.toCity}>
+                      {work_request_data?.request?.to_city?.title?.ru}
+                    </Text>
+                  </View>
+
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      flexWrap: "wrap",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Text style={styles.quantity}>
+                      Количество: {work_request_data?.request?.count}
+                    </Text>
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <Text style={styles.priceText}>Цена:</Text>
+                      <Text style={styles.price}>
+                        {work_request_data?.request?.price
+                          ? work_request_data?.request.price +
+                            " " +
+                            work_request_data?.request?.currency?.sign
+                          : "по запросу"}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+              <View style={styles.commentBlock}>
+                <Text style={styles.commentHeader}>
+                  {work_request_data?.request?.decription}
+                </Text>
+              </View>
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                paddingHorizontal: 20,
+                columnGap: 20,
+              }}
+            >
+              <TouchableOpacity
+                style={{
+                  flex: 1,
+                  backgroundColor: "#00a8ff",
+                  height: 30,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: 10,
+                }}
+                onPress={() => {
+                  dispatch(
+                    workRequestAcceptRequest(
+                      JSON.stringify({
+                        secret_token: token,
+                        last_id: work_request_data?.request?.last_id.toString(),
+                        comment_id:
+                          work_request_data?.request?.comment?.last_id,
+                      })
+                    )
+                  ).then((res) => {
+                    console.log(res.payload);
+                  });
+                }}
+              >
+                <Text style={{ color: "white" }}>Принять</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={{
+                  flex: 1,
+                  backgroundColor: "#fb6067",
+                  height: 30,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: 10,
+                }}
+              >
+                <Text style={{ color: "white" }}>отказать</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
       <Modal visible={loading} transparent={true} statusBarTranslucent>
         <View
           style={{

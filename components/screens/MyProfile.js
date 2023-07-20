@@ -826,10 +826,6 @@ const MyProfile = ({ route, navigation }) => {
                   })
                 )
                   .then((res) => {
-                    console.log(
-                      "📢[MyProfile.js:926]: res: ",
-                      res.payload.data
-                    );
                     if (res.payload.data.message == "Successfully done") {
                       showMessage({
                         message: "Ваши изменения успешно созранены",

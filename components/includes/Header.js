@@ -25,6 +25,7 @@ function Header({ currentPage, home, navigation, onSavePress }) {
   const [token, setToken] = useState(null);
   const [visible, setVisible] = useState(false);
   const dispatch = useDispatch();
+  
   useEffect(() => {
     AsyncStorage.getItem("token").then((result) => {
       if (result) {
@@ -101,15 +102,22 @@ function Header({ currentPage, home, navigation, onSavePress }) {
                     style={styles.notificationWrapper}
                     key={index}
                     onPress={() => {
-                      console.log(item[0]?.object?.request,)
-                      if (item[0].type == "request_service_comment") {
-                        dispatch(
-                          workRequestGetDataRequest({
-                            secret_token: token,
-                            last_id: item[0]?.object?.request.last_id,
-                          })
-                        );
-                      }
+                      // if (item[0].type == "request_service_comment") {
+                      dispatch(
+                        workRequestGetDataRequest({
+                          secret_token: token,
+                          last_id: item[0]?.object?.request.last_id,
+                        })
+                      ).then((res) => {
+                        console.log(res.payload);
+                        if (res.payload.message == "Successfully data got") {
+                          navigation.navigate("MyApplications", {
+                            currentPage: "В работе",
+                            request_service: item[0].type,
+                          });
+                        }
+                      });
+                      // }
                     }}
                   >
                     <Image
@@ -128,7 +136,7 @@ function Header({ currentPage, home, navigation, onSavePress }) {
                       </Text>
                       <Text style={styles.notifyText}>{item[0].comment}</Text>
                     </View>
-                    {item[0].read == 1 ? (
+                    {item[0].read == 0 ? (
                       <FontAwesome5 name="envelope" size={20} color="black" />
                     ) : (
                       <FontAwesome

@@ -1,28 +1,24 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { api } from "../../Api";
 
-export const workRequestGetDataRequest = createAsyncThunk(
-  "work-request-get-data",
+export const workRequestAcceptRequest = createAsyncThunk(
+  "work-request-accept",
   async (data) => {
     console.log(data);
     try {
       let myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
 
-      let raw = JSON.stringify({
-        secret_token: "vJCygUO7w9xb",
-        last_id: 1308,
-      });
+  
 
       let requestOptions = {
         method: "POST",
         headers: myHeaders,
-        body: raw,
+        body: data,
         redirect: "follow",
       };
 
       const result = await fetch(
-        "https://teus.online/api/work-request-get-data",
+        "https://teus.online/api/work-request-accept",
         requestOptions
       );
       const data = await result.json();
@@ -34,8 +30,8 @@ export const workRequestGetDataRequest = createAsyncThunk(
   }
 );
 
-const workRequestGetDataSlice = createSlice({
-  name: "work-request-get-data",
+const workRequestAcceptSlice = createSlice({
+  name: "work-request-accept",
   initialState: {
     loading: false,
     error: false,
@@ -44,11 +40,11 @@ const workRequestGetDataSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(workRequestGetDataRequest.pending, (state) => {
+      .addCase(workRequestAcceptRequest.pending, (state) => {
         state.loading = true;
       })
 
-      .addCase(workRequestGetDataRequest.fulfilled, (state, action) => {
+      .addCase(workRequestAcceptRequest.fulfilled, (state, action) => {
         // const data = Object.values(action.payload.data?.data.rows).map(
         //   (row) => {
         // console.log(row);
@@ -62,11 +58,11 @@ const workRequestGetDataSlice = createSlice({
         state.error = false;
       })
 
-      .addCase(workRequestGetDataRequest.rejected, (state) => {
+      .addCase(workRequestAcceptRequest.rejected, (state) => {
         state.error = true;
         state.loading = false;
       });
   },
 });
 
-export default workRequestGetDataSlice.reducer;
+export default workRequestAcceptSlice.reducer;
