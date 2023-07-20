@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-export const workRequestAcceptRequest = createAsyncThunk(
-  "work-request-accept",
+export const workRequestCancelRequest = createAsyncThunk(
+  "work-request-cancel",
   async (data) => {
     console.log(data);
     try {
@@ -16,7 +16,7 @@ export const workRequestAcceptRequest = createAsyncThunk(
       };
 
       const result = await fetch(
-        "https://teus.online/api/work-request-accept",
+        "https://teus.online/api/work-request-cancel",
         requestOptions
       );
       const data = await result.json();
@@ -28,8 +28,8 @@ export const workRequestAcceptRequest = createAsyncThunk(
   }
 );
 
-const workRequestAcceptSlice = createSlice({
-  name: "work-request-accept",
+const workRequestCancelSlice = createSlice({
+  name: "work-request-cancel",
   initialState: {
     loading: false,
     error: false,
@@ -38,11 +38,11 @@ const workRequestAcceptSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(workRequestAcceptRequest.pending, (state) => {
+      .addCase(workRequestCancelRequest.pending, (state) => {
         state.loading = true;
       })
 
-      .addCase(workRequestAcceptRequest.fulfilled, (state, action) => {
+      .addCase(workRequestCancelRequest.fulfilled, (state, action) => {
         // const data = Object.values(action.payload.data?.data.rows).map(
         //   (row) => {
         // console.log(row);
@@ -56,11 +56,11 @@ const workRequestAcceptSlice = createSlice({
         state.error = false;
       })
 
-      .addCase(workRequestAcceptRequest.rejected, (state) => {
+      .addCase(workRequestCancelRequest.rejected, (state) => {
         state.error = true;
         state.loading = false;
       });
   },
 });
 
-export default workRequestAcceptSlice.reducer;
+export default workRequestCancelSlice.reducer;

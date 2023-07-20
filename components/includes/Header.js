@@ -25,7 +25,7 @@ function Header({ currentPage, home, navigation, onSavePress }) {
   const [token, setToken] = useState(null);
   const [visible, setVisible] = useState(false);
   const dispatch = useDispatch();
-  
+
   useEffect(() => {
     AsyncStorage.getItem("token").then((result) => {
       if (result) {
@@ -111,6 +111,7 @@ function Header({ currentPage, home, navigation, onSavePress }) {
                       ).then((res) => {
                         console.log(res.payload);
                         if (res.payload.message == "Successfully data got") {
+                          onCancel();
                           navigation.navigate("MyApplications", {
                             currentPage: "В работе",
                             request_service: item[0].type,
