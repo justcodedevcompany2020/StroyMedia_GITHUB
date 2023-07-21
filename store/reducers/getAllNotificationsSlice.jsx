@@ -21,7 +21,10 @@ const getAllNotificationsSlice = createSlice({
   initialState: {
     loading: false,
     error: false,
-    notification_data: [],
+    notification_data: {
+      key: [],
+      value: null,
+    },
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -31,14 +34,19 @@ const getAllNotificationsSlice = createSlice({
       })
 
       .addCase(getAllNotificationsRequest.fulfilled, (state, action) => {
-        const data = Object.values(action.payload.data?.data.rows).map(
+        const keys = Object.keys(action.payload.data?.data.rows).map((row) => {
+          return row;
+        });
+        const values = Object.values(action.payload.data?.data.rows).map(
           (row) => {
-            // console.log(row);
             return row;
           }
         );
         // console.log(data)
-        state.notification_data = data;
+        state.notification_data = {
+          keys,
+          values,
+        };
         // state.notification_data = action.payload.data?.data.rows;
         state.error = false;
       })

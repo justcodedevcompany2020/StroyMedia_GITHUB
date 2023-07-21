@@ -2,25 +2,26 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 export const workRequestCancelRequest = createAsyncThunk(
   "work-request-cancel",
-  async (data) => {
+  async ({ secret_token, last_id, comment_id }) => {
     console.log(data);
     try {
-      let myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
+      let formdata = new FormData();
+      formdata.append("comment_id", comment_id);
+      formdata.append("last_id", last_id);
+      formdata.append("secret_token", secret_token);
 
       let requestOptions = {
         method: "POST",
-        headers: myHeaders,
-        body: data,
+        body: formdata,
         redirect: "follow",
       };
-
       const result = await fetch(
         "https://teus.online/api/work-request-cancel",
         requestOptions
       );
-      const data = await result.json();
 
+      const data = await result.json();
+      console.log(data);
       return data;
     } catch (error) {
       return error;

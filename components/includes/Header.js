@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import {
   COLOR_1,
   COLOR_2,
@@ -18,6 +25,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getAllNotificationsRequest } from "../../store/reducers/getAllNotificationsSlice";
 import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
 import { workRequestGetDataRequest } from "../../store/reducers/workRequestGetDataSlice";
+import { workRequestAcceptRequest } from "../../store/reducers/workRequestAcceptSlice";
+import { workRequestCancelRequest } from "../../store/reducers/workRequestCancelSlice";
 
 function Header({ currentPage, home, navigation, onSavePress }) {
   const state = useSelector((state) => state);
@@ -94,65 +103,140 @@ function Header({ currentPage, home, navigation, onSavePress }) {
       >
         <View style={styles.modalWrapper}>
           <Text style={styles.title}>Уведомления</Text>
-          <View>
+          <ScrollView showsVerticalScrollIndicator={false}>
             {notification_data ? (
-              notification_data.map((item, index) => {
+              notification_data.values?.map((item, index) => {
+                console.log(
+                  "item[0]?.object?.accept",
+                  item[0]?.object.disable,
+                  "item[0]?.object?.accept"
+                );
                 return (
-                  <TouchableOpacity
-                    style={styles.notificationWrapper}
-                    key={index}
-                    onPress={() => {
-                      // if (item[0].type == "request_service_comment") {
-                      dispatch(
-                        workRequestGetDataRequest({
-                          secret_token: token,
-                          last_id: item[0]?.object?.request.last_id,
-                        })
-                      ).then((res) => {
-                        console.log(res.payload);
-                        if (res.payload.message == "Successfully data got") {
-                          onCancel();
-                          navigation.navigate("MyApplications", {
-                            currentPage: "В работе",
-                            request_service: item[0].type,
-                          });
-                        }
-                      });
-                      // }
-                    }}
-                  >
-                    <Image
-                      source={{
-                        uri: "https://teus.online" + item[0]?.author?.avatar,
-                      }}
-                      style={styles.imageStyles}
-                    />
-                    <View
-                      style={{
-                        alignItems: "flex-end",
+                  <View key={index}>
+                    <TouchableOpacity
+                      style={styles.notificationWrapper}
+                      key={index}
+                      onPress={() => {
+                        // if (item[0].type == "request_service_comment") {
+                        dispatch(
+                          workRequestGetDataRequest({
+                            secret_token: token,
+                            last_id: item[0]?.object?.request.last_id,
+                          })
+                        ).then((res) => {
+                          if (res.payload.message == "Successfully data got") {
+                            onCancel();
+                            navigation.navigate("MyApplications", {
+                              currentPage: "В работе",
+                              request_service: item[0].type,
+                            });
+                          }
+                        });
+                        // }
                       }}
                     >
-                      <Text style={styles.authorNotification}>
-                        {item[0]?.author?.name}
-                      </Text>
-                      <Text style={styles.notifyText}>{item[0].comment}</Text>
-                    </View>
-                    {item[0].read == 0 ? (
-                      <FontAwesome5 name="envelope" size={20} color="black" />
-                    ) : (
-                      <FontAwesome
-                        name="envelope-open-o"
-                        size={20}
-                        color="black"
+                      <Image
+                        source={{
+                          uri: "https://teus.online" + item[0]?.author?.avatar,
+                        }}
+                        style={styles.imageStyles}
                       />
+                      <View
+                        style={{
+                          alignItems: "flex-end",
+                        }}
+                      >
+                        <Text style={styles.authorNotification}>
+                          {item[0]?.author?.name}
+                        </Text>
+                        <Text style={styles.notifyText}>{item[0].comment}</Text>
+                      </View>
+                      {item[0].read == 0 ? (
+                        <FontAwesome5 name="envelope" size={20} color="black" />
+                      ) : (
+                        <FontAwesome
+                          name="envelope-open-o"
+                          size={20}
+                          color="black"
+                        />
+                      )}
+                    </TouchableOpacity>
+                    {item[0]?.object.disable == 0 && (
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          paddingHorizontal: 20,
+                          columnGap: 20,
+                          justifyContent: "center",
+                          paddingTop: 20,
+                          width: "100%",
+                        }}
+                      >
+                        <TouchableOpacity
+                          style={{
+                            flex: 1,
+                            backgroundColor: "#00a8ff",
+                            height: 30,
+                            justifyContent: "center",
+                            alignItems: "center",
+                            borderRadius: 10,
+                          }}
+                          onPress={() => {
+                            dispatch(
+                              workRequestAcceptRequest({
+                                secret_token: token,
+                                last_id: item?.request?.last_id.toString(),
+                                comment_id:
+                                  item?.request?.comments[0].last_id.toString(),
+                              })
+                            ).then((res) => {
+                              console.log(res.payload, "res.payload");
+                            });
+                          }}
+                        >
+                          <Text style={{ color: "white" }}>Принять</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          style={{
+                            flex: 1,
+                            backgroundColor: "#fb6067",
+                            height: 30,
+                            justifyContent: "center",
+                            alignItems: "center",
+                            borderRadius: 10,
+                          }}
+                          onPress={() => {
+                            dispatch(
+                              workRequestCancelRequest({
+                                secret_token: token,
+                                last_id: item?.request?.last_id.toString(),
+                                comment_id:
+                                  item?.request?.comments[0].last_id.toString(),
+                              })
+                            ).then((res) => {
+                              console.log(res, "res.payload");
+                            });
+                          }}
+                        >
+                          <Text style={{ color: "white" }}>отказать</Text>
+                        </TouchableOpacity>
+
+                        {item[0].object?.accept == 1 && (
+                          <Text style={{ color: "#34A303" }}>ПРИНЯТО</Text>
+                        )}
+                        {item[0]?.object?.disable == 1 && (
+                          <Text style={{ color: "#fb6067" }}>ОТКАЗАНО</Text>
+                        )}
+                      </View>
                     )}
-                  </TouchableOpacity>
+                  </View>
                 );
               })
             ) : (
               <Text style={styles.noDataText}>У Вас нет уведомлений</Text>
             )}
-          </View>
+          </ScrollView>
         </View>
       </Modal>
     </View>

@@ -2,27 +2,26 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 export const workRequestAcceptRequest = createAsyncThunk(
   "work-request-accept",
-  async (data) => {
-    console.log(data);
+  async ({ secret_token, last_id, comment_id }) => {
     try {
-      let myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
+      var formdata = new FormData();
+      formdata.append("comment_id", comment_id);
+      formdata.append("last_id", last_id);
+      formdata.append("secret_token", secret_token);
 
       let requestOptions = {
         method: "POST",
-        headers: myHeaders,
-        body: data,
+        body: formdata,
         redirect: "follow",
       };
-
       const result = await fetch(
         "https://teus.online/api/work-request-accept",
         requestOptions
       );
       const data = await result.json();
-
       return data;
     } catch (error) {
+      console.log(error);
       return error;
     }
   }

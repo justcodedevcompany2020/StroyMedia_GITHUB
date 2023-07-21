@@ -38,6 +38,7 @@ import { authRequest } from "../../store/reducers/authUserSlice";
 import { Entypo } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { workRequestAcceptRequest } from "../../store/reducers/workRequestAcceptSlice";
+import { workRequestCancelRequest } from "../../store/reducers/workRequestCancelSlice";
 
 const SearchIcon = require("../../assets/search.png");
 
@@ -58,7 +59,6 @@ function MyApplications() {
   const [filteredData, setFilteredData] = useState([]);
   const timeStamnp = +filteredData[0]?.date_create?.$date.$numberLong;
   const [modalRequest, setModalRequest] = useState(false);
-  console.log("work_request_data", work_request_data, "work_request_data");
 
   useEffect(() => {
     AsyncStorage.getItem("token").then((result) => {
@@ -469,47 +469,72 @@ function MyApplications() {
                 flexDirection: "row",
                 paddingHorizontal: 20,
                 columnGap: 20,
+                justifyContent: "center",
+                paddingTop: 20,
               }}
             >
-              <TouchableOpacity
-                style={{
-                  flex: 1,
-                  backgroundColor: "#00a8ff",
-                  height: 30,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderRadius: 10,
-                }}
-                onPress={() => {
-                  dispatch(
-                    workRequestAcceptRequest(
-                      JSON.stringify({
-                        secret_token: token,
-                        last_id: work_request_data?.request?.last_id.toString(),
-                        comment_id:
-                          work_request_data?.request?.comment?.last_id,
-                      })
-                    )
-                  ).then((res) => {
-                    console.log(res.payload);
-                  });
-                }}
-              >
-                <Text style={{ color: "white" }}>Принять</Text>
-              </TouchableOpacity>
+              {work_request_data?.request?.comments[0]?.accept == 0 &&
+                work_request_data?.request?.comments[0]?.disable == 0 && (
+                  <>
+                    <TouchableOpacity
+                      style={{
+                        flex: 1,
+                        backgroundColor: "#00a8ff",
+                        height: 30,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        borderRadius: 10,
+                      }}
+                      onPress={() => {
+                        dispatch(
+                          workRequestAcceptRequest({
+                            secret_token: token,
+                            last_id:
+                              work_request_data?.request?.last_id.toString(),
+                            comment_id:
+                              work_request_data?.request?.comments[0].last_id.toString(),
+                          })
+                        ).then((res) => {
+                          console.log(res.payload, "res.payload");
+                        });
+                      }}
+                    >
+                      <Text style={{ color: "white" }}>Принять</Text>
+                    </TouchableOpacity>
 
-              <TouchableOpacity
-                style={{
-                  flex: 1,
-                  backgroundColor: "#fb6067",
-                  height: 30,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderRadius: 10,
-                }}
-              >
-                <Text style={{ color: "white" }}>отказать</Text>
-              </TouchableOpacity>
+                    <TouchableOpacity
+                      style={{
+                        flex: 1,
+                        backgroundColor: "#fb6067",
+                        height: 30,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        borderRadius: 10,
+                      }}
+                      onPress={() => {
+                        dispatch(
+                          workRequestCancelRequest({
+                            secret_token: token,
+                            last_id:
+                              work_request_data?.request?.last_id.toString(),
+                            comment_id:
+                              work_request_data?.request?.comments[0].last_id.toString(),
+                          })
+                        ).then((res) => {
+                          console.log(res, "res.payload");
+                        });
+                      }}
+                    >
+                      <Text style={{ color: "white" }}>отказать</Text>
+                    </TouchableOpacity>
+                  </>
+                )}
+              {work_request_data?.request?.comments[0]?.accept == 1 && (
+                <Text style={{ color: "#34A303" }}>ПРИНЯТО</Text>
+              )}
+              {work_request_data?.request?.comments[0]?.disable == 1 && (
+                <Text style={{ color: "#fb6067" }}>ОТКАЗАНО</Text>
+              )}
             </View>
           </View>
         </TouchableOpacity>
