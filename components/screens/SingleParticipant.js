@@ -1,13 +1,7 @@
-import React, { useEffect, useState } from "react";
-import {
-  FlatList,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import React, {useEffect, useState} from "react";
+import {FlatList, StyleSheet, Text, TouchableOpacity, View,} from "react-native";
 import Wrapper from "../helpers/Wrapper";
-import { useDispatch, useSelector } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import SingleParticipantBlock from "../includes/SingleParticipantBlock";
 import {
   ImageCallGreen,
@@ -17,31 +11,33 @@ import {
   ImageOkSmall,
   ImageRating,
 } from "../helpers/images";
-import { COLOR_1, COLOR_6, WRAPPER_PADDINGS } from "../helpers/Variables";
+import {COLOR_1, COLOR_6, WRAPPER_PADDINGS} from "../helpers/Variables";
 import MyButton from "../includes/MyButton";
 import ReviewItem from "../includes/ReviewItem";
 import LeaveReviewModal from "../includes/LeaveReviewModal";
-import { showMessage } from "react-native-flash-message";
+import {showMessage} from "react-native-flash-message";
 import MoreReviewsModal from "../includes/MoreReviewsModal";
-import { getProjectReviewsRequest } from "../../store/reducers/getAllProjectReviews";
+import {getProjectReviewsRequest} from "../../store/reducers/getAllProjectReviews";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment";
-import { chatOrderRequest } from "../../store/reducers/chatDialogOrderSlice";
-import { projectReviewRequest } from "../../store/reducers/projectReview";
+import {chatOrderRequest} from "../../store/reducers/chatDialogOrderSlice";
+import {projectReviewRequest} from "../../store/reducers/projectReview";
 import * as Linking from "expo-linking";
 import _ from "lodash";
+import {checkUserReviewRequest} from "../../store/reducers/checkUserReviewSlice";
 
-function SingleParticipant({ route, navigation }) {
+function SingleParticipant({route, navigation}) {
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showMoreReviewsModal, setShowMoreReviewsModal] = useState(false);
   const [toOrFrom, setToOrFrom] = useState("");
   const totalRate = [];
   const [reviewText, setReviewText] = useState("");
-  const { currentPage } = route.params;
+  const {currentPage} = route.params;
   const [rate, setRate] = useState("");
   const dispatch = useDispatch();
   const data = useSelector((state) => state.membersSingleSlice.data);
-  const { rows, contacts } = useSelector(
+  const [successReviewSend, setSuccessReviewSend] = useState(false)
+  const {rows, contacts} = useSelector(
     (state) => state.getAllProjectReviews.data
   );
   // const rows = useSelector((state) => state.getAllProjectReviews.data.rows);
@@ -63,43 +59,74 @@ function SingleParticipant({ route, navigation }) {
         setToken(result);
       }
     });
-    dispatch(getProjectReviewsRequest({ token, id: route?.params.id }));
+    dispatch(getProjectReviewsRequest({token, id: route?.params.id}));
+    dispatch(checkUserReviewRequest({
+      token,
+      last_id: route?.params.id,
+      user_id: contacts[0]?.company.last_id
+    })).then(res => {
+      if (res.payload.success) {
+        setSuccessReviewSend(res.payload.data)
+      }
+    })
+    console.log(route.params.id)
   }, [data]);
 
   const leaveReview = () => {
     setShowReviewModal(true);
   };
   const reviewSubmit = () => {
-    reviewText && rate
-      ? dispatch(
-          projectReviewRequest({
-            token,
-            id: route?.params?.id,
-            rate: rate === 3 ? "netral" : rate > 3 ? "plus" : "minus",
-            // rate: new_rate,
-            review: reviewText,
-          })
-        )
-          .unwrap()
-          .then((res) => {
-            showMessage({
-              message: "Ваш отзыв успешно сохранён",
-              type: "success",
-            });
-            dispatch(getProjectReviewsRequest({ token, id: route?.params.id }));
-            setShowReviewModal(false);
-            setReviewText("");
-            setRate("");
-          })
-      : rate < 1
-      ? showMessage({
-          message: "Поставьте оценку",
-          type: "danger",
-        })
-      : showMessage({
-          message: "Заполните данные",
-          type: "danger",
+    let star = null
+    if (rate === 2) {
+      star = 5
+    } else if (rate === 1) {
+      star = 4
+    } else if (rate === 0) {
+      star = 3
+    } else if (rate === -1) {
+      star = 2
+    } else if (rate === -2) {
+      star = 1
+    }
+
+    if (star == 3) {
+      star = 'netral'
+    } else if (star > 3) {
+      star = 'plus'
+    } else if (star < 3) {
+      star = 'minus'
+    }
+    // star == 3 ? alert() : star > 3 ? "plus" : "minus"
+    reviewText && star
+    ? dispatch(
+      projectReviewRequest({
+        token,
+        id: route?.params?.id,
+        rate: star,
+        // rate: new_rate,
+        review: reviewText,
+      })
+    )
+      .unwrap()
+      .then((res) => {
+        showMessage({
+          message: "Ваш отзыв успешно сохранён",
+          type: "success",
         });
+        dispatch(getProjectReviewsRequest({token, id: route?.params.id}));
+        setShowReviewModal(false);
+        setReviewText("");
+        setRate("");
+      })
+    : star < 1
+      ? showMessage({
+        message: "Поставьте оценку",
+        type: "danger",
+      })
+      : showMessage({
+        message: "Заполните данные",
+        type: "danger",
+      });
   };
 
   const moreReviews = (toOrFrom) => {
@@ -107,42 +134,42 @@ function SingleParticipant({ route, navigation }) {
     setToOrFrom(toOrFrom);
   };
   rows &&
-    rows?.map((item) => {
-      if (item.ball === 2) {
-        totalRate.push(5);
-      }
-      if (item.ball === 1) {
-        totalRate.push(4);
-      }
-      if (item.ball === 0) {
-        totalRate.push(3);
-      }
-      if (item.ball === -1) {
-        totalRate.push(2);
-      }
-      if (item.ball === -2) {
-        totalRate.push(1);
-      }
-    });
+  rows?.map((item) => {
+    if (item.ball === 2) {
+      totalRate.push(5);
+    }
+    if (item.ball === 1) {
+      totalRate.push(4);
+    }
+    if (item.ball === 0) {
+      totalRate.push(3);
+    }
+    if (item.ball === -1) {
+      totalRate.push(2);
+    }
+    if (item.ball === -2) {
+      totalRate.push(1);
+    }
+  });
 
   let totalRateing =
     rows && totalRate.length > 0
-      ? totalRate.reduce((num, acc) => {
-          return (num + acc) / totalRate?.length;
-        })
-      : null;
+    ? totalRate.reduce((num, acc) => {
+      return (num + acc) / totalRate?.length;
+    })
+    : null;
   let total_rate = 0;
   let rate_check = rows?.rate_minus
-    ? rows?.rate_minus
-    : 0 + rows?.rate_plus
-    ? rows?.rate_plus
-    : 0 + rows?.rate_good
-    ? rows?.rate_good
-    : 0 + rows?.rate_netral
-    ? rows?.rate_netral
-    : 0 + rows?.rate_negativ
-    ? rows?.rate_negativ
-    : 0;
+                   ? rows?.rate_minus
+                   : 0 + rows?.rate_plus
+                     ? rows?.rate_plus
+                     : 0 + rows?.rate_good
+                       ? rows?.rate_good
+                       : 0 + rows?.rate_netral
+                         ? rows?.rate_netral
+                         : 0 + rows?.rate_negativ
+                           ? rows?.rate_negativ
+                           : 0;
 
   if (
     !_.isEmpty(rows?.rate_minus) ||
@@ -152,21 +179,21 @@ function SingleParticipant({ route, navigation }) {
     !_.isEmpty(rows?.rate_negativ)
   ) {
     total_rate = rows?.rate_minus
-      ? rows?.rate_minus * 2
-      : 0 + rows?.rate_plus
-      ? rows?.rate_plus * 5
-      : 0 + rows?.rate_good
-      ? rows?.rate_good * 4
-      : 0 + rows?.rate_netral
-      ? rows?.rate_netral * 3
-      : 0 + rows?.rate_negativ
-      ? rows?.rate_negativ * 1
-      : 0;
+                 ? rows?.rate_minus * 2
+                 : 0 + rows?.rate_plus
+                   ? rows?.rate_plus * 5
+                   : 0 + rows?.rate_good
+                     ? rows?.rate_good * 4
+                     : 0 + rows?.rate_netral
+                       ? rows?.rate_netral * 3
+                       : 0 + rows?.rate_negativ
+                         ? rows?.rate_negativ * 1
+                         : 0;
   }
 
   console.log(total_rate, 152);
 
-  const renderItem = ({ item }) => {
+  const renderItem = ({item}) => {
     const date = item.date.$date.$numberLomg;
     return (
       <ReviewItem
@@ -197,7 +224,7 @@ function SingleParticipant({ route, navigation }) {
         <Text style={styles.header}>Основные данные</Text>
         <SingleParticipantBlock uri={`https://teus.online/${data?.avatar}`}>
           <View style={styles.coWorked}>
-            <ImageOkSmall />
+            <ImageOkSmall/>
             <Text style={styles.coWorkedText}>Сотрудничали</Text>
           </View>
           <Text style={styles.companyName}>{data?.name}</Text>
@@ -217,13 +244,13 @@ function SingleParticipant({ route, navigation }) {
           </Text>
           {data?.factadress && (
             <View style={styles.contactLine}>
-              <ImageMapPlaceholder />
+              <ImageMapPlaceholder/>
               <Text style={styles.contactInfo}>{data?.factadress}</Text>
             </View>
           )}
           {data?.site && (
             <View style={styles.contactLine}>
-              <ImageMouseCursor />
+              <ImageMouseCursor/>
               <Text style={styles.contactInfo}>{data?.site}</Text>
             </View>
           )}
@@ -231,7 +258,7 @@ function SingleParticipant({ route, navigation }) {
         <Text style={styles.header}>Контакты</Text>
         <FlatList
           data={contacts}
-          renderItem={({ item }, index) => {
+          renderItem={({item}, index) => {
             return (
               <SingleParticipantBlock
                 key={index}
@@ -242,7 +269,7 @@ function SingleParticipant({ route, navigation }) {
                     dispatch(
                       chatOrderRequest({
                         token: token,
-                        id: item.company.last_id,
+                        id: item?.company.last_id,
                       })
                     )
                       .unwrap()
@@ -259,21 +286,21 @@ function SingleParticipant({ route, navigation }) {
               >
                 <Text style={styles.name}>{item?.contact_person}</Text>
                 <Text style={styles.location}>
-                  {item.company.city.title.ru}
+                  {item?.company.city.title.ru}
                 </Text>
                 <TouchableOpacity
                   onPress={() => Linking.openURL("tel:" + item.phone)}
                   style={styles.contacts}
                 >
                   <Text style={styles.contactsText}>{item.phone}</Text>
-                  <ImageCallGreen />
+                  <ImageCallGreen/>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => Linking.openURL("mailto:" + item.email)}
                   style={styles.contacts}
                 >
                   <Text style={styles.contactsText}>{item.email}</Text>
-                  <ImageEmailGreen />
+                  <ImageEmailGreen/>
                 </TouchableOpacity>
               </SingleParticipantBlock>
             );
@@ -282,7 +309,7 @@ function SingleParticipant({ route, navigation }) {
         <View style={styles.reviewBlock}>
           <Text style={styles.header}>Отзывы на участника</Text>
           <View style={styles.reviewLine}>
-            <ImageRating />
+            <ImageRating/>
             <View style={styles.reviewDescription}>
               <Text style={styles.averageReview}>{Math.round(total_rate)}</Text>
               <Text style={styles.reviewInfo}>
@@ -290,7 +317,7 @@ function SingleParticipant({ route, navigation }) {
               </Text>
             </View>
           </View>
-          <FlatList data={rows?.slice(0, 2)} renderItem={renderItem} />
+          <FlatList data={rows?.slice(0, 2)} renderItem={renderItem}/>
           <View style={styles.buttonRow}>
             <MyButton
               textStyle={styles.buttonText}
@@ -309,7 +336,7 @@ function SingleParticipant({ route, navigation }) {
           </View>
         </View>
       </View>
-      <LeaveReviewModal
+      {successReviewSend && <LeaveReviewModal
         // value={reviewText}
         onChangeText={(val) => setReviewText(val)}
         isVisible={showReviewModal}
@@ -318,7 +345,7 @@ function SingleParticipant({ route, navigation }) {
         // id={route?.params?.id}
         setRate={setRate}
         rate={rate}
-      />
+      />}
       <MoreReviewsModal
         isVisible={showMoreReviewsModal}
         onCancel={() => setShowMoreReviewsModal(false)}

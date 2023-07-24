@@ -1,9 +1,10 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { api } from "../../Api";
+import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import {api} from "../../Api";
 
 export const projectReviewRequest = createAsyncThunk(
   "project/review",
-  async ({ token, id, rate, review }) => {
+  async ({token, id, rate, review}) => {
+    console.log(rate, 'asdasd')
     try {
       const result = await api.post("/send-project-review", {
         secret_token: token,

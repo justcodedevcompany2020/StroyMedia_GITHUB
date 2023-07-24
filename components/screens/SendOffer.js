@@ -63,7 +63,6 @@ function SendOffer(props) {
             </View>
 
             <Text style={styles.price}>
-              {console.log(item.currency)}
               {item.price > 0 && item.currency != null
                ? item.price.toString() + item.currency?.sign.toString()
                : "по запросу"}
@@ -209,6 +208,8 @@ function SendOffer(props) {
         <MyButton
           style={styles.submitButton}
           onPress={() => {
+            console.log(currency, 'currency')
+            console.log(periodOfUsing)
             var form_data = new FormData();
             form_data.append("secret_token", token);
             form_data.append("last_id", item.last_id.toString());
@@ -218,9 +219,9 @@ function SendOffer(props) {
               "currency",
               currency == "₽"
               ? "1"
-              : currency == "€"
+              : currency == "$"
                 ? "2"
-                : currency == "$"
+                : currency == "€"
                   ? "3"
                   : ""
             );
@@ -230,38 +231,45 @@ function SendOffer(props) {
 
             dispatch(workRequest(form_data))
               .unwrap()
-              .then((res) => {
-                // if (res.success) {
-                //   showMessage({
-                //     message: "Ваши данные успешно сохранены",
-                //     type: "success",
-                //   });
-                //   navigation.goBack();
-                // } else if (!res.success) {
-                //   showMessage({
-                //     type: "danger",
-                //     message: "Неверные данные",
-                //   });
-                // }
+              .then(async (res) => {
                 if (res.success) {
-                  dispatch(
-                    chatOrderRequest({token: token, id: item.user.last_id})
-                  )
-                    .unwrap()
-                    .then(async () => {
-                      // await AsyncStorage.setItem("comment", comment);
-                      navigation.navigate("DialogChat", {
-                        currentPage: "Диалоги",
-                        title: item.user.name,
-                        id: item.user.last_id,
-                      });
-                    });
+                  await showMessage({
+                    message: "Ваши данные успешно сохранены",
+                    type: "success",
+                  });
+                  navigation.goBack();
+                } else if (res.message == "Incorrect Details. You can not add comment") {
+                  showMessage({
+                    type: "info",
+                    message: "Вы уже отправили запрос на это предложение",
+                  });
+                } else if (res.message == "Incorrect Details. Please try again") {
+                  showMessage({
+                    type: "denger",
+                    message: "Что-то пошло не так, Попробуйте еще раз",
+                  });
                 }
+
+
+                // if (res.success) {
+                //   dispatch(
+                //     chatOrderRequest({token: token, id: item.user.last_id})
+                //   )
+                //     .unwrap()
+                //     .then(async () => {
+                //       // await AsyncStorage.setItem("comment", comment);
+                //       navigation.navigate("DialogChat", {
+                //         currentPage: "Диалоги",
+                //         title: item.user.name,
+                //         id: item.user.last_id,
+                //       });
+                //     });
+                // }
               })
               .catch((e) => {
                 showMessage({
                   type: "danger",
-                  message: "Неверные данные",
+                  message: "Что-то пошло не так, Попробуйте еще раз",
                 });
               });
           }}

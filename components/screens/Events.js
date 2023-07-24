@@ -1,41 +1,24 @@
-import React, { useEffect, useState } from "react";
-import {
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import React, {useEffect, useState} from "react";
+import {StyleSheet, Text, TouchableOpacity, useWindowDimensions, View,} from "react-native";
 import Wrapper from "../helpers/Wrapper";
-import { useDispatch, useSelector } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import NavBar from "../includes/NavBar";
-import {
-  COLOR_1,
-  COLOR_6,
-  COLOR_8,
-  COLOR_9,
-  WRAPPER_PADDINGS,
-} from "../helpers/Variables";
-import {
-  ImageBiggerPlaceholder,
-  ImageCalendar,
-  ImageNextArrow,
-} from "../helpers/images";
-import openMap, { createOpenLink } from "react-native-open-maps";
+import {COLOR_1, COLOR_6, COLOR_8, COLOR_9, WRAPPER_PADDINGS,} from "../helpers/Variables";
+import {ImageBiggerPlaceholder, ImageCalendar, ImageNextArrow,} from "../helpers/images";
+import openMap, {createOpenLink} from "react-native-open-maps";
 import AccordionItem from "../includes/AccordionItem";
 import moment from "moment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getEventsRequest } from "../../store/reducers/getEventsAllSlice";
+import {getEventsRequest} from "../../store/reducers/getEventsAllSlice";
 import EventsItem from "../includes/eventsItem";
 import RenderHtml from "react-native-render-html";
-import { checkChatExistRequest } from "../../store/reducers/checkChatExistSlice";
+import {checkChatExistRequest} from "../../store/reducers/checkChatExistSlice";
 
-function Events({ route, navigation }) {
+function Events({route, navigation}) {
   const [tabs, setTabs] = useState(["1 день", "2 день"]);
-  const { width } = useWindowDimensions();
+  const {width} = useWindowDimensions();
   const [activeTab, setActiveTab] = useState("1 день");
-  const { currentPage } = route.params;
+  const {currentPage} = route.params;
   const [token, setToken] = useState();
   const session = useSelector((state) => state.getEventsSlice.data.schedule);
   const data = useSelector((state) => state.getEventsSlice.data.rows);
@@ -113,7 +96,7 @@ function Events({ route, navigation }) {
               <Text style={styles.title}>{d.title}</Text>
               <View style={styles.info}>
                 <View style={styles.date}>
-                  <ImageCalendar />
+                  <ImageCalendar/>
                   <Text style={styles.dateText}>
                     {moment(+date).format("YYYY-MM-DD")}
                   </Text>
@@ -124,7 +107,7 @@ function Events({ route, navigation }) {
                     openMap(mapLink);
                   }}
                 >
-                  <ImageBiggerPlaceholder />
+                  <ImageBiggerPlaceholder/>
                   <Text style={styles.locationText}>{d.place}</Text>
                 </TouchableOpacity>
               </View>
@@ -172,7 +155,7 @@ function Events({ route, navigation }) {
                     <>
                       <RenderHtml
                         contentWidth={width}
-                        source={{ html: s.full }}
+                        source={{html: s.full}}
                         tagsStyles={{
                           body: {
                             listStyleType: "none",
@@ -209,7 +192,7 @@ function Events({ route, navigation }) {
 
                       <RenderHtml
                         contentWidth={width}
-                        source={{ html: s.event.full }}
+                        source={{html: s.event.full}}
                         tagsStyles={{
                           body: {
                             listStyleType: "none",
@@ -270,7 +253,7 @@ function Events({ route, navigation }) {
                   }}
                   style={styles.nextArrow}
                 >
-                  <ImageNextArrow />
+                  <ImageNextArrow/>
                 </TouchableOpacity>
               </View>
             </AccordionItem>
@@ -320,7 +303,7 @@ function Events({ route, navigation }) {
                     <>
                       <RenderHtml
                         contentWidth={width}
-                        source={{ html: s.full }}
+                        source={{html: s.full}}
                         tagsStyles={{
                           body: {
                             listStyleType: "none",
@@ -353,7 +336,7 @@ function Events({ route, navigation }) {
 
                       <RenderHtml
                         contentWidth={width}
-                        source={{ html: s.event.full }}
+                        source={{html: s.event.full}}
                         tagsStyles={{
                           body: {
                             listStyleType: "none",
@@ -408,7 +391,7 @@ function Events({ route, navigation }) {
                   }}
                   style={styles.nextArrow}
                 >
-                  <ImageNextArrow />
+                  <ImageNextArrow/>
                 </TouchableOpacity>
               </View>
             </AccordionItem>

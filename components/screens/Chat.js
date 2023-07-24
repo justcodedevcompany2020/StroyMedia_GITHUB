@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -11,34 +11,26 @@ import {
   View,
 } from "react-native";
 import Wrapper from "../helpers/Wrapper";
-import {
-  COLOR_1,
-  COLOR_10,
-  COLOR_2,
-  COLOR_5,
-  COLOR_8,
-  COLOR_9,
-  WRAPPER_PADDINGS,
-} from "../helpers/Variables";
-import { Search } from "../includes/Search";
+import {COLOR_1, COLOR_10, COLOR_5, COLOR_8, COLOR_9, WRAPPER_PADDINGS,} from "../helpers/Variables";
+import {Search} from "../includes/Search";
 import MyInput from "../includes/MyInput";
-import { ImageAttach, ImageSend } from "../helpers/images";
-import { useDispatch, useSelector } from "react-redux";
+import {ImageAttach, ImageSend} from "../helpers/images";
+import {useDispatch, useSelector} from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment";
-import { sendForumMessageRequest } from "../../store/reducers/sendForumMessageSlice";
-import { chatForumOrderRequest } from "./../../store/reducers/orderForumChatSlice";
-import { useNavigation } from "@react-navigation/native";
-import { ImagesViewModal } from "../includes/ImagesViewModal";
-import { showMessage } from "react-native-flash-message";
+import {sendForumMessageRequest} from "../../store/reducers/sendForumMessageSlice";
+import {chatForumOrderRequest} from "./../../store/reducers/orderForumChatSlice";
+import {useNavigation} from "@react-navigation/native";
+import {ImagesViewModal} from "../includes/ImagesViewModal";
+import {showMessage} from "react-native-flash-message";
 import * as DocumentPicker from "expo-document-picker";
-import { Ionicons } from "@expo/vector-icons";
+import {Ionicons} from "@expo/vector-icons";
 
 const SearchIcon = require("../../assets/search.png");
 const HEIGHT = Dimensions.get("window").width;
 const ITEM_HEIGHT = 100;
 
-export default function Chat({ route }) {
+export default function Chat({route}) {
   const navigation = useNavigation();
   const messagesRef = useRef(null);
   const [searchValue, setSearchValue] = useState("");
@@ -48,11 +40,11 @@ export default function Chat({ route }) {
   const [isChanged, setIsChanged] = useState(false);
   const user = useSelector((state) => state.authUserSlice?.data?.user);
   const dispatch = useDispatch();
-  const { currentPage } = route.params;
+  const {currentPage} = route.params;
   const [id, setId] = useState();
   const [token, setToken] = useState();
   const state = useSelector((state) => state);
-  const { dialog_message } = state.orderForumChatSlice;
+  const {dialog_message} = state.orderForumChatSlice;
   const intervalRef = useRef(null);
   const [filePath, setFilePath] = useState("");
   const [fileName, setFileName] = useState("");
@@ -97,7 +89,7 @@ export default function Chat({ route }) {
       type: ["*/*"],
     });
 
-    const { type, uri, mimeType, size, name } = result;
+    const {type, uri, mimeType, size, name} = result;
 
     if (size < 500000) {
       if (type === "success") {
@@ -170,7 +162,7 @@ export default function Chat({ route }) {
     data.append("secret_token", token);
     data.append("last_id", route.params.id);
     data.append("message", inputValue);
-    dispatch(sendForumMessageRequest({ data }));
+    dispatch(sendForumMessageRequest({data}));
     setInputValue("");
     setFilePath("");
     setInputHeight(40);
@@ -189,7 +181,7 @@ export default function Chat({ route }) {
           <View style={styles.selectImage}>
             {fileType == "image/png" || "image/jpg" || "image/jpeg" ? (
               <Image
-                source={{ uri: filePath }}
+                source={{uri: filePath}}
                 style={{
                   width: 60,
                   height: 60,
@@ -197,20 +189,20 @@ export default function Chat({ route }) {
                 }}
               />
             ) : (
-              <Ionicons name="document" size={45} color="black" />
-            )}
+               <Ionicons name="document" size={45} color="black"/>
+             )}
 
             <Text onPress={() => setFilePath("")} style={styles.cancel}>
               X
             </Text>
           </View>
         ) : (
-          <View></View>
-        )}
+           <View></View>
+         )}
         <View style={styles.footer}>
           <TouchableOpacity onPress={pickImage} style={styles.attach}>
             <View style={styles.attachImage}>
-              <ImageAttach />
+              <ImageAttach/>
             </View>
           </TouchableOpacity>
           <View style={styles.inputView}>
@@ -238,7 +230,7 @@ export default function Chat({ route }) {
                   <TouchableOpacity
                     style={[
                       styles.send,
-                      { bottom: countSendBottom(inputBottom) },
+                      {bottom: countSendBottom(inputBottom)},
                     ]}
                     onPress={sendMessage}
                   >
@@ -248,7 +240,7 @@ export default function Chat({ route }) {
                         paddingRight: HEIGHT / 8,
                       }}
                     >
-                      <ImageSend />
+                      <ImageSend/>
                     </View>
                   </TouchableOpacity>
                 ) : null
@@ -310,7 +302,7 @@ export default function Chat({ route }) {
     );
   };
 
-  const renderItem = ({ item, index }) => {
+  const renderItem = ({item, index}) => {
     return (
       <View style={styles.item}>
         <Image
@@ -333,7 +325,7 @@ export default function Chat({ route }) {
               </Text>
             </View>
             <Text style={styles.message}>{item.comment} </Text>
-            <View style={!item.comment ? { marginTop: -16 } : { marginTop: 8 }}>
+            <View style={!item.comment ? {marginTop: -16} : {marginTop: 8}}>
               {item?.files ? (
                 <TouchableOpacity
                   onPress={() => {
@@ -344,8 +336,8 @@ export default function Chat({ route }) {
                     <Image
                       source={{
                         uri: item.local
-                          ? item.files
-                          : "https://teus.online/" + item.files,
+                             ? item.files
+                             : "https://teus.online/" + item.files,
                       }}
                       style={{
                         width: 60,
@@ -353,15 +345,15 @@ export default function Chat({ route }) {
                       }}
                     />
                   ) : (
-                    <Ionicons name="document" size={45} color="black" />
-                  )}
+                     <Ionicons name="document" size={45} color="black"/>
+                   )}
                 </TouchableOpacity>
               ) : (
-                <></>
-              )}
+                 <></>
+               )}
             </View>
           </View>
-          <View style={styles.triangle} />
+          <View style={styles.triangle}/>
         </View>
       </View>
     );
@@ -408,7 +400,7 @@ export default function Chat({ route }) {
             alignItems: "center",
           }}
         >
-          <ActivityIndicator size={50} color={COLOR_5} />
+          <ActivityIndicator size={50} color={COLOR_5}/>
         </View>
       </Modal>
       <View style={styles.listWrapper}>
@@ -429,7 +421,7 @@ export default function Chat({ route }) {
                   fontSize: 20,
                 }}
               >
-                Не найдено
+                У вас еще нет сообщений
               </Text>
             </View>
           )}

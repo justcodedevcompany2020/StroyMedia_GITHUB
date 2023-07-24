@@ -1,44 +1,19 @@
-import React, { useEffect, useRef, useState } from "react";
-import {
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  ActivityIndicator,
-  Modal,
-  Dimensions,
-} from "react-native";
+import React, {useEffect, useState} from "react";
+import {ActivityIndicator, Image, Modal, StyleSheet, Text, TouchableOpacity, View,} from "react-native";
 import Wrapper from "../helpers/Wrapper";
-import { useDispatch, useSelector } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import NavBar from "../includes/NavBar";
-import {
-  COLOR_1,
-  COLOR_2,
-  COLOR_3,
-  COLOR_5,
-  COLOR_6,
-  COLOR_8,
-  COLOR_9,
-  WRAPPER_PADDINGS,
-} from "../helpers/Variables";
-import { SwipeListView } from "react-native-swipe-list-view";
-import { allCatRequest } from "../../store/reducers/allCatSlice";
-import {
-  ImageBlankApplications,
-  ImageEdit,
-  ImageFadePart,
-  ImageOffersArrow,
-} from "../helpers/images";
-import { Search } from "../includes/Search";
+import {COLOR_1, COLOR_2, COLOR_3, COLOR_5, COLOR_6, COLOR_8, COLOR_9, WRAPPER_PADDINGS,} from "../helpers/Variables";
+import {SwipeListView} from "react-native-swipe-list-view";
+import {allCatRequest} from "../../store/reducers/allCatSlice";
+import {ImageBlankApplications, ImageEdit, ImageFadePart, ImageOffersArrow,} from "../helpers/images";
+import {Search} from "../includes/Search";
 import AddNew from "../includes/AddNew";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment";
-import { authRequest } from "../../store/reducers/authUserSlice";
-import { Entypo } from "@expo/vector-icons";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { workRequestAcceptRequest } from "../../store/reducers/workRequestAcceptSlice";
-import { workRequestCancelRequest } from "../../store/reducers/workRequestCancelSlice";
+import {authRequest} from "../../store/reducers/authUserSlice";
+import {Entypo} from "@expo/vector-icons";
+import {useNavigation, useRoute} from "@react-navigation/native";
 
 const SearchIcon = require("../../assets/search.png");
 
@@ -49,11 +24,11 @@ function MyApplications() {
   const [searchValue, setSearchValue] = useState("");
   const [page, setPage] = useState(1);
   const [offset, setOffset] = useState(0);
-  const { currentPage } = route.params;
+  const {currentPage} = route.params;
   const [token, setToken] = useState();
   const dispatch = useDispatch();
   const state = useSelector((state1) => state1);
-  const { loading, data } = state.allCatSlice;
+  const {loading, data} = state.allCatSlice;
   const user = state.authUserSlice?.data?.user;
   const [filteredData, setFilteredData] = useState([]);
   const timeStamnp = +filteredData[0]?.date_create?.$date.$numberLong;
@@ -62,7 +37,7 @@ function MyApplications() {
     AsyncStorage.getItem("token").then((result) => {
       if (result) {
         setToken(result);
-        dispatch(authRequest({ secret_token: result })).then((res) => {
+        dispatch(authRequest({secret_token: result})).then((res) => {
           setToken(res.payload?.data?.token);
         });
       }
@@ -74,7 +49,7 @@ function MyApplications() {
       AsyncStorage.getItem("token").then((result) => {
         if (result) {
           setToken(result);
-          dispatch(authRequest({ secret_token: result })).then((res) => {
+          dispatch(authRequest({secret_token: result})).then((res) => {
             // setToken(res.payload?.data?.token);
           });
         }
@@ -121,7 +96,7 @@ function MyApplications() {
     };
   }, [activeTab, token, navigation]);
 
-  const renderItem = ({ item, index }) => {
+  const renderItem = ({item, index}) => {
     return (
       <View style={styles.item}>
         <View style={styles.row}>
@@ -130,8 +105,8 @@ function MyApplications() {
               source={{
                 uri:
                   typeof item?.img === "string"
-                    ? "https://teus.online" + item?.img
-                    : Array.isArray(item?.img)
+                  ? "https://teus.online" + item?.img
+                  : Array.isArray(item?.img)
                     ? "https://teus.online" + item.img[0]?.url
                     : null,
               }}
@@ -161,8 +136,8 @@ function MyApplications() {
           <View style={styles.leftBlock}>
             <Text style={styles.type}>
               {typeof item?.service?.title === "string"
-                ? item?.service?.title
-                : item?.service?.title?.ru}
+               ? item?.service?.title
+               : item?.service?.title?.ru}
             </Text>
             <Text style={styles.type2}>
               Тип КТК: {item?.type_container?.title}{" "}
@@ -182,7 +157,7 @@ function MyApplications() {
               <Text style={styles.fromCity}>
                 {item?.from_city?.title?.ru || item?.dislokaciya?.title.ru}
               </Text>
-              <ImageOffersArrow />
+              <ImageOffersArrow/>
               <Text style={styles.toCity}>{item?.to_city?.title?.ru}</Text>
             </View>
 
@@ -195,12 +170,12 @@ function MyApplications() {
               }}
             >
               <Text style={styles.quantity}>Количество: {item?.count}</Text>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <View style={{flexDirection: "row", alignItems: "center"}}>
                 <Text style={styles.priceText}>Цена:</Text>
                 <Text style={styles.price}>
                   {item?.price
-                    ? item.price + " " + item?.currency?.sign
-                    : "по запросу"}
+                   ? item.price + " " + item?.currency?.sign
+                   : "по запросу"}
                 </Text>
               </View>
             </View>
@@ -246,7 +221,7 @@ function MyApplications() {
           }}
         />
         <View style={styles.searchRow}>
-          <View style={{ flex: 1 }}>
+          <View style={{flex: 1}}>
             <Search
               style={styles.search}
               keyboardType={"web-search"}
@@ -259,7 +234,7 @@ function MyApplications() {
           </View>
           <TouchableOpacity
             activeOpacity={0.2}
-            style={{ marginLeft: 10 }}
+            style={{marginLeft: 10}}
             onPress={() => filtered(searchValue)}
           >
             <Image
@@ -328,12 +303,12 @@ function MyApplications() {
             backgroundColor: "#00000055",
           }}
         >
-          <ActivityIndicator color={COLOR_1} size={50} />
+          <ActivityIndicator color={COLOR_1} size={50}/>
         </View>
       </Modal>
       {headerComponent()}
       {/* && activeTab !== "Архив" */}
-      {filteredData.length ? (
+      {data.length ? (
         <View style={styles.wrapper}>
           <SwipeListView
             data={filteredData}
@@ -359,7 +334,7 @@ function MyApplications() {
                       disabled={page <= 1 ? true : false}
                       onPress={previusPage}
                     >
-                      <Entypo name="chevron-left" size={28} color={"gray"} />
+                      <Entypo name="chevron-left" size={28} color={"gray"}/>
                     </TouchableOpacity>
                   </View>
                   <View>
@@ -372,7 +347,7 @@ function MyApplications() {
                       disabled={filteredData.length === 5 ? false : true}
                       onPress={nextPage}
                     >
-                      <Entypo name="chevron-right" size={28} color={"gray"} />
+                      <Entypo name="chevron-right" size={28} color={"gray"}/>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -380,7 +355,7 @@ function MyApplications() {
             }}
             renderItem={renderItem}
             // ListHeaderComponent={headerComponent()}
-            renderHiddenItem={({ item }) => (
+            renderHiddenItem={({item}) => (
               <View style={styles.hiddenWrapper}>
                 <TouchableOpacity
                   style={styles.hiddenItem}
@@ -408,21 +383,21 @@ function MyApplications() {
                       img: item?.img,
                       valut: item?.currency?.sign,
                       paymentType: item?.typepay?.title.hasOwnProperty("ru")
-                        ? item?.typepay?.title.ru
-                        : item?.typepay?.title,
+                                   ? item?.typepay?.title.ru
+                                   : item?.typepay?.title,
                       reestrrzhd_: item?.reestrrzhd?.title.hasOwnProperty("ru")
-                        ? item?.reestrrzhd?.title?.ru
-                        : item?.reestrrzhd?.title,
+                                   ? item?.reestrrzhd?.title?.ru
+                                   : item?.reestrrzhd?.title,
                       condition_: item?.condition?.title.hasOwnProperty("ru")
-                        ? item?.condition?.title?.ru
-                        : item?.condition?.title,
+                                  ? item?.condition?.title?.ru
+                                  : item?.condition?.title,
                       cargo: item?.cargo?.toString(),
                       comment_: item?.comment?.toString(),
                     });
                   }}
                 >
                   <View style={styles.hiddenBlock}>
-                    <ImageEdit />
+                    <ImageEdit/>
 
                     <View style={styles.hiddenItemTextBlock}>
                       <Text style={styles.hiddenItemText}>Редактировать</Text>
@@ -435,32 +410,32 @@ function MyApplications() {
             disableRightSwipe
             keyExtractor={(item) => item.last_id.toString()}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ flexShrink: 0 }}
+            contentContainerStyle={{flexShrink: 0}}
             // stickyHeaderIndices={[0]}
           />
           <View style={styles.fadeBlock}>
-            <Image source={ImageFadePart} style={styles.fade} />
+            <Image source={ImageFadePart} style={styles.fade}/>
           </View>
         </View>
       ) : (
-        <View style={styles.wrapper}>
-          {/* <NavBar
+         <View style={styles.wrapper}>
+           {/* <NavBar
             tabs={["В работе", "Черновик", "Архив"]}
             activeTab={activeTab}
             onPress={async (tab) => {
               setActiveTab(tab);
             }}
           /> */}
-          <View style={styles.blankTextBlock}>
-            <Text style={styles.blankText}>Здесь будут ваши заявки.</Text>
-            <Text style={styles.blankText}>Нажмите на «+» чтобы</Text>
-            <Text style={styles.blankText}>добавить заявку</Text>
-          </View>
-          <View style={styles.blankImage}>
-            <ImageBlankApplications />
-          </View>
-        </View>
-      )}
+           <View style={styles.blankTextBlock}>
+             <Text style={styles.blankText}>Здесь будут ваши заявки.</Text>
+             <Text style={styles.blankText}>Нажмите на «+» чтобы</Text>
+             <Text style={styles.blankText}>добавить заявку</Text>
+           </View>
+           <View style={styles.blankImage}>
+             <ImageBlankApplications/>
+           </View>
+         </View>
+       )}
       <AddNew
         end={true}
         onPress={() =>

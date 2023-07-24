@@ -1,5 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { api } from "../../Api";
+import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 
 export const workRequestGetDataRequest = createAsyncThunk(
   "work-request-get-data",
@@ -55,9 +54,9 @@ const workRequestGetDataSlice = createSlice({
         //     return row;
         //   }
         // );
-        if (action.payload.message == "Successfully data got") {
-          state.work_request_data = action.payload.data;
-        }
+        // if (action.payload.message == "Successfully data got") {
+        state.work_request_data = action.payload.data;
+        // }
         // state.notification_data = action.payload.data?.data.rows;
         state.error = false;
       })

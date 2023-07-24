@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {ImageAddNew} from "../helpers/images";
-import {StyleSheet, TouchableOpacity} from "react-native";
+import {Dimensions, StyleSheet, TouchableOpacity} from "react-native";
 
 class AddNew extends Component {
   render() {
@@ -27,7 +27,7 @@ class AddNew extends Component {
 const styles = StyleSheet.create({
   wrapper: {
     position: "absolute",
-    bottom: 40,
+    bottom: Dimensions.get('window').height / 12,
   },
 });
 

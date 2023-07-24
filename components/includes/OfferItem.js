@@ -1,29 +1,10 @@
-import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  Text,
-  Pressable,
-} from "react-native";
-import {
-  ImageFavorite,
-  ImageFavoriteGreen,
-  ImageOffersArrow,
-  ImageRatingSmall,
-} from "../helpers/images";
-import { useDispatch } from "react-redux";
-import {
-  COLOR_2,
-  COLOR_5,
-  COLOR_6,
-  COLOR_8,
-  COLOR_9,
-  WRAPPER_PADDINGS,
-} from "../helpers/Variables";
+import React, {useEffect, useState} from "react";
+import {Pressable, StyleSheet, Text, TouchableOpacity, View,} from "react-native";
+import {ImageFavorite, ImageFavoriteGreen, ImageOffersArrow, ImageRatingSmall,} from "../helpers/images";
+import {useDispatch} from "react-redux";
+import {COLOR_2, COLOR_5, COLOR_6, COLOR_8, COLOR_9, WRAPPER_PADDINGS,} from "../helpers/Variables";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getLiklyCatRequest } from "../../store/reducers/liklyCatSlice";
-import { checkLiklyOfferRequest } from "../../store/reducers/checkOfferLiklySlice";
+import {getLiklyCatRequest} from "../../store/reducers/liklyCatSlice";
 import moment from "moment";
 
 export function OfferItem({
@@ -66,7 +47,7 @@ export function OfferItem({
               <Text style={styles.fromCity}>
                 {item?.from_city?.title?.ru?.replace("(RU)", "")}
               </Text>
-              <ImageOffersArrow />
+              <ImageOffersArrow/>
               <Text style={styles.toCity}>
                 {item?.to_city?.title?.ru?.replace("(RU)", "")}
               </Text>
@@ -85,10 +66,10 @@ export function OfferItem({
             <TouchableOpacity
               onPress={() => {
                 setLiked(!liked);
-                dispatch(getLiklyCatRequest({ token, id: item.last_id }));
+                dispatch(getLiklyCatRequest({token, id: item.last_id}));
               }}
             >
-              {liked ? <ImageFavoriteGreen /> : <ImageFavorite />}
+              {liked ? <ImageFavoriteGreen/> : <ImageFavorite/>}
             </TouchableOpacity>
             <Text style={styles.date}>
               {moment(+date).format("YYYY-MM-DD")}
@@ -96,17 +77,17 @@ export function OfferItem({
           </View>
           <View style={styles.row}>
             <View style={styles.ratingBlock}>
-              <ImageRatingSmall />
+              <ImageRatingSmall/>
               <Text style={styles.rating}>
                 {item?.user?.rate_plus
-                  ? 5
-                  : item?.user?.rate_good
-                  ? 4
-                  : item?.user?.rate_netral
-                  ? 3
-                  : item?.user?.rate_minus
-                  ? 2
-                  : 1}
+                 ? 5
+                 : item?.user?.rate_good
+                   ? 4
+                   : item?.user?.rate_netral
+                     ? 3
+                     : item?.user?.rate_minus
+                       ? 2
+                       : 1}
               </Text>
               <Text style={styles.companyName}>{item.createdBy}</Text>
             </View>
@@ -131,7 +112,7 @@ export function OfferItem({
                 {item?.from_city?.title?.ru?.replace(" (RU)", "") ||
                   item?.dislokaciya?.title.ru}
               </Text>
-              {item?.to_city && <ImageOffersArrow />}
+              {item?.to_city && <ImageOffersArrow/>}
               <Text style={styles.toCity}>
                 {item?.to_city?.title?.ru?.replace("(RU)", "")}
               </Text>
@@ -139,8 +120,8 @@ export function OfferItem({
 
             <Text style={styles.price}>
               {item.price > 0 && item.currency != null
-                ? item.price.toString() + item.currency?.sign.toString()
-                : "по запросу"}
+               ? item.price.toString() + item.currency?.sign.toString()
+               : "по запросу"}
             </Text>
           </View>
           <View style={styles.row}>
@@ -153,10 +134,10 @@ export function OfferItem({
             <TouchableOpacity
               onPress={() => {
                 setLiked(!liked);
-                dispatch(getLiklyCatRequest({ token, id: item.last_id }));
+                dispatch(getLiklyCatRequest({token, id: item.last_id}));
               }}
             >
-              {liked ? <ImageFavoriteGreen /> : <ImageFavorite />}
+              {liked ? <ImageFavoriteGreen/> : <ImageFavorite/>}
             </TouchableOpacity>
             <Text style={styles.date}>
               {moment(+date).format("YYYY-MM-DD")}
@@ -164,17 +145,17 @@ export function OfferItem({
           </View>
           <View style={styles.row}>
             <View style={styles.ratingBlock}>
-              <ImageRatingSmall />
+              <ImageRatingSmall/>
               <Text style={styles.rating}>
                 {item?.user?.rate_plus
-                  ? 5
-                  : item?.user?.rate_good
-                  ? 4
-                  : item?.user?.rate_netral
-                  ? 3
-                  : item?.user?.rate_minus
-                  ? 2
-                  : 1}
+                 ? 5
+                 : item?.user?.rate_good
+                   ? 4
+                   : item?.user?.rate_netral
+                     ? 3
+                     : item?.user?.rate_minus
+                       ? 2
+                       : 1}
               </Text>
               <Text style={styles.companyName}>{item.createdBy}</Text>
             </View>

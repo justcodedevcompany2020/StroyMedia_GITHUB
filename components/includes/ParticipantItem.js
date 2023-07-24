@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Image, Text, TouchableOpacity } from "react-native";
-import { ImageFavorite, ImageFavoriteGreen } from "../helpers/images";
-import { COLOR_1 } from "../helpers/Variables";
-import { addFavoriteRequest } from "../../store/reducers/addFavoriteDataSlice";
-import { useDispatch, useSelector } from "react-redux";
+import React, {useEffect, useState} from "react";
+import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {ImageFavorite, ImageFavoriteGreen} from "../helpers/images";
+import {COLOR_1} from "../helpers/Variables";
+import {addFavoriteRequest} from "../../store/reducers/addFavoriteDataSlice";
+import {useDispatch} from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { membersSingleRequest } from "../../store/reducers/membersSingleSlice";
-import { checkLiklyRequest } from "../../store/reducers/checkLikliSlice";
+import {membersSingleRequest} from "../../store/reducers/membersSingleSlice";
 
 function ParticipantItem({
   imageUri,
@@ -43,7 +42,7 @@ function ParticipantItem({
           style={styles.wrapper}
           activeOpacity={0.5}
           onPress={() => {
-            dispatch(membersSingleRequest({ token: token, id: id }));
+            dispatch(membersSingleRequest({token: token, id: id}));
             navigation.navigate("SingleParticipant", {
               currentPage: "Страница участника",
               id,
@@ -51,7 +50,7 @@ function ParticipantItem({
           }}
         >
           <View style={styles.leftPart}>
-            <Image source={{ uri: imageUri }} style={styles.image} />
+            <Image source={{uri: imageUri}} style={styles.image}/>
             <View style={styles.info}>
               <Text style={styles.name}>{companyName}</Text>
               <Text style={styles.city}>{city}</Text>
@@ -60,7 +59,7 @@ function ParticipantItem({
           </View>
           <TouchableOpacity
             onPress={() => {
-              dispatch(addFavoriteRequest({ token: token, id: id }));
+              dispatch(addFavoriteRequest({token: token, id: id}));
 
               setLiked((prevState) => {
                 return prevState.map((like) => {
@@ -76,10 +75,10 @@ function ParticipantItem({
             styles={styles.favImgBlock}
           >
             {liked[index] == "is_Favorite" ? (
-              <ImageFavoriteGreen />
+              <ImageFavoriteGreen/>
             ) : (
-              <ImageFavorite />
-            )}
+               <ImageFavorite/>
+             )}
           </TouchableOpacity>
         </TouchableOpacity>
       ) : null}
@@ -89,7 +88,7 @@ function ParticipantItem({
           style={styles.wrapper}
           activeOpacity={0.5}
           onPress={() => {
-            dispatch(membersSingleRequest({ token: token, id: id }));
+            dispatch(membersSingleRequest({token: token, id: id}));
             navigation.navigate("SingleParticipant", {
               currentPage: "Страница участника",
               id,
@@ -97,7 +96,7 @@ function ParticipantItem({
           }}
         >
           <View style={styles.leftPart}>
-            <Image source={{ uri: imageUri }} style={styles.image} />
+            <Image source={{uri: imageUri}} style={styles.image}/>
             <View style={styles.info}>
               <Text style={styles.name}>{companyName}</Text>
               <Text style={styles.city}>{city}</Text>
@@ -106,7 +105,7 @@ function ParticipantItem({
           </View>
           <TouchableOpacity
             onPress={() => {
-              dispatch(addFavoriteRequest({ token: token, id: id }));
+              dispatch(addFavoriteRequest({token: token, id: id}));
 
               setLiked((prevState) => {
                 return prevState.map((like) => {
@@ -121,10 +120,10 @@ function ParticipantItem({
             styles={styles.favImgBlock}
           >
             {liked[index] == "is_Favorite" ? (
-              <ImageFavoriteGreen />
+              <ImageFavoriteGreen/>
             ) : (
-              <ImageFavorite />
-            )}
+               <ImageFavorite/>
+             )}
           </TouchableOpacity>
         </TouchableOpacity>
       )}

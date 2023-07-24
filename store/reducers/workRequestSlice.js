@@ -1,10 +1,9 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { api } from "../../Api";
+import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 
 export const workRequest = createAsyncThunk(
   "work/request",
   async (form_data) => {
-    var requestOptions = {
+    let requestOptions = {
       method: "POST",
       // headers: myHeaders,
       body: form_data,
@@ -16,6 +15,7 @@ export const workRequest = createAsyncThunk(
         requestOptions
       );
       const data = await response.json();
+      
       return data;
     } catch (error) {
       return error;

@@ -1,20 +1,12 @@
-import React, { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  FlatList,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import React, {useEffect, useState} from "react";
+import {ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View,} from "react-native";
 import Wrapper from "../helpers/Wrapper";
-import { useDispatch, useSelector } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import NavBar from "../includes/NavBar";
-import { Search } from "../includes/Search";
-import { ImageFadePart, ImageSend } from "../helpers/images";
+import {Search} from "../includes/Search";
+import {ImageFadePart, ImageSend} from "../helpers/images";
 import FilterItem from "../includes/FilterItem";
-import { SwipeListView } from "react-native-swipe-list-view";
+import {SwipeListView} from "react-native-swipe-list-view";
 import {
   COLOR_1,
   COLOR_10,
@@ -27,18 +19,18 @@ import {
   WRAPPER_PADDINGS,
 } from "../helpers/Variables";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { OfferItem } from "../includes/OfferItem";
-import { getCitys } from "../../store/reducers/getCitysSlice";
+import {OfferItem} from "../includes/OfferItem";
+import {getCitys} from "../../store/reducers/getCitysSlice";
 import Modal from "react-native-modal";
-import { allSuggestionRequest } from "../../store/reducers/getAllSuggestionsSlice";
-import { Entypo } from "@expo/vector-icons";
+import {allSuggestionRequest} from "../../store/reducers/getAllSuggestionsSlice";
+import {Entypo} from "@expo/vector-icons";
 
 const SearchIcon = require("../../assets/search.png");
 
-function Offers({ route, navigation }) {
+function Offers({route, navigation}) {
   const [tabs, setTabs] = useState(["Все предложения", "Избранное"]);
   const [activeTab, setActiveTab] = useState("Все предложения");
-  const { loading } = useSelector((state) => state.getAllSuggestionsSlice);
+  const {loading} = useSelector((state) => state.getAllSuggestionsSlice);
   const [citys, setCitys] = useState([]);
   const typeContainer = ["40 ST", "20 (30)", "20 (24)", "40 HQ"];
   const secondaryTabs = [
@@ -54,7 +46,7 @@ function Offers({ route, navigation }) {
   const [id, setId] = useState("2");
   const [token, setToken] = useState();
 
-  const { currentPage } = route.params;
+  const {currentPage} = route.params;
   const [containerType, setTypeContainer] = useState("");
   const [searchName, setSearchName] = useState("");
   const [cityFromName, setFromCityName] = useState("");
@@ -97,7 +89,7 @@ function Offers({ route, navigation }) {
     );
   };
 
-  const renderItem = ({ item, index }) => {
+  const renderItem = ({item, index}) => {
     if (favoriteList[index] == "is_Favorite") {
       liked = true;
     } else if (favoriteList[index] == "not_Favorite") {
@@ -133,7 +125,7 @@ function Offers({ route, navigation }) {
     setTypeContainer(null);
     setFromCityName(null);
     setToCityName(null);
-    dispatch(allSuggestionRequest({ token, id: id, offset: 0 })).then((res) => {
+    dispatch(allSuggestionRequest({token, id: id, offset: 0})).then((res) => {
       setFilteredData(res.payload.data?.data.rows);
     });
   };
@@ -177,14 +169,14 @@ function Offers({ route, navigation }) {
             setActiveSecondaryTab(tab);
             setId(
               tab === "Поиск КТК"
-                ? "2"
-                : tab === "Продажа КТК"
+              ? "2"
+              : tab === "Продажа КТК"
                 ? "5"
                 : tab === "Выдача КТК"
-                ? "3"
-                : tab === "Контейнерный сервис"
-                ? "6"
-                : "7"
+                  ? "3"
+                  : tab === "Контейнерный сервис"
+                    ? "6"
+                    : "7"
             );
           }}
           secondary
@@ -201,7 +193,7 @@ function Offers({ route, navigation }) {
             resetText={resetText}
           />
           <TouchableOpacity activeOpacity={0.2} onPress={filtered}>
-            <Image source={SearchIcon} style={{ width: 25, height: 25 }} />
+            <Image source={SearchIcon} style={{width: 25, height: 25}}/>
           </TouchableOpacity>
         </View>
         <View style={styles.filtersRow}>
@@ -268,12 +260,12 @@ function Offers({ route, navigation }) {
         from_city: cityFromName ? cityFromName.last_id : null,
         type_container:
           containerType === "40 ST" || containerType === "20 (30)"
-            ? 4
-            : containerType === "20 (24)"
+          ? 4
+          : containerType === "20 (24)"
             ? 2
             : containerType === "40 HQ"
-            ? 3
-            : null,
+              ? 3
+              : null,
       })
     ).then((res) => {
       setFilteredData(res.payload.data?.data.rows);
@@ -298,7 +290,7 @@ function Offers({ route, navigation }) {
       {loading && (
         <Modal backdropOpacity={0.75} isVisible={true}>
           <View>
-            <ActivityIndicator size="large" />
+            <ActivityIndicator size="large"/>
           </View>
         </Modal>
       )}
@@ -327,7 +319,7 @@ function Offers({ route, navigation }) {
           renderItem={renderItem}
           ListHeaderComponent={headerComponent()}
           ListFooterComponent={() => {
-            return filteredData.length === 5 && activeTab !== "Избранное" ? (
+            return filteredData.length === 5 && activeTab !== "Избранное" && (
               <View
                 style={{
                   flex: 1,
@@ -343,7 +335,7 @@ function Offers({ route, navigation }) {
                     disabled={page === 1 ? true : false}
                     onPress={previusPage}
                   >
-                    <Entypo name="chevron-left" size={28} color={"gray"} />
+                    <Entypo name="chevron-left" size={28} color={"gray"}/>
                   </TouchableOpacity>
                 </View>
                 <View>
@@ -356,17 +348,21 @@ function Offers({ route, navigation }) {
                     disabled={filteredData.length === 5 ? false : true}
                     onPress={nextPage}
                   >
-                    <Entypo name="chevron-right" size={28} color={"gray"} />
+                    <Entypo name="chevron-right" size={28} color={"gray"}/>
                   </TouchableOpacity>
                 </View>
               </View>
-            ) : null;
+            )
+
           }}
           ListEmptyComponent={() => {
-            return <Text style={styles.empty}>ничего не найдено</Text>;
+            return <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+              <Text style={styles.empty}>ничего не найдено</Text>
+            </View>;
           }}
-          renderHiddenItem={({ item }) => (
-            <View style={styles.hiddenWrapper}>
+
+          renderHiddenItem={({item}) => {
+            return <View style={styles.hiddenWrapper}>
               <TouchableOpacity
                 style={styles.hiddenItem}
                 onPress={() =>
@@ -378,7 +374,7 @@ function Offers({ route, navigation }) {
                 }
               >
                 <View style={styles.hiddenBlock}>
-                  <ImageSend />
+                  <ImageSend/>
                   <View style={styles.hiddenItemTextBlock}>
                     <Text style={styles.hiddenItemText}>Отправить</Text>
                     <Text style={styles.hiddenItemText}>предложение</Text>
@@ -386,20 +382,22 @@ function Offers({ route, navigation }) {
                 </View>
               </TouchableOpacity>
             </View>
-          )}
+          }
+          }
           rightOpenValue={-110}
           disableRightSwipe
           keyExtractor={(item) => item.last_id}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ flexGrow: 1 }}
+          contentContainerStyle={{flexGrow: 1}}
           stickyHeaderIndices={[0]}
         />
         <View style={styles.fadeBlock}>
-          <Image source={ImageFadePart} style={styles.fade} />
+          <Image source={ImageFadePart} style={styles.fade}/>
         </View>
       </Wrapper>
     </>
-  );
+  )
+    ;
 }
 
 const styles = StyleSheet.create({

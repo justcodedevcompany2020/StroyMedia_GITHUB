@@ -1,12 +1,12 @@
 import React from "react";
 import Modal from "react-native-modal";
-import { View, Text, StyleSheet, FlatList } from "react-native";
-import { COLOR_1, COLOR_5 } from "../helpers/Variables";
+import {FlatList, StyleSheet, Text, View} from "react-native";
+import {COLOR_1, COLOR_5} from "../helpers/Variables";
 import ReviewItem from "./ReviewItem";
 import moment from "moment";
 
-function MoreReviewsModal({ onCancel, isVisible, toOrFrom, data }) {
-  const renderItem = ({ item }) => {
+function MoreReviewsModal({onCancel, isVisible, toOrFrom, data}) {
+  const renderItem = ({item}) => {
     const date = item.date.$date.$numberLomg;
     return (
       <ReviewItem

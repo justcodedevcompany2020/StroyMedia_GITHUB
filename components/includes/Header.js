@@ -1,55 +1,34 @@
-import React, { useEffect, useState } from "react";
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import {
-  COLOR_1,
-  COLOR_2,
-  COLOR_3,
-  COLOR_5,
-  COLOR_6,
-  COLOR_8,
-  COLOR_9,
-  WRAPPER_PADDINGS,
-} from "../helpers/Variables";
-import {
-  ImageBackArrow,
-  ImageHomeIcon,
-  ImageNotificationsIcon,
-  ImageOffersArrow,
-  ImageSave,
-} from "../helpers/images";
-import { useDispatch, useSelector } from "react-redux";
+import React, {useEffect, useState} from "react";
+import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from "react-native";
+import {COLOR_1, COLOR_2, COLOR_3, COLOR_5, COLOR_6, COLOR_8, COLOR_9, WRAPPER_PADDINGS,} from "../helpers/Variables";
+import {ImageBackArrow, ImageHomeIcon, ImageNotificationsIcon, ImageOffersArrow, ImageSave,} from "../helpers/images";
+import {useDispatch, useSelector} from "react-redux";
 import Modal from "react-native-modal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getAllNotificationsRequest } from "../../store/reducers/getAllNotificationsSlice";
-import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
-import { workRequestGetDataRequest } from "../../store/reducers/workRequestGetDataSlice";
-import { workRequestAcceptRequest } from "../../store/reducers/workRequestAcceptSlice";
-import { workRequestCancelRequest } from "../../store/reducers/workRequestCancelSlice";
+import {getAllNotificationsRequest} from "../../store/reducers/getAllNotificationsSlice";
+import {FontAwesome, FontAwesome5} from "@expo/vector-icons";
+import {workRequestGetDataRequest} from "../../store/reducers/workRequestGetDataSlice";
+import {workRequestAcceptRequest} from "../../store/reducers/workRequestAcceptSlice";
+import {workRequestCancelRequest} from "../../store/reducers/workRequestCancelSlice";
 import moment from "moment";
 
-function Header({ currentPage, home, navigation, onSavePress }) {
+function Header({currentPage, home, navigation, onSavePress}) {
   const state = useSelector((state) => state);
-  const { notification_data } = state.getAllNotificationsSlice;
+  const {notification_data} = state.getAllNotificationsSlice;
   const [token, setToken] = useState(null);
   const [visible, setVisible] = useState(false);
   const dispatch = useDispatch();
   const [modalRequest, setModalRequest] = useState(false);
-  const { work_request_data } = state.workRequestGetDataSlice;
+  // const {work_request_data} = state.workRequestGetDataSlice;
+  const [work_request_data, setWork_request_data] = useState([])
 
   const timeStamnp =
     +work_request_data?.request?.comments[0]?.date.$date.$numberLong;
-  console.log(timeStamnp);
+
   useEffect(() => {
     AsyncStorage.getItem("token").then((result) => {
       if (result) {
-        dispatch(getAllNotificationsRequest({ token: result }));
+        dispatch(getAllNotificationsRequest({token: result}));
         setToken(result);
       }
     });
@@ -71,7 +50,7 @@ function Header({ currentPage, home, navigation, onSavePress }) {
               onPress={navigation.goBack}
               style={styles.imageView}
             >
-              <ImageBackArrow style={styles.image} />
+              <ImageBackArrow style={styles.image}/>
             </TouchableOpacity>
             <Text style={styles.currentPage}>{currentPage}</Text>
           </>
@@ -84,20 +63,20 @@ function Header({ currentPage, home, navigation, onSavePress }) {
               onPress={() => navigation.navigate("Home")}
               style={styles.homeImageView}
             >
-              <ImageHomeIcon style={styles.homeImage} />
+              <ImageHomeIcon style={styles.homeImage}/>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={isVisible}
               style={styles.notificationImageView}
             >
-              <ImageNotificationsIcon style={styles.notificationImage} />
+              <ImageNotificationsIcon style={styles.notificationImage}/>
             </TouchableOpacity>
           </>
         ) : (
-          <TouchableOpacity style={styles.saveIconView} onPress={onSavePress}>
-            <ImageSave style={styles.saveIcon} />
-          </TouchableOpacity>
-        )}
+           <TouchableOpacity style={styles.saveIconView} onPress={onSavePress}>
+             <ImageSave style={styles.saveIcon}/>
+           </TouchableOpacity>
+         )}
       </View>
       <Modal
         style={styles.modal}
@@ -129,8 +108,10 @@ function Header({ currentPage, home, navigation, onSavePress }) {
                             last_id: item[0]?.object?.request.last_id,
                           })
                         ).then((res) => {
-                          console.log(item[0]?.type);
+
                           if (res.payload.message == "Successfully data got") {
+                            setWork_request_data(res.payload.data)
+
                             onCancel();
                             if (item[0]?.type == "request_service_comment") {
                               setModalRequest(true);
@@ -158,21 +139,21 @@ function Header({ currentPage, home, navigation, onSavePress }) {
                         </Text>
                       </View>
                       {item[0]?.read == 0 ? (
-                        <FontAwesome5 name="envelope" size={20} color="black" />
+                        <FontAwesome5 name="envelope" size={20} color="black"/>
                       ) : (
-                        <FontAwesome
-                          name="envelope-open-o"
-                          size={20}
-                          color="black"
-                        />
-                      )}
+                         <FontAwesome
+                           name="envelope-open-o"
+                           size={20}
+                           color="black"
+                         />
+                       )}
                     </TouchableOpacity>
                   </View>
                 );
               })
             ) : (
-              <Text style={styles.noDataText}>У Вас нет уведомлений</Text>
-            )}
+               <Text style={styles.noDataText}>У Вас нет уведомлений</Text>
+             )}
           </ScrollView>
         </View>
       </Modal>
@@ -195,14 +176,14 @@ function Header({ currentPage, home, navigation, onSavePress }) {
             height: "50%",
             backgroundColor: "white",
             shadowRadius: 10,
-            shadowOffset: { width: 0, height: 0 },
+            shadowOffset: {width: 0, height: 0},
             shadowColor: "black",
             elevation: 5,
             borderRadius: 20,
             // justifyContent: "center",
           }}
         >
-          <Text style={[styles.title, { marginTop: 20, marginBottom: 30 }]}>
+          <Text style={[styles.title, {marginTop: 20, marginBottom: 30}]}>
             Вам поступило предложение
           </Text>
           <View
@@ -217,13 +198,12 @@ function Header({ currentPage, home, navigation, onSavePress }) {
           >
             <View style={styles.row}>
               <View style={styles.img}>
-                {console.log(work_request_data.request?.img)}
                 <Image
                   source={{
                     uri:
                       typeof work_request_data.request?.img === "string"
-                        ? "https://teus.online" + work_request_data?.img
-                        : Array.isArray(work_request_data?.request?.img)
+                      ? "https://teus.online" + work_request_data?.img
+                      : Array.isArray(work_request_data?.request?.img)
                         ? "https://teus.online" +
                           work_request_data?.request.img[0]?.url
                         : null,
@@ -256,8 +236,8 @@ function Header({ currentPage, home, navigation, onSavePress }) {
               <View style={styles.leftBlock}>
                 <Text style={styles.type}>
                   {typeof work_request_data.request?.service?.title === "string"
-                    ? work_request_data?.request?.service?.title
-                    : work_request_data?.request?.service?.title?.ru}
+                   ? work_request_data?.request?.service?.title
+                   : work_request_data?.request?.service?.title?.ru}
                 </Text>
                 <Text style={styles.type2}>
                   Тип КТК: {work_request_data?.request?.type_container?.title}{" "}
@@ -278,7 +258,7 @@ function Header({ currentPage, home, navigation, onSavePress }) {
                     {work_request_data?.request?.from_city?.title?.ru ||
                       work_request_data?.request?.dislokaciya?.title.ru}
                   </Text>
-                  <ImageOffersArrow />
+                  <ImageOffersArrow/>
                   <Text style={styles.toCity}>
                     {work_request_data?.request?.to_city?.title?.ru}
                   </Text>
@@ -295,14 +275,14 @@ function Header({ currentPage, home, navigation, onSavePress }) {
                   <Text style={styles.quantity}>
                     Количество: {work_request_data?.request?.count}
                   </Text>
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <View style={{flexDirection: "row", alignItems: "center"}}>
                     <Text style={styles.priceText}>Цена:</Text>
                     <Text style={styles.price}>
                       {work_request_data?.request?.price
-                        ? work_request_data?.request.price +
-                          " " +
-                          work_request_data?.request?.currency?.sign
-                        : "по запросу"}
+                       ? work_request_data?.request.price +
+                         " " +
+                         work_request_data?.request?.currency?.sign
+                       : "по запросу"}
                     </Text>
                   </View>
                 </View>
@@ -345,11 +325,11 @@ function Header({ currentPage, home, navigation, onSavePress }) {
                             work_request_data?.request?.comments[0].last_id.toString(),
                         })
                       ).then((res) => {
-                        console.log(res.payload, "res.payload");
+                        console.log(res, 'res.payload')
                       });
                     }}
                   >
-                    <Text style={{ color: "white" }}>Принять</Text>
+                    <Text style={{color: "white"}}>Принять</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity
@@ -375,15 +355,15 @@ function Header({ currentPage, home, navigation, onSavePress }) {
                       });
                     }}
                   >
-                    <Text style={{ color: "white" }}>отказать</Text>
+                    <Text style={{color: "white"}}>отказать</Text>
                   </TouchableOpacity>
                 </>
               )}
             {work_request_data?.request?.comments[0]?.accept == 1 && (
-              <Text style={{ color: "#34A303" }}>ПРИНЯТО</Text>
+              <Text style={{color: "#34A303"}}>ПРИНЯТО</Text>
             )}
             {work_request_data?.request?.comments[0]?.disable == 1 && (
-              <Text style={{ color: "#fb6067" }}>ОТКАЗАНО</Text>
+              <Text style={{color: "#fb6067"}}>ОТКАЗАНО</Text>
             )}
           </View>
         </View>
@@ -480,6 +460,10 @@ const styles = StyleSheet.create({
     fontFamily: "GothamProRegular",
     fontSize: 12,
     marginTop: 5,
+    borderWidth: 1,
+    // flex: 1,
+    // flexWrap: "wrap"
+
   },
   noDataText: {
     textAlign: "center",
