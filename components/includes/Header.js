@@ -102,18 +102,19 @@ function Header({currentPage, home, navigation, onSavePress}) {
                       style={styles.notificationWrapper}
                       key={index}
                       onPress={() => {
+                        console.log(item[0]?.object?.request.last_id)
+                        let form_data = new FormData();
+                        form_data.append("secret_token", token);
+                        form_data.append("last_id", item[0]?.object?.request.last_id);
                         dispatch(
-                          workRequestGetDataRequest({
-                            secret_token: token,
-                            last_id: item[0]?.object?.request.last_id,
-                          })
+                          workRequestGetDataRequest(form_data)
                         ).then((res) => {
 
-                          if (res.payload.message == "Successfully data got") {
+                          if (res.payload.message === "Successfully data got") {
                             setWork_request_data(res.payload.data)
 
                             onCancel();
-                            if (item[0]?.type == "request_service_comment") {
+                            if (item[0]?.type === "request_service_comment") {
                               setModalRequest(true);
                             }
                           }
@@ -201,7 +202,7 @@ function Header({currentPage, home, navigation, onSavePress}) {
                 <Image
                   source={{
                     uri:
-                      typeof work_request_data.request?.img === "string"
+                      typeof work_request_data?.request?.img === "string"
                       ? "https://teus.online" + work_request_data?.img
                       : Array.isArray(work_request_data?.request?.img)
                         ? "https://teus.online" +
@@ -235,7 +236,7 @@ function Header({currentPage, home, navigation, onSavePress}) {
             <View style={styles.row}>
               <View style={styles.leftBlock}>
                 <Text style={styles.type}>
-                  {typeof work_request_data.request?.service?.title === "string"
+                  {typeof work_request_data?.request?.service?.title === "string"
                    ? work_request_data?.request?.service?.title
                    : work_request_data?.request?.service?.title?.ru}
                 </Text>
@@ -303,8 +304,8 @@ function Header({currentPage, home, navigation, onSavePress}) {
               paddingTop: 20,
             }}
           >
-            {work_request_data?.request?.comments[0]?.accept == 0 &&
-              work_request_data?.request?.comments[0]?.disable == 0 && (
+            {!work_request_data?.request?.comments[0]?.accept &&
+              !work_request_data?.request?.comments[0]?.disable && (
                 <>
                   <TouchableOpacity
                     style={{
@@ -326,6 +327,11 @@ function Header({currentPage, home, navigation, onSavePress}) {
                         })
                       ).then((res) => {
                         console.log(res, 'res.payload')
+                        if (res.payload.success) {
+                          setModalRequest(false)
+                          navigation.navigate("DialogChat", {})
+
+                        }
                       });
                     }}
                   >
@@ -352,6 +358,9 @@ function Header({currentPage, home, navigation, onSavePress}) {
                         })
                       ).then((res) => {
                         console.log(res, "res.payload");
+                        if (res.payload.success) {
+                          setModalRequest(false)
+                        }
                       });
                     }}
                   >
@@ -460,7 +469,7 @@ const styles = StyleSheet.create({
     fontFamily: "GothamProRegular",
     fontSize: 12,
     marginTop: 5,
-    borderWidth: 1,
+
     // flex: 1,
     // flexWrap: "wrap"
 

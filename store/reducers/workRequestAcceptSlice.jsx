@@ -1,8 +1,8 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 
 export const workRequestAcceptRequest = createAsyncThunk(
   "work-request-accept",
-  async ({ secret_token, last_id, comment_id }) => {
+  async ({secret_token, last_id, comment_id}) => {
     try {
       var formdata = new FormData();
       formdata.append("comment_id", comment_id);
@@ -19,6 +19,7 @@ export const workRequestAcceptRequest = createAsyncThunk(
         requestOptions
       );
       const data = await result.json();
+      console.log(data)
       return data;
     } catch (error) {
       console.log(error);
